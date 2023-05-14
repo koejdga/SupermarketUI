@@ -1,0 +1,30 @@
+.add-product-form {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding-bottom: 10px;
+    gap: 15px;
+  }
+  
+  .add-product-form h3 {
+    font-size: 24px;
+    margin: 0;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #eee;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .add-product-form .autocomplete-field {
+    margin-top: 5px;
+    width: 100%;
+  }
+  
+  .add-product-form .form-group .text-field {
+    width: 100%;
+  }
