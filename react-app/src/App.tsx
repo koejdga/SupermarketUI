@@ -3,17 +3,17 @@ import TableObject from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
 import { useState, ChangeEvent } from "react";
-import { SelectBox } from "./components";
-import type { SelectOption } from "./components";
-import TextField from "./components/TextField";
+// import TextField from "./components/TextField";
 import DateInput from "./components/DateInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { Checkbox, FormControlLabel, SelectChangeEvent } from "@mui/material";
 import PrintReportButton from "./components/PrintReportButton";
 import AddProductForm from "./components/AddProductForm";
 import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
+import SelectVariants from "./components/SelectVariants";
+import TextField from "@mui/material/TextField";
 
 function App() {
   //#region Constants
@@ -94,13 +94,11 @@ function App() {
   //#endregion
 
   //#region HandleOnChange functions
-  const handleOnChangeIsPromotional = (
-    event: ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleOnChangeIsPromotional = (event: SelectChangeEvent) => {
     setIsPromotional(event.target.value);
   };
 
-  const handleOnChangeIsCategory = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleOnChangeIsCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value);
   };
 
@@ -271,35 +269,32 @@ function App() {
       style={{
         display: "flex",
         alignItems: "center",
-        marginBottom: "15px",
-        paddingBottom: "10px",
-        borderBottom: "1px solid grey",
-        height: "70px",
+        marginBottom: "10px",
+        height: "80px",
+        gap: "30px",
       }}
     >
-      <div style={{ marginRight: "50px" }}>
-        <SelectBox
-          options={["Вибрати.."].concat(categories)}
-          value={category}
-          onChange={handleOnChangeIsCategory}
-          label="Search by category:"
-        />
-      </div>
-      <div style={{ marginRight: "50px" }}>
-        <TextField
-          label="Search by name:"
-          value={tovarName}
-          onChange={handleOnChangeName}
-        ></TextField>
-      </div>
-      <div style={{ marginRight: "50px" }}>
-        <SelectBox
-          options={["Вибрати.."].concat(isPromotionalOptions)}
-          value={isPromotional}
-          onChange={handleOnChangeIsPromotional}
-          label="Чи акційний товар:"
-        />
-      </div>
+      <SelectVariants
+        label="Категорія:"
+        options={categories}
+        onChange={handleOnChangeIsCategory}
+        width={150}
+      />
+      <SelectVariants
+        label="Чи акційний товар:"
+        options={isPromotionalOptions}
+        onChange={handleOnChangeIsPromotional}
+        width={200}
+      />
+      <TextField
+        className="text-field"
+        label="Пошук за іменем"
+        onChange={handleOnChangeName}
+        variant="outlined"
+        value={tovarName}
+        sx={{ m: 1, width: 150 }}
+      />
+
       <button
         type="button"
         className={"btn btn-primary"}
@@ -308,11 +303,11 @@ function App() {
             "Searching " + category + " category and name " + tovarName
           )
         }
-        style={{ marginRight: "50px" }}
+        // style={{ marginRight: "50px" }}
       >
         Search
       </button>
-      <div style={{ marginLeft: "200px" }}>
+      <div style={{ marginLeft: "100px" }}>
         <PrintReportButton />
       </div>
     </div>
