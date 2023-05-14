@@ -13,6 +13,7 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import PrintReportButton from "./components/PrintReportButton";
 import AddProductForm from "./components/AddProductForm";
 import type { Option } from "./components/AutocompleteTextField";
+import AlertComponent from "./components/AlertComponent";
 
 function App() {
   //#region Constants
