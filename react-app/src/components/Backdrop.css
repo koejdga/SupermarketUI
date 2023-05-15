@@ -1,0 +1,27 @@
+.backdrop {
+    color: #363636;
+    z-index: calc(var(--drawer-z-index) + 1);
+  }
+  
+  .backdrop-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    padding: 20px;
+    width: 400px;
+    border-radius: 10px;
+  }
+
+  h3 {
+    margin-bottom: 15px;
+  }
+  
+  .text-field {
+    margin-bottom: 15px;
+  }
+  
+  button {
+    margin-top: 10px;
+  }

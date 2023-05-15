@@ -195,7 +195,7 @@ function App() {
     "Zip code",
   ];
 
-  let workersRows = [
+  const [workersRows, setWorkerRows] = useState([
     new TableRow(1, [
       "1",
       "Jack",
@@ -238,7 +238,7 @@ function App() {
       "Main str",
       "86752",
     ]),
-  ];
+  ]);
 
   let categoriesColumnNames = ["Категорії"];
   let categoriesRows: TableRow[] = [];
@@ -288,11 +288,11 @@ function App() {
       />
       <TextField
         className="text-field"
-        label="Пошук за іменем"
+        label="Пошук за назвою"
         onChange={handleOnChangeName}
         variant="outlined"
         value={tovarName}
-        sx={{ m: 1, width: 150 }}
+        sx={{ m: 1, width: 180 }}
       />
 
       <button

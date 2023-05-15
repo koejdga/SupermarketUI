@@ -1,5 +1,5 @@
 class TableRow {
-  private id ;
+  public id ;
   public values: string[];
 
   constructor(id = -1, values: string[]){
