@@ -136,19 +136,52 @@ function TableObject({ columnNames, rows: initialRows }: Props) {
         }
       </Table>
       <Backdrop className="backdrop" open={backdropOpen}>
-        <div className="backdrop-content">
+        <div>
           <h3>Редагування</h3>
-          {columnNames.map((columnName, index) => (
-            <TextField
-              className="text-field"
-              label={columnName}
-              onChange={(event) => handleChanges(index, event.target.value)}
-              variant="outlined"
-              value={editedRow?.values[index] || ""}
-              inputProps={{ defaultValue: editedRow?.values[index] }}
-              fullWidth
-            />
-          ))}
+          {/* <div className="backdrop-content"> */}
+          <div
+            id="carouselExampleControls"
+            className="carousel slide"
+            data-bs-ride="carousel"
+          >
+            <div className="carousel-inner">
+              <div className="carousel-item active">
+                <Button onClick={applyChangesToTheRow}>Готово12</Button>
+              </div>
+              <div className="carousel-item">
+                <Button onClick={applyChangesToTheRow}>Готово21</Button>
+              </div>
+              <div className="carousel-item">
+                <Button onClick={applyChangesToTheRow}>Готово444</Button>
+              </div>
+            </div>
+            <button
+              className="carousel-control-prev"
+              type="button"
+              data-bs-target="#carouselExampleControls"
+              data-bs-slide="prev"
+            >
+              <span
+                className="carousel-control-prev-icon"
+                aria-hidden="false"
+              ></span>
+              <span className="visually-hidden">Previous</span>
+            </button>
+            <button
+              className="carousel-control-next"
+              type="button"
+              data-bs-target="#carouselExampleControls"
+              data-bs-slide="next"
+            >
+              <span
+                className="carousel-control-next-icon"
+                aria-hidden="false"
+              ></span>
+              <span className="visually-hidden">Next</span>
+            </button>
+          </div>
+          {/* </div> */}
+
           <Button onClick={applyChangesToTheRow}>Готово</Button>
         </div>
       </Backdrop>
@@ -157,3 +190,20 @@ function TableObject({ columnNames, rows: initialRows }: Props) {
 }
 
 export default TableObject;
+
+{
+  /* {columnNames.map((columnName, index) => (
+              <TextField
+                className="text-field"
+                label={columnName}
+                onChange={(event) => handleChanges(index, event.target.value)}
+                variant="outlined"
+                value={editedRow?.values[index] || ""}
+                inputProps={{ defaultValue: editedRow?.values[index] }}
+                fullWidth
+              />
+            ))} */
+}
+{
+  /* </div> */
+}

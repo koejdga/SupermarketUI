@@ -14,6 +14,7 @@ import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
 import SelectVariants from "./components/SelectVariants";
 import TextField from "@mui/material/TextField";
+import LoginForm from "./components/LoginForm";
 
 function App() {
   //#region Constants
@@ -518,7 +519,7 @@ function App() {
                     <TableObject
                       columnNames={checkColumnNames}
                       rows={checkRows}
-                    ></TableObject>
+                    />
                   </div>
                 </div>
               </div>
