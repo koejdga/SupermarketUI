@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 interface Props {
   buttonNames: string[];
   onClickFunctions: (() => void)[];
@@ -5,10 +7,6 @@ interface Props {
 
 const ButtonGroup = ({ buttonNames, onClickFunctions }: Props) => {
   if (buttonNames.length !== onClickFunctions.length) return <div>Error</div>;
-  let nums = [];
-  for (let i = 0; i < buttonNames.length; i++) {
-    nums[i] = i;
-  }
 
   return (
     <>
@@ -17,25 +15,23 @@ const ButtonGroup = ({ buttonNames, onClickFunctions }: Props) => {
         role="group"
         aria-label="Basic radio toggle button group"
       >
-        {nums.map((num) => (
-          <>
+        {buttonNames.map((buttonName, index) => (
+          <Fragment key={index}>
             <input
               type="radio"
               className="btn-check"
               name="btnradio"
-              id={"btnradios" + num}
-              key={"btnradios" + num}
+              id={index.toString()}
               autoComplete="off"
-              onClick={onClickFunctions[num]}
+              onClick={onClickFunctions[index]}
             ></input>
             <label
               className="btn btn-outline-primary"
-              htmlFor={"btnradios" + num}
-              key={"btnradioss" + num}
+              htmlFor={index.toString()}
             >
-              {buttonNames[num]}
+              {buttonName}
             </label>
-          </>
+          </Fragment>
         ))}
       </div>
     </>

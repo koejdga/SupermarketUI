@@ -2,7 +2,7 @@ import ButtonGroup from "./components/ButtonGroup";
 import TableObject from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 // import TextField from "./components/TextField";
 import DateInput from "./components/DateInput";
 import TovarCard from "./components/TovarCard";
@@ -15,8 +15,63 @@ import AlertComponent from "./components/AlertComponent";
 import SelectVariants from "./components/SelectVariants";
 import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
+import axios from "axios";
 
 function App() {
+  //#region Axios things
+
+  const [testData, setTestData] = useState<TableRow[]>([]);
+  const getTestData = () => {
+    const url = "https://reqres.in/api/users?page=2";
+    axios
+      .get(url)
+      .then((responce) => {
+        console.log("get data function");
+        const data = responce.data.data.map((row: any) => {
+          const { id, email, first_name } = row;
+          const values = [id, email, first_name];
+          return new TableRow(id, values);
+        });
+        setTestData(data);
+        console.log(responce);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const updateSmthInTestData = () => {
+    const url = "https://reqres.in/api/users/7";
+    axios
+      .put(url, {
+        email: "morpheus",
+        first_name: "Sonya",
+      })
+      .then((responce) => {
+        console.log("update data function");
+        console.log(responce);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const createNewRowInTestData = () => {
+    const url = "https://reqres.in/api/users";
+    axios
+      .post(url, {
+        email: "sonya",
+        first_name: "ejfvejfvj",
+      })
+      .then((responce) => {
+        console.log("Created new row in test data");
+        console.log(responce);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  // useEffect(() => {
+  //   getTestData();
+  // }, []);
+
+  //#endregion
+
   //#region Constants
   const isPromotionalOptions = ["Всі", "Акційні", "Не акційні"];
 
