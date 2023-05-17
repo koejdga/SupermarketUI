@@ -19,22 +19,22 @@ function Profile(props: Props) {
     <div className="profile">
       <h2>{`${props.surname} ${props.name} ${props.patronymic}`}</h2>
       <p>
-        <strong>Employee Role:</strong> {props.employeeRole}
+        <strong>Посада:</strong> {props.employeeRole}
       </p>
       <p>
-        <strong>Salary:</strong> {props.salary}
+        <strong>Зарплата:</strong> {props.salary}
       </p>
       <p>
-        <strong>Date of Birth:</strong> {props.dateOfBirth}
+        <strong>Дата народження:</strong> {props.dateOfBirth}
       </p>
       <p>
-        <strong>Date of Work Start:</strong> {props.dateOfWorkStart}
+        <strong>Дата початку роботи:</strong> {props.dateOfWorkStart}
       </p>
       <p>
-        <strong>Phone Number:</strong> {props.phoneNumber}
+        <strong>Номер телефону:</strong> {props.phoneNumber}
       </p>
       <p>
-        <strong>Address:</strong>{" "}
+        <strong>Адреса:</strong>{" "}
         {`${props.city}, ${props.street}, ${props.zipCode}`}
       </p>
     </div>

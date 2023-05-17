@@ -3,7 +3,6 @@ import TableObject from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
 import { useState, ChangeEvent, useEffect } from "react";
-// import TextField from "./components/TextField";
 import DateInput from "./components/DateInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
@@ -379,7 +378,7 @@ function App() {
         {whatTableIsVisible === Table.Clients && (
           <>
             <TextField
-              label="Search by surname:"
+              label="Прізвище"
               value={tovarName}
               onChange={handleOnChangeName}
             ></TextField>
@@ -403,7 +402,7 @@ function App() {
                 <AutocompleteTextField
                   options={UPCs}
                   onChange={handleOnChangeUPC}
-                  label="Search by UPC"
+                  label="UPC"
                 />
               </div>
 
@@ -592,7 +591,7 @@ function App() {
               <AutocompleteTextField
                 options={UPCs}
                 onChange={handleOnChangeUPC}
-                label="Search by UPC"
+                label="UPC"
               />
             </div>
 
@@ -754,7 +753,7 @@ function App() {
               <AutocompleteTextField
                 options={UPCs}
                 onChange={handleOnChangeSurname}
-                label="Search by surname"
+                label="Прізвище"
               />
             </div>
 
@@ -780,7 +779,7 @@ function App() {
                   >
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
-                      label="Only cashiers"
+                      label="Лише касир/ки"
                       onChange={handleOnChangeOnlyCashiers}
                     />
                     <div>

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Table from "react-bootstrap/Table";
 import TableRow from "../classes/TableRow";
-import "./Backdrop.css";
 import EditWindow from "./EditWindow";
 
 interface Props {

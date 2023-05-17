@@ -3,7 +3,6 @@ import Autocomplete, {
   AutocompleteRenderInputParams,
 } from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { JSX } from "react/jsx-runtime";
 
 export type Option = {
   value: string;
