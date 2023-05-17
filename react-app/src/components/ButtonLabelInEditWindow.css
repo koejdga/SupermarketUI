@@ -1,0 +1,9 @@
+.button-label:hover,
+.x-icon:hover {
+  color: #8de;
+}
+
+.button-label:active,
+.x-icon:active {
+  color: #6bc;
+}
