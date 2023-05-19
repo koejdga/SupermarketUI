@@ -15,6 +15,7 @@ import SelectVariants from "./components/SelectVariants";
 import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
 import axios from "axios";
+import EditOrCreateWindow from "./components/EditOrCreateWindow";
 
 function App() {
   //#region Axios things
@@ -146,6 +147,20 @@ function App() {
   const [checkRows, setCheckRows] = useState<TableRow[]>([]);
 
   const [amountOfProductInCheck, setAmountOfProductInCheck] = useState(0);
+
+  const [checksDateRangeCashier, setChecksDateRangeCashier] = useState<
+    [Date | null, Date | null]
+  >([null, null]);
+
+  const [tovarDateRange, setTovarDateRange] = useState<
+    [Date | null, Date | null]
+  >([null, null]);
+
+  const [checksDateRangeManager, setChecksDateRangeManager] = useState<
+    [Date | null, Date | null]
+  >([null, null]);
+
+  const [showAddCategory, setShowAddCategory] = useState(false);
   //#endregion
 
   //#region HandleOnChange functions
@@ -153,7 +168,7 @@ function App() {
     setIsPromotional(event.target.value);
   };
 
-  const handleOnChangeIsCategory = (event: SelectChangeEvent) => {
+  const handleOnChangeCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value);
   };
 
@@ -176,26 +191,25 @@ function App() {
     setOnlyCashiers(!onlyCashiers);
   };
 
-  const handleOnChangeCategory = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setCategory(event.target.value);
-  };
-
   const handleOnChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTovarName(event.target.value);
   };
 
-  const handleOnChangeAmountOfProductInCheck = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    // TODO: додати перевірку, чи можна перевести передане значення в число
-    setAmountOfProductInCheck(Number(event.target.value));
-  };
   //#endregion
 
-  //#region Constants that will be from the database but now are hard coded
-  const categories = ["Напівфабрикати", "Крупи", "Напої"];
+  //#region Variables that will be from the database but now are hard coded
+
+  let categoriesColumnNames = ["Категорії"];
+  let categoriesRows = [
+    new TableRow(1, ["Напівфабрикати"]),
+    new TableRow(1, ["Крупи"]),
+    new TableRow(1, ["Напої"]),
+  ];
+
+  let categories = [];
+  for (let i = 0; i < categoriesRows.length; i++) {
+    categories.push(categoriesRows[i].values[0]);
+  }
 
   const upcFromDb = [123, 1230, 3423, 5343];
   const UPCs: Option[] = [];
@@ -295,12 +309,6 @@ function App() {
     ]),
   ]);
 
-  let categoriesColumnNames = ["Категорії"];
-  let categoriesRows: TableRow[] = [];
-
-  for (let i = 0; i < categories.length; i++) {
-    categoriesRows.push(new TableRow(i, [categories[i]]));
-  }
   //#endregion
 
   //#region Functions
@@ -316,7 +324,13 @@ function App() {
     console.log("Check is saved");
     setShowAddCheckForm(false);
   };
+
   //#endregion
+
+  const [newWorker, setNewWorker] = useState<TableRow>();
+  const addNewWorker = (newWorker: TableRow) => {
+    setNewWorker(newWorker);
+  };
 
   //#region Parts of return that should be separate components maybe (maybe not)
   const searchFields = (
@@ -330,13 +344,13 @@ function App() {
       }}
     >
       <SelectVariants
-        label="Категорія:"
+        label="Категорія"
         options={categories}
-        onChange={handleOnChangeIsCategory}
+        onChange={handleOnChangeCategory}
         width={150}
       />
       <SelectVariants
-        label="Чи акційний товар:"
+        label="Чи акційний товар"
         options={isPromotionalOptions}
         onChange={handleOnChangeIsPromotional}
         width={200}
@@ -444,7 +458,10 @@ function App() {
         )}
         {whatTableIsVisible === Table.Checks && (
           <>
-            <DateInput />
+            <DateInput
+              dateRange={checksDateRangeCashier}
+              setDateRange={setChecksDateRangeCashier}
+            />
             <TableObject columnNames={checksColumnNames} rows={checksRows} />
           </>
         )}
@@ -484,13 +501,22 @@ function App() {
   return (
     // Manager Page
     <div>
-      <div style={{ backgroundColor: "#ffee99" }}>
+      <div
+        style={{
+          backgroundColor: "#ffee99",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: 999,
+          width: "100%",
+        }}
+      >
         <ButtonGroup
           buttonNames={buttonNamesManager}
           onClickFunctions={onClickFunctionsManager}
         />
       </div>
-      <div style={{ marginLeft: "15px", marginTop: "15px" }}>
+      <div style={{ marginLeft: "15px", marginTop: "55px", width: "100%" }}>
         {whatTableIsVisible === Table.Main && (
           <div>
             {!showAddCheckForm && (
@@ -638,7 +664,10 @@ function App() {
                         Кількість проданих одиниць товару: {soldProductsAmount}
                       </label>
 
-                      <DateInput />
+                      <DateInput
+                        dateRange={tovarDateRange}
+                        setDateRange={setTovarDateRange}
+                      />
                     </div>
                   </div>
                 )}
@@ -670,11 +699,25 @@ function App() {
             <div
               style={{
                 position: "relative",
-                left: "50%",
+                left: "42%",
                 height: "50px",
               }}
             >
+              <button
+                style={{ marginRight: "15px" }}
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowAddCategory(true)}
+              >
+                Додати категорію
+              </button>
               <PrintReportButton />
+              {/* {showAddCategory && (
+                <EditOrCreateWindow
+                  columnNames={categoriesColumnNames}
+                  onSave={handleAddCategory}
+                />
+              )} */}
             </div>
           </div>
         )}
@@ -710,7 +753,10 @@ function App() {
               }}
             >
               <div style={{ width: "250px" }}>
-                <DateInput />
+                <DateInput
+                  dateRange={checksDateRangeManager}
+                  setDateRange={setChecksDateRangeManager}
+                />
               </div>
 
               <div style={{ width: "15%" }}>

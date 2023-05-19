@@ -5,19 +5,26 @@ import "./ButtonLabelInEditWindow.css";
 
 interface Props {
   columnNames: string[];
-  selectedRow: TableRow;
+  selectedRow?: TableRow;
   onSave: (tableRow: TableRow) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
-const EditWindow = ({ columnNames, selectedRow, onSave, onCancel }: Props) => {
+const EditOrCreateWindow = ({
+  columnNames,
+  selectedRow,
+  onSave,
+  onCancel,
+}: Props) => {
   var buttonStyle = {
     color: "#fff",
     backgroundColor: "transparent",
     border: "none",
     padding: "5px",
   };
-  const [editedRow, setEditedRow] = useState(selectedRow);
+  const [editedRow, setEditedRow] = useState(
+    selectedRow || new TableRow(-1, Array(columnNames.length).fill(""))
+  );
 
   const handleChanges = (columnIndex: number, value: string) => {
     if (editedRow) {
@@ -99,4 +106,4 @@ const EditWindow = ({ columnNames, selectedRow, onSave, onCancel }: Props) => {
   );
 };
 
-export default EditWindow;
+export default EditOrCreateWindow;

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import Table from "react-bootstrap/Table";
 import TableRow from "../classes/TableRow";
-import EditWindow from "./EditWindow";
+import EditOrCreateWindow from "./EditOrCreateWindow";
 
 interface Props {
   columnNames: string[];
   rows: TableRow[];
+  withButtons?: boolean;
 }
 
 interface RowActionsProps {
@@ -67,11 +68,14 @@ function RowActions({ rowIndex, onDelete, onSelect }: RowActionsProps) {
   );
 }
 
-function TableObject({ columnNames, rows: initialRows }: Props) {
+function TableObject({
+  columnNames,
+  rows: initialRows,
+  withButtons = true,
+}: Props) {
   const [rows, setRows] = useState(initialRows);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
   const [selectedRow, setSelectedRow] = useState<TableRow>();
-  const [open, setOpen] = useState(false);
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -112,7 +116,7 @@ function TableObject({ columnNames, rows: initialRows }: Props) {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th></th>
+            {withButtons && <th></th>}
             {columnNames.map((columnName) => (
               <th key={columnName}>{columnName}</th>
             ))}
@@ -122,11 +126,14 @@ function TableObject({ columnNames, rows: initialRows }: Props) {
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr key={rowIndex}>
-                <RowActions
-                  rowIndex={rowIndex}
-                  onDelete={handleDeleteRow}
-                  onSelect={handleSelectRow}
-                />
+                {withButtons && (
+                  <RowActions
+                    rowIndex={rowIndex}
+                    onDelete={handleDeleteRow}
+                    onSelect={handleSelectRow}
+                  />
+                )}
+
                 {row.values.map((rowData, index) => (
                   <td key={`${rowIndex}-${index}`}>{rowData}</td>
                 ))}
@@ -136,7 +143,7 @@ function TableObject({ columnNames, rows: initialRows }: Props) {
         }
       </Table>
       {selectedRow && (
-        <EditWindow
+        <EditOrCreateWindow
           columnNames={columnNames}
           selectedRow={selectedRow}
           onSave={handleSaveChanges}
