@@ -16,59 +16,95 @@ import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
 import axios from "axios";
 import EditOrCreateWindow from "./components/EditOrCreateWindow";
+import { Upc } from "react-bootstrap-icons";
 
 function App() {
   //#region Axios things
-
   const [testData, setTestData] = useState<TableRow[]>([]);
   const getTestData = () => {
-    const url = "https://reqres.in/api/users?page=2";
-    axios
-      .get(url)
-      .then((responce) => {
-        console.log("get data function");
-        const data = responce.data.data.map((row: any) => {
-          const { id, email, first_name } = row;
-          const values = [id, email, first_name];
-          return new TableRow(id, values);
+    const url = "http://26.133.25.6:8080/api/categories";
+
+    return new Promise<TableRow[]>((resolve, reject) => {
+      axios
+        .get(url)
+        .then((response) => {
+          console.log("get data function");
+          const data = response.data.map((row: any) => {
+            const { category_number, category_name } = row;
+            const values = [category_number, category_name];
+            return new TableRow(category_number, values);
+          });
+          setTestData(data);
+          resolve(data);
+        })
+        .catch((error) => {
+          console.log(error);
+          reject(error);
         });
-        setTestData(data);
-        console.log(responce);
-      })
-      .catch((error) => console.log(error));
+    });
   };
 
-  const updateSmthInTestData = () => {
-    const url = "https://reqres.in/api/users/7";
-    axios
-      .put(url, {
-        email: "morpheus",
-        first_name: "Sonya",
-      })
-      .then((responce) => {
-        console.log("update data function");
-        console.log(responce);
-      })
-      .catch((error) => console.log(error));
+  const updateSmthInTestData = (id: string, name: string) => {
+    return new Promise<void>((resolve, reject) => {
+      const url = "http://26.133.25.6:8080/api/categories/" + id;
+      axios
+        .put(url, {
+          category_name: name,
+        })
+        .then((responce) => {
+          console.log("update data function");
+          console.log(responce);
+          resolve();
+        })
+        .catch((error) => {
+          console.log(error);
+          reject("Update failed");
+        });
+    });
   };
+
+  // const createNewRowInTestData = () => {
+  //   const url = "http://26.133.25.6:8080/api/categories";
+  //   axios
+  //     .post(url, {
+  //       category_name: "davyd",
+  //     })
+  //     .then((responce) => {
+  //       console.log("Created new row in test data");
+  //       console.log(responce);
+  //       getTestData()
+  //         .then((result: TableRow[]) => {
+  //           console.log(result);
+  //           setTestData(result);
+  //           console.log("test data");
+  //           console.log(result);
+  //         })
+  //         .catch((error) => {
+  //           console.log(error);
+  //         });
+  //     })
+  //     .catch((error) => console.log(error));
+  // };
 
   const createNewRowInTestData = () => {
-    const url = "https://reqres.in/api/users";
+    const url = "http://26.133.25.6:8080/api/categories";
     axios
       .post(url, {
-        email: "sonya",
-        first_name: "ejfvejfvj",
+        category_name: "gggggg",
       })
-      .then((responce) => {
+      .then((response) => {
         console.log("Created new row in test data");
-        console.log(responce);
+        console.log(response);
+        return getTestData(); // Return the promise from getTestData
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  // useEffect(() => {
-  //   getTestData();
-  // }, []);
+  useEffect(() => {
+    getTestData();
+  }, []);
 
   //#endregion
 
@@ -200,11 +236,11 @@ function App() {
   //#region Variables that will be from the database but now are hard coded
 
   let categoriesColumnNames = ["Категорії"];
-  let categoriesRows = [
+  const [categoriesRows, setCategoriesRows] = useState([
     new TableRow(1, ["Напівфабрикати"]),
     new TableRow(1, ["Крупи"]),
     new TableRow(1, ["Напої"]),
-  ];
+  ]);
 
   let categories = [];
   for (let i = 0; i < categoriesRows.length; i++) {
@@ -323,6 +359,14 @@ function App() {
   const saveCheck = () => {
     console.log("Check is saved");
     setShowAddCheckForm(false);
+  };
+
+  const handleAddCategory = (newCategory: TableRow) => {
+    if (categoriesRows.length === 0) {
+      setCategoriesRows([newCategory]);
+    } else {
+      setCategoriesRows([...categoriesRows, newCategory]);
+    }
   };
 
   //#endregion
@@ -604,6 +648,15 @@ function App() {
                 </div>
               </div>
             )}
+            <TableObject
+              rows={testData}
+              columnNames={["id", "категорія"]}
+              getDataFromDB={getTestData}
+              updateDataFromDB={updateSmthInTestData}
+            />
+            <button onClick={createNewRowInTestData}>
+              Додати тестову категорію
+            </button>
           </div>
         )}
         {whatTableIsVisible === Table.Tovary && (
@@ -708,16 +761,17 @@ function App() {
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowAddCategory(true)}
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling"
+                aria-controls="offcanvasScrolling"
               >
                 Додати категорію
               </button>
               <PrintReportButton />
-              {/* {showAddCategory && (
-                <EditOrCreateWindow
-                  columnNames={categoriesColumnNames}
-                  onSave={handleAddCategory}
-                />
-              )} */}
+              <EditOrCreateWindow
+                columnNames={categoriesColumnNames}
+                onSave={handleAddCategory}
+              />
             </div>
           </div>
         )}

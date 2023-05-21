@@ -2,11 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import Table from "react-bootstrap/Table";
 import TableRow from "../classes/TableRow";
 import EditOrCreateWindow from "./EditOrCreateWindow";
+import { Resizable, ResizableBox } from "react-resizable";
 
 interface Props {
   columnNames: string[];
   rows: TableRow[];
   withButtons?: boolean;
+  getDataFromDB?: () => Promise<TableRow[]>;
+  updateDataFromDB?: (id: string, name: string) => Promise<void>;
 }
 
 interface RowActionsProps {
@@ -72,10 +75,17 @@ function TableObject({
   columnNames,
   rows: initialRows,
   withButtons = true,
+  getDataFromDB,
+  updateDataFromDB,
 }: Props) {
   const [rows, setRows] = useState(initialRows);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
   const [selectedRow, setSelectedRow] = useState<TableRow>();
+
+  useEffect(() => {
+    console.log("rows з компонента таблиці");
+    console.log(rows);
+  }, [rows]);
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -88,14 +98,24 @@ function TableObject({
     updatedRows[selectedRowIndex] = updatedRow;
     console.log("UpdatedRows = ", updatedRows);
 
-    setRows(updatedRows);
+    if (updateDataFromDB && getDataFromDB) {
+      updateDataFromDB(updatedRow.values[0], updatedRow.values[1]).then(() => {
+        getDataFromDB()
+          .then((result: TableRow[]) => {
+            console.log(result);
+            setRows(result);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+    } else {
+      setRows(updatedRows);
+    }
+
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
   };
-
-  useEffect(() => {
-    console.log("Rows:", rows);
-  }, [rows]);
 
   const handleCancelEditing = () => {
     setSelectedRow(undefined);
@@ -143,12 +163,14 @@ function TableObject({
         }
       </Table>
       {selectedRow && (
+        // <Resizable>
         <EditOrCreateWindow
           columnNames={columnNames}
           selectedRow={selectedRow}
           onSave={handleSaveChanges}
           onCancel={handleCancelEditing}
         />
+        // </Resizable>
       )}
     </div>
   );

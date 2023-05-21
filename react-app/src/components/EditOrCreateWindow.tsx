@@ -22,9 +22,9 @@ const EditOrCreateWindow = ({
     border: "none",
     padding: "5px",
   };
-  const [editedRow, setEditedRow] = useState(
-    selectedRow || new TableRow(-1, Array(columnNames.length).fill(""))
-  );
+
+  const row: TableRow = new TableRow(-1, Array(columnNames.length).fill(""));
+  const [editedRow, setEditedRow] = useState(selectedRow || row);
 
   const handleChanges = (columnIndex: number, value: string) => {
     if (editedRow) {
