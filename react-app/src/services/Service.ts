@@ -14,7 +14,8 @@ abstract class Service<T> {
   
     abstract deleteRow(id: number): Promise<void>;
   
-    abstract createRow(data: T): Promise<void>;
+    // abstract createRow(data: T): Promise<void>;
+    abstract createRow(): Promise<void>;
   }
   
   export default Service;

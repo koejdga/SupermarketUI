@@ -1,12 +1,25 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 interface Props {
   buttonNames: string[];
   onClickFunctions: (() => void)[];
+  defaultValue?: number;
 }
 
-const ButtonGroup = ({ buttonNames, onClickFunctions }: Props) => {
+const ButtonGroup = ({
+  buttonNames,
+  onClickFunctions,
+  defaultValue,
+}: Props) => {
+  const [selectedButton, setSelectedButton] = useState<number | null>(null);
   if (buttonNames.length !== onClickFunctions.length) return <div>Error</div>;
+
+  useEffect(() => {
+    if (defaultValue !== undefined && defaultValue !== selectedButton) {
+      setSelectedButton(defaultValue);
+      onClickFunctions[defaultValue]();
+    }
+  }, [defaultValue, selectedButton, onClickFunctions]);
 
   return (
     <>
@@ -24,6 +37,8 @@ const ButtonGroup = ({ buttonNames, onClickFunctions }: Props) => {
               id={index.toString()}
               autoComplete="off"
               onClick={onClickFunctions[index]}
+              checked={index === selectedButton}
+              onChange={() => {}}
             ></input>
             <label
               className="btn btn-outline-primary"

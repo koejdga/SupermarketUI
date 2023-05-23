@@ -46,15 +46,17 @@ class CategoriesService extends Service<Category> {
           }
     }
   
-    async createRow(data: Category): Promise<void> {
-        try {
-            await axios.post(this.baseUrl, {
-              category_name: data.categoryName,
-            });
-          } catch (error) {
-            console.log(error);
-            throw error;
-          }
+    static counter = 0;
+    createRow = async (): Promise<void> => {
+      try {
+        await axios.post(this.baseUrl, {
+          category_name: "аб " + CategoriesService.counter,
+        });
+        CategoriesService.counter += 1;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
     }
   }
 

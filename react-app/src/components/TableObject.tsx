@@ -4,6 +4,7 @@ import TableRow from "../classes/TableRow";
 import EditOrCreateWindow from "./EditOrCreateWindow";
 import { Resizable, ResizableBox } from "react-resizable";
 import CategoriesService from "../services/CategoriesService";
+import "./AddRowButton.css";
 
 interface Props {
   columnNames: string[];
@@ -87,16 +88,19 @@ function TableObject({
   }, [rows]);
 
   useEffect(() => {
-    if (service)
-      service
-        .getRows()
-        .then((result: TableRow[]) => {
-          setRows(result);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    getRows();
   }, []);
+
+  const getRows = async () => {
+    try {
+      if (service) {
+        const result = await service.getRows();
+        setRows(result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -138,11 +142,23 @@ function TableObject({
     if (service) service.deleteRow(rowIndex);
   };
 
+  const handleAddRow = async () => {
+    try {
+      service?.createRow();
+      getRows();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   if (rows.length > 0 && columnNames.length !== rows[0].values.length)
     return <div>Error</div>;
 
   return (
     <div>
+      <div className="add-row-button">
+        <button onClick={handleAddRow}>Add Row</button>
+      </div>
       <Table striped bordered hover>
         <thead>
           <tr>

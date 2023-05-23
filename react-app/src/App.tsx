@@ -43,29 +43,6 @@ function App() {
 
   const categoriesService = new CategoriesService();
 
-  // const createNewRowInTestData = () => {
-  //   const url = "http://26.133.25.6:8080/api/categories";
-  //   axios
-  //     .post(url, {
-  //       category_name: "davyd",
-  //     })
-  //     .then((responce) => {
-  //       console.log("Created new row in test data");
-  //       console.log(responce);
-  //       getTestData()
-  //         .then((result: TableRow[]) => {
-  //           console.log(result);
-  //           setTestData(result);
-  //           console.log("test data");
-  //           console.log(result);
-  //         })
-  //         .catch((error) => {
-  //           console.log(error);
-  //         });
-  //     })
-  //     .catch((error) => console.log(error));
-  // };
-
   const createNewRowInTestData = () => {
     const url = "http://26.133.25.6:8080/api/categories";
     axios
@@ -534,6 +511,7 @@ function App() {
         <ButtonGroup
           buttonNames={buttonNamesManager}
           onClickFunctions={onClickFunctionsManager}
+          defaultValue={0}
         />
       </div>
       <div style={{ marginLeft: "15px", marginTop: "55px", width: "100%" }}>
@@ -543,8 +521,8 @@ function App() {
               <button
                 className={"btn"}
                 style={{
-                  width: "20%",
-                  height: "20%",
+                  width: "400",
+                  height: "100",
                   backgroundColor: "#4CAF50",
                   fontSize: 40,
                 }}
@@ -628,9 +606,6 @@ function App() {
               columnNames={["id", "категорія"]}
               service={categoriesService}
             />
-            <button onClick={createNewRowInTestData}>
-              Додати тестову категорію
-            </button>
           </div>
         )}
         {whatTableIsVisible === Table.Tovary && (
