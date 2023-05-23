@@ -17,32 +17,10 @@ import LoginForm from "./components/LoginForm";
 import axios from "axios";
 import EditOrCreateWindow from "./components/EditOrCreateWindow";
 import { Upc } from "react-bootstrap-icons";
+import CategoriesService from "./services/CategoriesService";
 
 function App() {
   //#region Axios things
-  const [testData, setTestData] = useState<TableRow[]>([]);
-  const getTestData = () => {
-    const url = "http://26.133.25.6:8080/api/categories";
-
-    return new Promise<TableRow[]>((resolve, reject) => {
-      axios
-        .get(url)
-        .then((response) => {
-          console.log("get data function");
-          const data = response.data.map((row: any) => {
-            const { category_number, category_name } = row;
-            const values = [category_number, category_name];
-            return new TableRow(category_number, values);
-          });
-          setTestData(data);
-          resolve(data);
-        })
-        .catch((error) => {
-          console.log(error);
-          reject(error);
-        });
-    });
-  };
 
   const updateSmthInTestData = (id: string, name: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -62,6 +40,8 @@ function App() {
         });
     });
   };
+
+  const categoriesService = new CategoriesService();
 
   // const createNewRowInTestData = () => {
   //   const url = "http://26.133.25.6:8080/api/categories";
@@ -95,16 +75,12 @@ function App() {
       .then((response) => {
         console.log("Created new row in test data");
         console.log(response);
-        return getTestData(); // Return the promise from getTestData
+        // return getTestData(); // Return the promise from getTestData
       })
       .catch((error) => {
         console.log(error);
       });
   };
-
-  useEffect(() => {
-    getTestData();
-  }, []);
 
   //#endregion
 
@@ -649,10 +625,8 @@ function App() {
               </div>
             )}
             <TableObject
-              rows={testData}
               columnNames={["id", "категорія"]}
-              getDataFromDB={getTestData}
-              updateDataFromDB={updateSmthInTestData}
+              service={categoriesService}
             />
             <button onClick={createNewRowInTestData}>
               Додати тестову категорію

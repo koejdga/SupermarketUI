@@ -3,13 +3,13 @@ import Table from "react-bootstrap/Table";
 import TableRow from "../classes/TableRow";
 import EditOrCreateWindow from "./EditOrCreateWindow";
 import { Resizable, ResizableBox } from "react-resizable";
+import CategoriesService from "../services/CategoriesService";
 
 interface Props {
   columnNames: string[];
-  rows: TableRow[];
   withButtons?: boolean;
-  getDataFromDB?: () => Promise<TableRow[]>;
-  updateDataFromDB?: (id: string, name: string) => Promise<void>;
+  service?: CategoriesService;
+  rows?: TableRow[];
 }
 
 interface RowActionsProps {
@@ -73,12 +73,11 @@ function RowActions({ rowIndex, onDelete, onSelect }: RowActionsProps) {
 
 function TableObject({
   columnNames,
-  rows: initialRows,
   withButtons = true,
-  getDataFromDB,
-  updateDataFromDB,
+  service,
+  rows: initialRows,
 }: Props) {
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
   const [selectedRow, setSelectedRow] = useState<TableRow>();
 
@@ -86,6 +85,18 @@ function TableObject({
     console.log("rows з компонента таблиці");
     console.log(rows);
   }, [rows]);
+
+  useEffect(() => {
+    if (service)
+      service
+        .getRows()
+        .then((result: TableRow[]) => {
+          setRows(result);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  }, []);
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -96,13 +107,12 @@ function TableObject({
   const handleSaveChanges = (updatedRow: TableRow) => {
     const updatedRows = [...rows];
     updatedRows[selectedRowIndex] = updatedRow;
-    console.log("UpdatedRows = ", updatedRows);
 
-    if (updateDataFromDB && getDataFromDB) {
-      updateDataFromDB(updatedRow.values[0], updatedRow.values[1]).then(() => {
-        getDataFromDB()
+    if (service) {
+      service.updateRow(updatedRow.id, updatedRow.values[1]).then(() => {
+        service
+          .getRows()
           .then((result: TableRow[]) => {
-            console.log(result);
             setRows(result);
           })
           .catch((error) => {
@@ -125,7 +135,7 @@ function TableObject({
   const handleDeleteRow = (rowIndex: number) => {
     const updatedRows = rows.filter((_, index) => index !== rowIndex);
     setRows(updatedRows);
-    // TODO: зробити так, щоб у базі даних теж видалялося
+    if (service) service.deleteRow(rowIndex);
   };
 
   if (rows.length > 0 && columnNames.length !== rows[0].values.length)
