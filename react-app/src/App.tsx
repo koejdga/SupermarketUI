@@ -14,10 +14,11 @@ import AlertComponent from "./components/AlertComponent";
 import SelectVariants from "./components/SelectVariants";
 import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
-import axios from "axios";
 import EditOrCreateWindow from "./components/EditOrCreateWindow";
 import { Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
+import ClientsService from "./services/ClientsService";
+import WorkersService from "./services/WorkersService";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -30,6 +31,8 @@ function App() {
 
   //#region Services
   const categoriesService = new CategoriesService();
+  const clientsService = new ClientsService();
+  const workersService = new WorkersService();
   const currentService = categoriesService;
   // можливо треба додати змінну карент сервіс (для кнопок додати щось та видалити все)
 
@@ -58,7 +61,7 @@ function App() {
   const buttonNamesManager = [
     "Головна",
     "Товари",
-    "Категорії",
+    "Категорія",
     "Клієнтки",
     "Чеки",
     "Працівники",
@@ -81,7 +84,38 @@ function App() {
     () => setTableVisible(Table.Profile),
   ];
 
+  //#endregion
+
+  //#region Column names
+  const categoriesColumnNames = ["ID", "Категорії"];
   const checkColumnNames = ["UPC", "Назва", "Кількість", "Ціна", "Вартість"];
+  // TODO можливо ініціали теж не варто розділяти на окремі колонки, типу навіщо це (і адресу)
+  const clientsColumnNames = [
+    "Номер картки",
+    "Прізвище",
+    "Ім'я",
+    "По батькові",
+    "Номер телефону",
+    "Місто",
+    "Вулиця",
+    "Поштовий індекс",
+    "Відсоток знижки",
+  ];
+
+  const workersColumnNames = [
+    "ID",
+    "Прізвище",
+    "Ім'я",
+    "По батькові",
+    "Посада",
+    "Зарплата",
+    "Дата народження",
+    "Дата початку роботи",
+    "Номер телефону",
+    "Місто",
+    "Вулиця",
+    "Поштовий індекс",
+  ];
   //#endregion
 
   //#region Variables
@@ -162,7 +196,6 @@ function App() {
 
   //#region Variables that will be from the database but now are hard coded
 
-  let categoriesColumnNames = ["Категорії"];
   const [categoriesRows, setCategoriesRows] = useState([
     new TableRow(1, ["Напівфабрикати"]),
     new TableRow(1, ["Крупи"]),
@@ -189,13 +222,6 @@ function App() {
     { value: "25", label: "25" },
   ];
 
-  let customersColumnNames = ["Number", "FN", "LN", "UN"];
-  let customersRows = [
-    new TableRow(1, ["1", "Sonya", "Budilova", "avolidub"]),
-    new TableRow(1, ["2", "Dariia", "Khomenko", "dariia"]),
-    new TableRow(1, ["3", "Dana", "Isaieva", "dana"]),
-  ];
-
   let tovaryColumnNames = ["Number", "Tovar name", "Price"];
   let tovaryRows = [
     new TableRow(1, ["1", "Cheese", "100"]),
@@ -210,21 +236,6 @@ function App() {
     new TableRow(1, ["2", "4563", "6336"]),
     new TableRow(1, ["3", "45643", "32424"]),
     new TableRow(1, ["4", "34525", "3452"]),
-  ];
-
-  let workersColumnNames = [
-    "ID",
-    "Name",
-    "Surname",
-    "Patronymic",
-    "Role",
-    "Salary",
-    "Date of birth",
-    "Date of start",
-    "Phone number",
-    "City",
-    "Street",
-    "Zip code",
   ];
 
   const [workersRows, setWorkerRows] = useState([
@@ -370,8 +381,8 @@ function App() {
             ></TextField>
             <br />
             <TableObject
-              columnNames={customersColumnNames}
-              rows={customersRows}
+              columnNames={clientsColumnNames}
+              service={clientsService}
             />
           </>
         )}
@@ -577,10 +588,6 @@ function App() {
                 </div>
               </div>
             )}
-            <TableObject
-              columnNames={["id", "категорія"]}
-              service={categoriesService}
-            />
           </div>
         )}
         {whatTableIsVisible === Table.Tovary && (
@@ -670,7 +677,7 @@ function App() {
             <div style={{ width: "30%" }}>
               <TableObject
                 columnNames={categoriesColumnNames}
-                rows={categoriesRows}
+                service={categoriesService}
               />
             </div>
             <div
@@ -715,8 +722,8 @@ function App() {
             </div>
             <br />
             <TableObject
-              columnNames={customersColumnNames}
-              rows={customersRows}
+              columnNames={clientsColumnNames}
+              service={clientsService}
             />
           </>
         )}
@@ -811,7 +818,7 @@ function App() {
                         style={{ marginRight: "15px" }}
                         type="button"
                         className="btn btn-secondary"
-                        onClick={currentService.createRow}
+                        // onClick={currentService.createRow}
                       >
                         Додати людину
                       </button>
@@ -821,7 +828,7 @@ function App() {
                   </div>
                   <TableObject
                     columnNames={workersColumnNames}
-                    rows={workersRows}
+                    service={workersService}
                   />
                 </>
               )}

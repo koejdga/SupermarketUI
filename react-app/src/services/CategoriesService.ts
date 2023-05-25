@@ -3,8 +3,26 @@ import TableRow from "../classes/TableRow";
 import Service from "./Service";
 
 interface Category {
-    categoryNumber: string;
-    categoryName: string;
+    category_number: string;
+    category_name: string;
+  }
+
+  function categoryToTableRow(category: Category): TableRow {
+    const values: string[] = [
+      category.category_number,
+      category.category_name
+    ];
+  
+    return new TableRow(-1, values);
+  }
+
+  function tableRowToCategory(tableRow: TableRow): Category {
+    const client: Category = {
+      category_number: tableRow.values[0],
+      category_name: tableRow.values[1]
+    };
+  
+    return client;
   }
 
   // ми коли створюємо нове, воно зберігається у вигляді TableRow, і для кожного класу (чи сервісу) треба
@@ -19,43 +37,26 @@ class CategoriesService extends Service<Category> {
         try {
             const response = await axios.get(this.baseUrl);
             return response.data.map((row: any) => 
-            (new TableRow(row.category_number, [row.category_number, row.category_name])));
+            (categoryToTableRow(row)))
+            // (new TableRow(row.category_number, [row.category_number, row.category_name])));
           } catch (error) {
             console.log(error);
             throw error;
           }
     }
   
-    async updateRow(id: number, data: string): Promise<void> {
+    async updateRow(id: number, data: TableRow): Promise<void> {
         try {
-            await axios.put(`${this.baseUrl}/${id}`, {
-              category_number: id,
-              category_name: data,
-            });
+            await axios.put(`${this.baseUrl}/${id}`, tableRowToCategory(data));
           } catch (error) {
             console.log(error);
             throw error;
           }
     }
   
-    async deleteRow(id: number): Promise<void> {
-        try {
-            await axios.delete(`${this.baseUrl}/${id}`);
-            console.log('deleted from db')
-          } catch (error) {
-            console.log(error);
-            throw error;
-          }
-    }
-  
-    static counter = 0;
-    // треба додати параметри
-    createRow = async (): Promise<void> => {
+    createRow = async (row: TableRow): Promise<void> => {
       try {
-        await axios.post(this.baseUrl, {
-          category_name: "aaa " + CategoriesService.counter,
-        });
-        CategoriesService.counter += 1;
+        await axios.post(this.baseUrl, tableRowToCategory(row));
       } catch (error) {
         console.log(error);
         throw error;
