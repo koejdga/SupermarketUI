@@ -10,7 +10,7 @@ interface Props {
   columnNames: string[];
   withButtons?: boolean;
   service?: CategoriesService;
-  rows?: TableRow[];
+  rows?: TableRow[]; // треба видалити буде цю штуку взагалі, коли всі таблиці будуть з сервісами
 }
 
 interface RowActionsProps {
@@ -64,6 +64,7 @@ function RowActions({ rowIndex, onDelete, onSelect }: RowActionsProps) {
           >
             Невидима
           </button>
+          {/* TODO: подивитися чому воно тепер видаляє все, а не один рядок */}
           <button onClick={handleDelete}>Видалити</button>
           <button onClick={handleCancel}>Скасувати</button>
         </div>
@@ -83,11 +84,6 @@ function TableObject({
   const [selectedRow, setSelectedRow] = useState<TableRow>();
 
   useEffect(() => {
-    console.log("rows з компонента таблиці");
-    console.log(rows);
-  }, [rows]);
-
-  useEffect(() => {
     getRows();
   }, []);
 
@@ -102,29 +98,27 @@ function TableObject({
     }
   };
 
+  const handleAddRow = async () => {
+    try {
+      service?.createRow().then(() => {
+        getRows();
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
-    setSelectedRowIndex(rowIndex);
+    setSelectedRowIndex(rows[rowIndex].id);
     setSelectedRow(rows[rowIndex]);
   };
 
   const handleSaveChanges = (updatedRow: TableRow) => {
-    const updatedRows = [...rows];
-    updatedRows[selectedRowIndex] = updatedRow;
-
     if (service) {
       service.updateRow(updatedRow.id, updatedRow.values[1]).then(() => {
-        service
-          .getRows()
-          .then((result: TableRow[]) => {
-            setRows(result);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        getRows();
       });
-    } else {
-      setRows(updatedRows);
     }
 
     setSelectedRow(undefined);
@@ -137,17 +131,23 @@ function TableObject({
   };
 
   const handleDeleteRow = (rowIndex: number) => {
-    const updatedRows = rows.filter((_, index) => index !== rowIndex);
+    let rowIndexDb = rows[rowIndex].id;
+    const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
-    if (service) service.deleteRow(rowIndex);
+
+    if (service) service.deleteRow(rowIndexDb);
   };
 
-  const handleAddRow = async () => {
-    try {
-      service?.createRow();
-      getRows();
-    } catch (error) {
-      console.log(error);
+  const handleDeleteAll = () => {
+    const rowIdsToDelete = rows.map((row) => row.id);
+    const updatedRows: TableRow[] = [];
+    setRows(updatedRows);
+
+    console.log(rowIdsToDelete + " - ids to be deleted");
+    if (service) {
+      rowIdsToDelete.forEach((rowId) => {
+        service.deleteRow(rowId);
+      });
     }
   };
 
@@ -158,6 +158,7 @@ function TableObject({
     <div>
       <div className="add-row-button">
         <button onClick={handleAddRow}>Add Row</button>
+        <button onClick={handleDeleteAll}>Delete All</button>
       </div>
       <Table striped bordered hover>
         <thead>

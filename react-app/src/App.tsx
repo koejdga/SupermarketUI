@@ -20,44 +20,18 @@ import { Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 
 function App() {
-  //#region Axios things
+  // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
+  // TODO спробувати зробити, щоб кнопка надрукувати звіт була в одному місці
+  // TODO категорія, чи акційний товар (AutocompleteTextField) якісь калічні
+  // TODO додати сервіси
+  // TODO заповнити таблиці даними
+  // TODO зробити щоб кнопка додавання й редагування приймала аргументи
+  // TODO розібратися з таблицею Товари
 
-  const updateSmthInTestData = (id: string, name: string) => {
-    return new Promise<void>((resolve, reject) => {
-      const url = "http://26.133.25.6:8080/api/categories/" + id;
-      axios
-        .put(url, {
-          category_name: name,
-        })
-        .then((responce) => {
-          console.log("update data function");
-          console.log(responce);
-          resolve();
-        })
-        .catch((error) => {
-          console.log(error);
-          reject("Update failed");
-        });
-    });
-  };
-
+  //#region Services
   const categoriesService = new CategoriesService();
-
-  const createNewRowInTestData = () => {
-    const url = "http://26.133.25.6:8080/api/categories";
-    axios
-      .post(url, {
-        category_name: "gggggg",
-      })
-      .then((response) => {
-        console.log("Created new row in test data");
-        console.log(response);
-        // return getTestData(); // Return the promise from getTestData
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const currentService = categoriesService;
+  // можливо треба додати змінну карент сервіс (для кнопок додати щось та видалити все)
 
   //#endregion
 
@@ -324,6 +298,7 @@ function App() {
 
   //#endregion
 
+  // можливо зайве, але я не впевнена
   const [newWorker, setNewWorker] = useState<TableRow>();
   const addNewWorker = (newWorker: TableRow) => {
     setNewWorker(newWorker);
@@ -731,7 +706,7 @@ function App() {
                 <AutocompleteTextField
                   options={clientsPercents}
                   onChange={handleOnChangePercent}
-                  label="Promotion percent"
+                  label="Відсоток знижки"
                 />
               </div>
               <div style={{ marginRight: "25px" }}>
@@ -836,6 +811,7 @@ function App() {
                         style={{ marginRight: "15px" }}
                         type="button"
                         className="btn btn-secondary"
+                        onClick={currentService.createRow}
                       >
                         Додати людину
                       </button>

@@ -7,9 +7,11 @@ interface Category {
     categoryName: string;
   }
 
+  // ми коли створюємо нове, воно зберігається у вигляді TableRow, і для кожного класу (чи сервісу) треба
+  // зробити конвертер з TableRow у те, що нам треба (Category, Check, Worker (interfaces))
+
 class CategoriesService extends Service<Category> {
     constructor() {
-      // Provide the base URL for the "categories" API
       super("http://26.133.25.6:8080/api/categories");
     }
   
@@ -47,10 +49,11 @@ class CategoriesService extends Service<Category> {
     }
   
     static counter = 0;
+    // треба додати параметри
     createRow = async (): Promise<void> => {
       try {
         await axios.post(this.baseUrl, {
-          category_name: "аб " + CategoriesService.counter,
+          category_name: "aaa " + CategoriesService.counter,
         });
         CategoriesService.counter += 1;
       } catch (error) {

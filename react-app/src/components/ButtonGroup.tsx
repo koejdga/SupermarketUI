@@ -21,6 +21,11 @@ const ButtonGroup = ({
     }
   }, [defaultValue, selectedButton, onClickFunctions]);
 
+  const handleButtonClick = (index: number) => {
+    onClickFunctions[index]();
+    // setSelectedButton(index);
+  };
+
   return (
     <>
       <div
@@ -36,12 +41,15 @@ const ButtonGroup = ({
               name="btnradio"
               id={index.toString()}
               autoComplete="off"
-              onClick={onClickFunctions[index]}
-              checked={index === selectedButton}
-              onChange={() => {}}
+              onClick={() => handleButtonClick(index)}
+              // checked={index === selectedButton}
+              // onChange={() => {}}
             ></input>
             <label
               className="btn btn-outline-primary"
+              // className={`btn ${
+              //   index === selectedButton ? "btn-primary" : "btn-outline-primary"
+              // }`}
               htmlFor={index.toString()}
             >
               {buttonName}
