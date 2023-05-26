@@ -8,6 +8,7 @@ interface Props {
   selectedRow?: TableRow;
   onSave: (tableRow: TableRow) => void;
   onCancel?: () => void;
+  saveNewRow?: (row: TableRow) => void;
 }
 
 const EditOrCreateWindow = ({
@@ -15,6 +16,7 @@ const EditOrCreateWindow = ({
   selectedRow,
   onSave,
   onCancel,
+  saveNewRow,
 }: Props) => {
   var buttonStyle = {
     color: "#fff",
@@ -38,6 +40,7 @@ const EditOrCreateWindow = ({
   console.log("we are in EditWindow");
 
   const handleSave = () => {
+    if (saveNewRow) saveNewRow(editedRow);
     onSave(editedRow);
   };
 
@@ -63,6 +66,7 @@ const EditOrCreateWindow = ({
         <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
           <button
             className="btn btn-secondary"
+            data-bs-dismiss="offcanvas"
             style={buttonStyle}
             onClick={handleSave}
           >

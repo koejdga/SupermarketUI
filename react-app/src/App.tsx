@@ -163,8 +163,17 @@ function App() {
     [Date | null, Date | null]
   >([null, null]);
 
-  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newRow, setNewRow] = useState<TableRow>();
   //#endregion
+
+  const [test, setTest] = useState(true);
+  useEffect(() => {
+    if (newRow) {
+      currentService.createRow(newRow).then(() => {
+        setTest(!test);
+      });
+    }
+  }, [newRow]);
 
   //#region HandleOnChange functions
   const handleOnChangeIsPromotional = (value: string) => {
@@ -308,21 +317,18 @@ function App() {
     setShowAddCheckForm(false);
   };
 
-  const handleAddCategory = (newCategory: TableRow) => {
-    if (categoriesRows.length === 0) {
-      setCategoriesRows([newCategory]);
-    } else {
-      setCategoriesRows([...categoriesRows, newCategory]);
-    }
+  const handleAddRow = async () => {
+    // try {
+    //   if (newRow)
+    //     currentService.createRow(newRow).then(() => {
+    //       currentService.getRows();
+    //     });
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   //#endregion
-
-  // можливо зайве, але я не впевнена
-  const [newWorker, setNewWorker] = useState<TableRow>();
-  const addNewWorker = (newWorker: TableRow) => {
-    setNewWorker(newWorker);
-  };
 
   //#region Parts of return that should be separate components maybe (maybe not)
   const searchFields = (
@@ -678,9 +684,12 @@ function App() {
             }}
           >
             <div style={{ width: "30%" }}>
+              {/* <button onClick={handleDeleteAll}>Delete All</button> */}
+
               <TableObject
                 columnNames={categoriesColumnNames}
                 service={categoriesService}
+                testVar={test}
               />
             </div>
             <div
@@ -694,7 +703,6 @@ function App() {
                 style={{ marginRight: "15px" }}
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => setShowAddCategory(true)}
                 data-bs-toggle="offcanvas"
                 data-bs-target="#offcanvasScrolling"
                 aria-controls="offcanvasScrolling"
@@ -704,7 +712,8 @@ function App() {
               <PrintReportButton />
               <EditOrCreateWindow
                 columnNames={categoriesColumnNames}
-                onSave={handleAddCategory}
+                saveNewRow={setNewRow}
+                onSave={handleAddRow}
               />
             </div>
           </div>

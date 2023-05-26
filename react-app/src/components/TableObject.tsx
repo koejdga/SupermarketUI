@@ -11,6 +11,7 @@ interface Props {
   withButtons?: boolean;
   service?: CategoriesService;
   rows?: TableRow[]; // треба видалити буде цю штуку взагалі, коли всі таблиці будуть з сервісами
+  testVar?: boolean;
 }
 
 interface RowActionsProps {
@@ -78,6 +79,7 @@ function TableObject({
   withButtons = true,
   service,
   rows: initialRows,
+  testVar,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
@@ -85,7 +87,7 @@ function TableObject({
 
   useEffect(() => {
     getRows();
-  }, []);
+  }, [testVar]);
 
   const getRows = async () => {
     try {
@@ -93,16 +95,6 @@ function TableObject({
         const result = await service.getRows();
         setRows(result);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleAddRow = async () => {
-    try {
-      service?.createRow().then(() => {
-        getRows();
-      });
     } catch (error) {
       console.log(error);
     }
@@ -116,7 +108,7 @@ function TableObject({
 
   const handleSaveChanges = (updatedRow: TableRow) => {
     if (service) {
-      service.updateRow(updatedRow.id, updatedRow.values[1]).then(() => {
+      service.updateRow(updatedRow.id, updatedRow).then(() => {
         getRows();
       });
     }
@@ -134,6 +126,8 @@ function TableObject({
     let rowIndexDb = rows[rowIndex].id;
     const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
+    console.log(rowIndex + " - row index");
+    console.log(rowIndexDb + " - row index database");
 
     if (service) service.deleteRow(rowIndexDb);
   };
@@ -156,10 +150,7 @@ function TableObject({
 
   return (
     <div>
-      <div className="add-row-button">
-        <button onClick={handleAddRow}>Add Row</button>
-        <button onClick={handleDeleteAll}>Delete All</button>
-      </div>
+      <label>{testVar}</label>
       <Table striped bordered hover>
         <thead>
           <tr>
