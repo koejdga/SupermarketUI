@@ -11,7 +11,6 @@ import PrintReportButton from "./components/PrintReportButton";
 import AddProductForm from "./components/AddProductForm";
 import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
-import SelectVariants from "./components/SelectVariants";
 import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
 import EditOrCreateWindow from "./components/EditOrCreateWindow";
@@ -25,7 +24,6 @@ import "./App.css";
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
   // TODO спробувати зробити, щоб кнопка надрукувати звіт була в одному місці
-  // TODO категорія, чи акційний товар (AutocompleteTextField) якісь калічні
   // TODO додати сервіси
   // TODO заповнити таблиці даними
   // TODO зробити щоб кнопка додавання й редагування приймала аргументи
@@ -41,7 +39,11 @@ function App() {
   //#endregion
 
   //#region Constants
-  const isPromotionalOptions = ["Всі", "Акційні", "Не акційні"];
+  const isPromotionalOptions = [
+    { value: "Всі", label: "Всі" },
+    { value: "Акційні", label: "Акційні" },
+    { value: "Не акційні", label: "Не акційні" },
+  ];
 
   enum Table {
     Main = 0,
@@ -165,12 +167,12 @@ function App() {
   //#endregion
 
   //#region HandleOnChange functions
-  const handleOnChangeIsPromotional = (event: SelectChangeEvent) => {
-    setIsPromotional(event.target.value);
+  const handleOnChangeIsPromotional = (value: string) => {
+    setIsPromotional(value);
   };
 
-  const handleOnChangeCategory = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
+  const handleOnChangeCategory = (value: string) => {
+    setCategory(value);
   };
 
   const handleOnChangeUPC = (value: string) => {
@@ -208,7 +210,10 @@ function App() {
 
   let categories = [];
   for (let i = 0; i < categoriesRows.length; i++) {
-    categories.push(categoriesRows[i].values[0]);
+    categories.push({
+      value: categoriesRows[i].values[0],
+      label: categoriesRows[i].values[0],
+    });
   }
 
   const upcFromDb = [123, 1230, 3423, 5343];
@@ -330,17 +335,17 @@ function App() {
         gap: "30px",
       }}
     >
-      <SelectVariants
+      <AutocompleteTextField
         label="Категорія"
         options={categories}
         onChange={handleOnChangeCategory}
-        width={150}
+        style={{ width: "150px" }}
       />
-      <SelectVariants
+      <AutocompleteTextField
         label="Чи акційний товар"
         options={isPromotionalOptions}
         onChange={handleOnChangeIsPromotional}
-        width={200}
+        style={{ width: "200px" }}
       />
       <TextField
         className="text-field"

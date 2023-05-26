@@ -14,6 +14,7 @@ interface Props {
   onChange: (value: string) => void;
   label: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const AutocompleteTextField = ({
@@ -21,6 +22,7 @@ const AutocompleteTextField = ({
   onChange,
   label,
   className,
+  style,
 }: Props) => {
   const handleOnChange = (
     event: React.ChangeEvent<{}>,
@@ -31,6 +33,7 @@ const AutocompleteTextField = ({
 
   return (
     <Autocomplete
+      style={style}
       className={className}
       options={options}
       getOptionLabel={(option: { label: any }) => option.label}
