@@ -19,6 +19,8 @@ import { Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 import ClientsService from "./services/ClientsService";
 import WorkersService from "./services/WorkersService";
+import ButtonGrid from "./components/ButtonGrid";
+import "./App.css";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -61,7 +63,7 @@ function App() {
   const buttonNamesManager = [
     "Головна",
     "Товари",
-    "Категорія",
+    "Категорії",
     "Клієнтки",
     "Чеки",
     "Працівники",
@@ -83,6 +85,8 @@ function App() {
     () => setTableVisible(Table.Workers),
     () => setTableVisible(Table.Profile),
   ];
+
+  const createCheckLabel = "Створити чек";
 
   //#endregion
 
@@ -500,22 +504,16 @@ function App() {
           defaultValue={0}
         />
       </div>
-      <div style={{ marginLeft: "15px", marginTop: "55px", width: "100%" }}>
+      <div className="page">
         {whatTableIsVisible === Table.Main && (
           <div>
             {!showAddCheckForm && (
-              <button
-                className={"btn"}
-                style={{
-                  width: "400",
-                  height: "100",
-                  backgroundColor: "#4CAF50",
-                  fontSize: 40,
-                }}
-                onClick={() => setShowAddCheckForm(true)}
-              >
-                Створити чек
-              </button>
+              <ButtonGrid
+                buttonLabels={buttonNamesManager.slice(1)}
+                addCheckButtonLabel={createCheckLabel}
+                onClickFunctions={onClickFunctionsManager.slice(1)}
+                onClickAddCheckButton={() => setShowAddCheckForm(true)}
+              />
             )}
             {showAddCheckForm && (
               <div>
