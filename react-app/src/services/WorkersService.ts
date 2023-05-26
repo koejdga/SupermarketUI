@@ -2,7 +2,7 @@ import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
 
-interface Worker {
+export interface Worker {
   id_employee: string;
   empl_surname: string;
   empl_name: string;
@@ -25,8 +25,16 @@ function workerToTableRow(worker: Worker): TableRow {
     worker.empl_patronymic,
     worker.empl_role,
     worker.salary.toString(),
-    worker.date_of_birth.toString(),
-    worker.date_of_start.toString(),
+    worker.date_of_birth.toLocaleDateString("uk-UA", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+    worker.date_of_start.toLocaleDateString("uk-UA", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
     worker.phone_number,
     worker.city,
     worker.street,
@@ -36,7 +44,7 @@ function workerToTableRow(worker: Worker): TableRow {
   return new TableRow(-1, values);
 }
 
-function tableRowToWorker(tableRow: TableRow): Worker {
+export function tableRowToWorker(tableRow: TableRow): Worker {
   const client: Worker = {
     id_employee: tableRow.values[0],
     empl_surname: tableRow.values[1],

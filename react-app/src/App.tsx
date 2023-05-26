@@ -203,9 +203,9 @@ function App() {
   //#region Variables that will be from the database but now are hard coded
 
   const [categoriesRows, setCategoriesRows] = useState([
-    new TableRow(1, ["Напівфабрикати"]),
-    new TableRow(1, ["Крупи"]),
-    new TableRow(1, ["Напої"]),
+    new TableRow(1, ["0", "Напівфабрикати"]),
+    new TableRow(1, ["2", "Крупи"]),
+    new TableRow(1, ["1", "Напої"]),
   ]);
 
   let categories = [];
