@@ -27,7 +27,7 @@ function clientToTableRow(client: Client): TableRow {
     client.percent.toString(),
   ];
 
-  return new TableRow(-1, values);
+  return new TableRow(client.card_number, values);
 }
 
 export function tableRowToClient(tableRow: TableRow): Client {
@@ -73,11 +73,9 @@ class ClientsService extends Service<Client> {
     }
   }
 
-  createRow = async (): Promise<void> => {
+  createRow = async (row: TableRow): Promise<void> => {
     try {
-      await axios.post(this.baseUrl, {
-        cust_number: "aaa ",
-      });
+      await axios.post(this.baseUrl, tableRowToClient(row));
     } catch (error) {
       console.log(error);
       throw error;

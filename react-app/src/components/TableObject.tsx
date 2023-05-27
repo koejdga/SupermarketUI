@@ -11,7 +11,7 @@ interface Props {
   withButtons?: boolean;
   service?: CategoriesService;
   rows?: TableRow[]; // треба видалити буде цю штуку взагалі, коли всі таблиці будуть з сервісами
-  testVar?: boolean;
+  updater?: boolean;
 }
 
 interface RowActionsProps {
@@ -79,7 +79,7 @@ function TableObject({
   withButtons = true,
   service,
   rows: initialRows,
-  testVar,
+  updater: testVar,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);

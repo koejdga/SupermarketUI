@@ -20,6 +20,7 @@ import ClientsService from "./services/ClientsService";
 import WorkersService from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
+import ProductsService from "./services/ProductsService";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -33,7 +34,8 @@ function App() {
   const categoriesService = new CategoriesService();
   const clientsService = new ClientsService();
   const workersService = new WorkersService();
-  const currentService = categoriesService;
+  const productsService = new ProductsService();
+  const [currentService, setCurrentService] = useState(categoriesService);
   // можливо треба додати змінну карент сервіс (для кнопок додати щось та видалити все)
 
   //#endregion
@@ -80,11 +82,23 @@ function App() {
   ];
   const onClickFunctionsManager = [
     () => setTableVisible(Table.Main),
-    () => setTableVisible(Table.Tovary),
-    () => setTableVisible(Table.Categories),
-    () => setTableVisible(Table.Clients),
+    () => {
+      setTableVisible(Table.Tovary);
+      setCurrentService(productsService);
+    },
+    () => {
+      setTableVisible(Table.Categories);
+      setCurrentService(categoriesService);
+    },
+    () => {
+      setTableVisible(Table.Clients);
+      setCurrentService(clientsService);
+    },
     () => setTableVisible(Table.Checks),
-    () => setTableVisible(Table.Workers),
+    () => {
+      setTableVisible(Table.Workers);
+      setCurrentService(workersService);
+    },
     () => setTableVisible(Table.Profile),
   ];
 
@@ -95,6 +109,14 @@ function App() {
   //#region Column names
   const categoriesColumnNames = ["ID", "Категорії"];
   const checkColumnNames = ["UPC", "Назва", "Кількість", "Ціна", "Вартість"];
+
+  const productsColumnNames = [
+    "ID",
+    "Категорія",
+    "Назва продукту",
+    "Характеристики",
+  ];
+
   // TODO можливо ініціали теж не варто розділяти на окремі колонки, типу навіщо це (і адресу)
   const clientsColumnNames = [
     "Номер картки",
@@ -166,11 +188,11 @@ function App() {
   const [newRow, setNewRow] = useState<TableRow>();
   //#endregion
 
-  const [test, setTest] = useState(true);
+  const [updater, setUpdater] = useState(true);
   useEffect(() => {
     if (newRow) {
       currentService.createRow(newRow).then(() => {
-        setTest(!test);
+        setUpdater(!updater);
       });
     }
   }, [newRow]);
@@ -240,7 +262,6 @@ function App() {
     { value: "25", label: "25" },
   ];
 
-  let tovaryColumnNames = ["Number", "Tovar name", "Price"];
   let tovaryRows = [
     new TableRow(1, ["1", "Cheese", "100"]),
     new TableRow(1, ["2", "Water", "500"]),
@@ -326,6 +347,9 @@ function App() {
     // } catch (error) {
     //   console.log(error);
     // }
+    let data = "04.05.2004";
+    let ddata = new Date(data);
+    console.log(ddata.toString());
   };
 
   //#endregion
@@ -445,7 +469,7 @@ function App() {
 
                   {selectedUPC === "" && (
                     <TableObject
-                      columnNames={tovaryColumnNames}
+                      columnNames={productsColumnNames}
                       rows={tovaryRows}
                     />
                   )}
@@ -626,6 +650,17 @@ function App() {
               }}
             >
               {searchFields}
+
+              <button
+                style={{ marginRight: "15px" }}
+                type="button"
+                className="btn btn-secondary"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling"
+                aria-controls="offcanvasScrolling"
+              >
+                Додати товар
+              </button>
               <div
                 style={{
                   width: "80%",
@@ -667,10 +702,17 @@ function App() {
 
                 {selectedUPC === "" && (
                   <TableObject
-                    columnNames={tovaryColumnNames}
-                    rows={tovaryRows}
+                    columnNames={productsColumnNames}
+                    service={productsService}
+                    updater={updater}
                   />
                 )}
+
+                <EditOrCreateWindow
+                  columnNames={productsColumnNames}
+                  saveNewRow={setNewRow}
+                  onSave={handleAddRow}
+                />
               </div>
             </div>
           </div>
@@ -684,12 +726,10 @@ function App() {
             }}
           >
             <div style={{ width: "30%" }}>
-              {/* <button onClick={handleDeleteAll}>Delete All</button> */}
-
               <TableObject
                 columnNames={categoriesColumnNames}
                 service={categoriesService}
-                testVar={test}
+                updater={updater}
               />
             </div>
             <div
@@ -733,9 +773,27 @@ function App() {
               </div>
             </div>
             <br />
+            <button
+              style={{ marginRight: "15px" }}
+              type="button"
+              className="btn btn-secondary"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasScrolling"
+              aria-controls="offcanvasScrolling"
+            >
+              Додати клієнт/ку
+            </button>
+            <PrintReportButton />
+
             <TableObject
               columnNames={clientsColumnNames}
               service={clientsService}
+              updater={updater}
+            />
+            <EditOrCreateWindow
+              columnNames={clientsColumnNames}
+              saveNewRow={setNewRow}
+              onSave={handleAddRow}
             />
           </>
         )}
@@ -830,9 +888,11 @@ function App() {
                         style={{ marginRight: "15px" }}
                         type="button"
                         className="btn btn-secondary"
-                        // onClick={currentService.createRow}
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasScrolling"
+                        aria-controls="offcanvasScrolling"
                       >
-                        Додати людину
+                        Додати робітника/цю
                       </button>
 
                       <PrintReportButton />
@@ -841,6 +901,12 @@ function App() {
                   <TableObject
                     columnNames={workersColumnNames}
                     service={workersService}
+                    updater={updater}
+                  />
+                  <EditOrCreateWindow
+                    columnNames={workersColumnNames}
+                    saveNewRow={setNewRow}
+                    onSave={handleAddRow}
                   />
                 </>
               )}

@@ -17,6 +17,14 @@ export interface Worker {
   zip_code: string;
 }
 
+function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString("uk-UA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 function workerToTableRow(worker: Worker): TableRow {
   const values: string[] = [
     worker.id_employee,
@@ -25,23 +33,15 @@ function workerToTableRow(worker: Worker): TableRow {
     worker.empl_patronymic,
     worker.empl_role,
     worker.salary.toString(),
-    worker.date_of_birth.toLocaleDateString("uk-UA", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }),
-    worker.date_of_start.toLocaleDateString("uk-UA", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }),
+    formatDate(worker.date_of_birth),
+    formatDate(worker.date_of_start),
     worker.phone_number,
     worker.city,
     worker.street,
     worker.zip_code,
   ];
 
-  return new TableRow(-1, values);
+  return new TableRow(worker.id_employee, values);
 }
 
 export function tableRowToWorker(tableRow: TableRow): Worker {
@@ -54,10 +54,10 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
     salary: Number(tableRow.values[5]),
     date_of_birth: new Date(tableRow.values[6]),
     date_of_start: new Date(tableRow.values[7]),
-    phone_number: tableRow.values[4],
-    city: tableRow.values[5],
-    street: tableRow.values[6],
-    zip_code: tableRow.values[7],
+    phone_number: tableRow.values[8],
+    city: tableRow.values[9],
+    street: tableRow.values[10],
+    zip_code: tableRow.values[11],
   };
 
   return client;
@@ -73,8 +73,6 @@ class WorkersService extends Service<Worker> {
     try {
       const response = await axios.get(this.baseUrl);
       return response.data.map((row: any) => workerToTableRow(row));
-      // (new TableRow(row.card_number, [row.card_number, row.cust_surname, row.cust_name,
-      //     row.cust_patronymic, row.phone_number, row.city, row.street, row.zip_code, row.percent])));
     } catch (error) {
       console.log(error);
       throw error;
@@ -92,6 +90,7 @@ class WorkersService extends Service<Worker> {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
+      console.log(tableRowToWorker(row));
       await axios.post(this.baseUrl, tableRowToWorker(row));
     } catch (error) {
       console.log(error);
