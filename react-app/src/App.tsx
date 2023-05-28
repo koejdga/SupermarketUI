@@ -21,11 +21,12 @@ import WorkersService from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
 import ProductsService from "./services/ProductsService";
+import ChecksService from "./services/ChecksService";
+import StoreProductsService from "./services/StoreProductsService";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
   // TODO спробувати зробити, щоб кнопка надрукувати звіт була в одному місці
-  // TODO додати сервіси
   // TODO заповнити таблиці даними
   // TODO зробити щоб кнопка додавання й редагування приймала аргументи
   // TODO розібратися з таблицею Товари
@@ -35,8 +36,9 @@ function App() {
   const clientsService = new ClientsService();
   const workersService = new WorkersService();
   const productsService = new ProductsService();
+  const checksService = new ChecksService();
+  const storeProductsService = new StoreProductsService();
   const [currentService, setCurrentService] = useState(categoriesService);
-  // можливо треба додати змінну карент сервіс (для кнопок додати щось та видалити все)
 
   //#endregion
 
@@ -94,7 +96,10 @@ function App() {
       setTableVisible(Table.Clients);
       setCurrentService(clientsService);
     },
-    () => setTableVisible(Table.Checks),
+    () => {
+      setTableVisible(Table.Checks);
+      setCurrentService(checksService);
+    },
     () => {
       setTableVisible(Table.Workers);
       setCurrentService(workersService);
@@ -269,7 +274,14 @@ function App() {
     new TableRow(1, ["4", "Meat", "1300"]),
   ];
 
-  let checksColumnNames = ["Number", "Cashier name", "Client name"];
+  const checksColumnNames = [
+    "Номер чека",
+    "ID працівника/ці",
+    "Номер карти клієнт/ки",
+    "Дата",
+    "Сума",
+    "ПДВ",
+  ];
   let checksRows = [
     new TableRow(1, ["1", "123", "321"]),
     new TableRow(1, ["2", "4563", "6336"]),
@@ -338,19 +350,7 @@ function App() {
     setShowAddCheckForm(false);
   };
 
-  const handleAddRow = async () => {
-    // try {
-    //   if (newRow)
-    //     currentService.createRow(newRow).then(() => {
-    //       currentService.getRows();
-    //     });
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    let data = "04.05.2004";
-    let ddata = new Date(data);
-    console.log(ddata.toString());
-  };
+  const handleAddRow = async () => {};
 
   //#endregion
 
@@ -823,6 +823,17 @@ function App() {
               </div>
 
               <button
+                style={{ marginRight: "15px" }}
+                type="button"
+                className="btn btn-secondary"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling"
+                aria-controls="offcanvasScrolling"
+              >
+                Додати чек
+              </button>
+
+              <button
                 className="btn btn-secondary"
                 style={{
                   height: "40px",
@@ -839,7 +850,17 @@ function App() {
                 }}
               />
             </div>
-            <TableObject columnNames={checksColumnNames} rows={checksRows} />
+            <TableObject
+              columnNames={checksColumnNames}
+              service={checksService}
+              updater={updater}
+            />
+
+            <EditOrCreateWindow
+              columnNames={checksColumnNames}
+              saveNewRow={setNewRow}
+              onSave={handleAddRow}
+            />
           </>
         )}
         {whatTableIsVisible === Table.Workers && (

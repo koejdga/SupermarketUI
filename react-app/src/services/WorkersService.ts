@@ -1,6 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
+import { formatDate } from "../utils/Utils";
 
 export interface Worker {
   id_employee: string;
@@ -15,14 +16,6 @@ export interface Worker {
   city: string;
   street: string;
   zip_code: string;
-}
-
-function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("uk-UA", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 }
 
 function workerToTableRow(worker: Worker): TableRow {

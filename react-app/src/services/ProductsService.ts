@@ -33,7 +33,7 @@ export function tableRowToProduct(tableRow: TableRow): Product {
 
 class ProductsService extends Service<Product> {
   constructor() {
-    super("http://26.133.25.6:8080/api/customer_cards");
+    super("http://26.133.25.6:8080/api/products");
   }
 
   async getRows(): Promise<TableRow[]> {
@@ -57,6 +57,7 @@ class ProductsService extends Service<Product> {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
+      console.log(tableRowToProduct(row));
       await axios.post(this.baseUrl, tableRowToProduct(row));
     } catch (error) {
       console.log(error);

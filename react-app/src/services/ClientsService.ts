@@ -56,8 +56,6 @@ class ClientsService extends Service<Client> {
     try {
       const response = await axios.get(this.baseUrl);
       return response.data.map((row: any) => clientToTableRow(row));
-      // (new TableRow(row.card_number, [row.card_number, row.cust_surname, row.cust_name,
-      //     row.cust_patronymic, row.phone_number, row.city, row.street, row.zip_code, row.percent])));
     } catch (error) {
       console.log(error);
       throw error;
