@@ -5,7 +5,6 @@ import Service from "./Service";
 export interface StoreProduct {
   UPC: string;
   UPC_prom: string;
-  id_product: number;
   product_name: string;
   selling_price: number;
   products_number: number;
@@ -16,7 +15,6 @@ function storeProductToTableRow(product: StoreProduct): TableRow {
   const values: string[] = [
     product.UPC,
     product.UPC_prom,
-    product.id_product.toString(),
     product.product_name,
     product.selling_price.toString(),
     product.products_number.toString(),
@@ -30,11 +28,10 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
   const product: StoreProduct = {
     UPC: tableRow.values[0],
     UPC_prom: tableRow.values[1],
-    id_product: Number(tableRow.values[2]),
-    product_name: tableRow.values[3],
-    selling_price: Number(tableRow.values[4]),
-    products_number: Number(tableRow.values[5]),
-    promotional_product: tableRow.values[6] === "так" ? true : false,
+    product_name: tableRow.values[2],
+    selling_price: Number(tableRow.values[3]),
+    products_number: Number(tableRow.values[4]),
+    promotional_product: tableRow.values[5] === "так" ? true : false,
   };
 
   return product;

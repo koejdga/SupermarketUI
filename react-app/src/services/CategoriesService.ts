@@ -22,9 +22,6 @@ function tableRowToCategory(tableRow: TableRow): Category {
   return client;
 }
 
-// ми коли створюємо нове, воно зберігається у вигляді TableRow, і для кожного класу (чи сервісу) треба
-// зробити конвертер з TableRow у те, що нам треба (Category, Check, Worker (interfaces))
-
 class CategoriesService extends Service<Category> {
   constructor() {
     super("http://26.133.25.6:8080/api/categories");

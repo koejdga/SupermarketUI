@@ -251,7 +251,7 @@ const PrintReportButton = ({ buttonStyle = {} }: Props) => {
     </body>
     </html>`;
 
-    printReport(clientsReport);
+    printReport(workersReport);
   };
 
   const generateReport = () => {};

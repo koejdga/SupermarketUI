@@ -13,7 +13,13 @@ const ButtonGrid = ({
   onClickFunctions,
   onClickAddCheckButton,
 }: Props) => {
-  if (buttonLabels.length != 6) return <div>Error</div>;
+  if (buttonLabels.length != onClickFunctions.length)
+    return (
+      <div>
+        Error: кількість назв кнопок та функцій для кнопок не однакова
+        (ButtonGrid)
+      </div>
+    );
   return (
     <div className="container">
       <h2>Супермаркет "ZLAGODA"</h2>
@@ -21,28 +27,15 @@ const ButtonGrid = ({
         {addCheckButtonLabel}
       </button>
       <div className="button-container">
-        <div className="button-group">
-          <button onClick={onClickFunctions[0]} className="button">
-            {buttonLabels[0]}
+        {buttonLabels.map((buttonLabel, index) => (
+          <button
+            onClick={onClickFunctions[index]}
+            className="button"
+            key={index}
+          >
+            {buttonLabel}
           </button>
-          <button onClick={onClickFunctions[1]} className="button">
-            {buttonLabels[1]}
-          </button>
-          <button onClick={onClickFunctions[2]} className="button">
-            {buttonLabels[2]}
-          </button>
-        </div>
-        <div className="button-group">
-          <button onClick={onClickFunctions[3]} className="button">
-            {buttonLabels[3]}
-          </button>
-          <button onClick={onClickFunctions[4]} className="button">
-            {buttonLabels[4]}
-          </button>
-          <button onClick={onClickFunctions[5]} className="button">
-            {buttonLabels[5]}
-          </button>
-        </div>
+        ))}
       </div>
     </div>
   );

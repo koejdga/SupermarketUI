@@ -41,6 +41,7 @@ const AutocompleteTextField = ({
       renderInput={(params: AutocompleteRenderInputParams) => (
         <TextField {...params} label={label} variant="outlined" fullWidth />
       )}
+      defaultValue={options[0]}
     />
   );
 };

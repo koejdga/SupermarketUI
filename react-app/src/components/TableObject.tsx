@@ -102,13 +102,13 @@ function TableObject({
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
-    setSelectedRowIndex(rows[rowIndex].id);
+    setSelectedRowIndex(Number(rows[rowIndex].id));
     setSelectedRow(rows[rowIndex]);
   };
 
   const handleSaveChanges = (updatedRow: TableRow) => {
     if (service) {
-      service.updateRow(updatedRow.id, updatedRow).then(() => {
+      service.updateRow(Number(updatedRow.id), updatedRow).then(() => {
         getRows();
       });
     }
@@ -129,7 +129,7 @@ function TableObject({
     console.log(rowIndex + " - row index");
     console.log(rowIndexDb + " - row index database");
 
-    if (service) service.deleteRow(rowIndexDb);
+    if (service) service.deleteRow(Number(rowIndexDb));
   };
 
   const handleDeleteAll = () => {
@@ -140,7 +140,7 @@ function TableObject({
     console.log(rowIdsToDelete + " - ids to be deleted");
     if (service) {
       rowIdsToDelete.forEach((rowId) => {
-        service.deleteRow(rowId);
+        service.deleteRow(Number(rowId));
       });
     }
   };
