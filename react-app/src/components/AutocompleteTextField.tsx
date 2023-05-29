@@ -15,6 +15,7 @@ interface Props {
   label: string;
   className?: string;
   style?: React.CSSProperties;
+  defaultValue?: Option;
 }
 
 const AutocompleteTextField = ({
@@ -23,6 +24,7 @@ const AutocompleteTextField = ({
   label,
   className,
   style,
+  defaultValue,
 }: Props) => {
   const handleOnChange = (
     event: React.ChangeEvent<{}>,
@@ -41,7 +43,7 @@ const AutocompleteTextField = ({
       renderInput={(params: AutocompleteRenderInputParams) => (
         <TextField {...params} label={label} variant="outlined" fullWidth />
       )}
-      defaultValue={options[0]}
+      defaultValue={defaultValue}
     />
   );
 };

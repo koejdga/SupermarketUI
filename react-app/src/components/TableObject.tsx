@@ -126,8 +126,6 @@ function TableObject({
     let rowIndexDb = rows[rowIndex].id;
     const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
-    console.log(rowIndex + " - row index");
-    console.log(rowIndexDb + " - row index database");
 
     if (service) service.deleteRow(Number(rowIndexDb));
   };
