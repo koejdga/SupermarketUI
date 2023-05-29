@@ -5,6 +5,8 @@ import EditOrCreateWindow from "./EditOrCreateWindow";
 import { Resizable, ResizableBox } from "react-resizable";
 import CategoriesService from "../services/CategoriesService";
 import "./AddRowButton.css";
+import Modal from "react-modal";
+import "./TableObject.css";
 
 interface Props {
   columnNames: string[];
@@ -122,10 +124,16 @@ function TableObject({
     setSelectedRowIndex(-1);
   };
 
+  const [showModal, setShowModal] = useState(false);
+
   const handleDeleteRow = (rowIndex: number) => {
     let rowIndexDb = rows[rowIndex].id;
     const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
+    setShowModal(true);
+    setTimeout(() => {
+      setShowModal(false);
+    }, 1000);
     console.log(rowIndex + " - row index");
     console.log(rowIndexDb + " - row index database");
 
@@ -180,6 +188,14 @@ function TableObject({
           </tbody>
         }
       </Table>
+      <Modal
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        contentLabel="Рядок видалено"
+        className="delete-button"
+      >
+        <h2>Рядок видалено</h2>
+      </Modal>
       {selectedRow && (
         // <Resizable>
         <EditOrCreateWindow
