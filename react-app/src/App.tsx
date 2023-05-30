@@ -14,17 +14,18 @@ import AlertComponent from "./components/AlertComponent";
 import TextField from "@mui/material/TextField";
 import LoginForm from "./components/LoginForm";
 import EditOrCreateWindow from "./components/EditOrCreateWindow";
-import { Upc } from "react-bootstrap-icons";
+import { Link, Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 import ClientsService from "./services/ClientsService";
 import WorkersService from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
 import ProductsService from "./services/ProductsService";
-import ChecksService from "./services/ChecksService";
+import ChecksService, { Check } from "./services/ChecksService";
 import StoreProductsService from "./services/StoreProductsService";
 import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
+import BasicCheckInfo from "./components/BasicCheckInfo";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -45,6 +46,10 @@ function App() {
   //#endregion
 
   //#region Constants
+  const cashierID = "1";
+
+  const id_employee = "1";
+
   const isPromotionalOptions = [
     { value: "Всі", label: "Всі" },
     { value: "Акційні", label: "Акційні" },
@@ -84,7 +89,7 @@ function App() {
     "Чеки",
     "Працівники",
   ];
-  const onClickFunctionsCashier = [
+  const onClickFunctionsCashierNotFull = [
     () => setTableVisible(Table.Main),
     () => {
       setTableVisible(Table.Products);
@@ -104,6 +109,14 @@ function App() {
     },
     () => setTableVisible(Table.Profile),
   ];
+
+  const onClickFunctionsCashier = onClickFunctionsCashierNotFull.map((func) => {
+    const newFunc = () => {
+      func();
+      setSelectedUPC("");
+    };
+    return newFunc;
+  });
   const onClickFunctionsManager = [
     () => setTableVisible(Table.Main),
     () => {
@@ -229,6 +242,15 @@ function App() {
   const [showAddCheckForm, setShowAddCheckForm] = useState(false);
 
   const [checkRows, setCheckRows] = useState<TableRow[]>([]);
+
+  const [selectedCheck, setSelectedCheck] = useState<Check>({
+    id_employee: "23452",
+    check_number: "98989",
+    card_number: "",
+    print_date: new Date(),
+    sum_total: 800,
+    vat: 40,
+  });
 
   const [amountOfProductInCheck, setAmountOfProductInCheck] = useState(0);
 
@@ -1102,16 +1124,7 @@ function App() {
                   }}
                 >
                   <div style={{ display: "flex", gap: "100px" }}>
-                    <div>
-                      {/* TODO оцей номер каси я не знаю звідки брати взагалі, але ладно */}
-                      <label>Каса: 1</label>
-                      <br />
-                      <label>
-                        Дата: {new Date().toLocaleDateString("uk-ua")}
-                      </label>
-                      <br />
-                      <label>Час: {new Date().toLocaleTimeString()}</label>
-                    </div>
+                    <BasicCheckInfo cashierID={cashierID} />
 
                     <AutocompleteTextField
                       options={UPCs}
@@ -1239,6 +1252,40 @@ function App() {
                     withButtons={false}
                   />
                 )}
+                {selectedUPC !== "" && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "55px",
+                      width: "100vh",
+                    }}
+                  >
+                    <TovarCard
+                      tovarName="Крупа гречана 'Геркулес' 500г"
+                      price="50.00"
+                      amount="40"
+                      unitOfMeasurement="шт."
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        width: "700px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <label>
+                        Кількість проданих одиниць товару: {soldProductsAmount}
+                      </label>
+
+                      <DateInput
+                        dateRange={tovarDateRange}
+                        setDateRange={setTovarDateRange}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1287,31 +1334,47 @@ function App() {
         {whatTableIsVisible === Table.Checks && (
           <>
             <div className="column-container" style={{ width: "90%" }}>
-              <div style={{ width: "250px" }}>
-                <DateInput
-                  dateRange={checksDateRangeManager}
-                  setDateRange={setChecksDateRangeManager}
-                />
-              </div>
-
               {checksPageView === ShowOnChecksPage.showChecksTable && (
-                <TableObject
-                  columnNames={checksColumnNames}
-                  service={checksService}
-                  updater={updater}
-                  withButtons={false}
-                  onDoubleClickRow={showCheckInfo}
-                />
+                <div className="column-container">
+                  <div style={{ width: "250px" }}>
+                    <DateInput
+                      dateRange={checksDateRangeManager}
+                      setDateRange={setChecksDateRangeManager}
+                    />
+                  </div>
+
+                  <TableObject
+                    columnNames={checksColumnNames}
+                    service={checksService}
+                    updater={updater}
+                    withButtons={false}
+                    onDoubleClickRow={showCheckInfo}
+                  />
+                </div>
               )}
               {checksPageView === ShowOnChecksPage.showCheckInfo && (
-                <CheckInfo />
+                <>
+                  <button
+                    className="btn btn-primary"
+                    style={{ width: "200px" }}
+                    onClick={() =>
+                      setChecksPageView(ShowOnChecksPage.showChecksTable)
+                    }
+                  >
+                    Назад до всіх чеків
+                  </button>
+                  <CheckInfo
+                    check={selectedCheck}
+                    checkColumnNames={checkColumnNames}
+                  />
+                </>
               )}
             </div>
           </>
         )}
         {whatTableIsVisible === Table.Profile && (
           <div style={{ width: "50%" }}>
-            <Profile />
+            <Profile id_employee={id_employee} />
           </div>
         )}
       </div>

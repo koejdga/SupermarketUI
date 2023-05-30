@@ -39,7 +39,7 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
 
 class StoreProductsService extends Service<StoreProduct> {
   constructor() {
-    super("http://26.133.25.6:8080/api/storeProducts");
+    super("http://26.133.25.6:8080/api/store_products/by_products_number");
   }
 
   async getRows(): Promise<TableRow[]> {

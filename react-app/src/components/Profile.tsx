@@ -3,11 +3,15 @@ import "./Profile.css";
 import ProfileService from "../services/ProfileService";
 import { Worker } from "../services/WorkersService";
 
-function Profile() {
+interface Props {
+  id_employee: string;
+}
+
+function Profile({ id_employee }: Props) {
   const [worker, setWorker] = useState<Worker>();
 
   useEffect(() => {
-    let profileService = new ProfileService();
+    let profileService = new ProfileService(id_employee);
     profileService.getRow().then((responce: Worker) => {
       setWorker(worker);
     });

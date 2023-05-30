@@ -1,7 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
-import { formatDate } from "../utils/Utils";
+import { formatDate, formatDateForDb } from "../utils/Utils";
 
 export interface Check {
   check_number: string;
@@ -40,7 +40,13 @@ export function tableRowToCheck(tableRow: TableRow): Check {
 
 class ChecksService extends Service<Check> {
   constructor() {
-    super("http://26.133.25.6:8080/api/checks");
+    let left_date = formatDateForDb(new Date());
+    let right_date = left_date;
+
+    let id_employee = 0;
+    super(
+      `http://26.133.25.6:8080/api/checks/${id_employee}/${left_date}/${right_date}`
+    );
   }
 
   async getRows(): Promise<TableRow[]> {

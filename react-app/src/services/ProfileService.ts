@@ -2,8 +2,10 @@ import axios from "axios";
 import { Worker } from "./WorkersService";
 
 class ProfileService {
-  url =
-    "http://26.133.25.6:8080/api/workers/*TODO token, який треба потім буде додати*";
+  url: string;
+  constructor(id_employee: string) {
+    this.url = `http://26.133.25.6:8080/api/employees/${id_employee}`;
+  }
 
   async getRow(): Promise<Worker> {
     try {
