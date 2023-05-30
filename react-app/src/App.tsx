@@ -24,6 +24,7 @@ import ProductsService from "./services/ProductsService";
 import ChecksService from "./services/ChecksService";
 import StoreProductsService from "./services/StoreProductsService";
 import ProfileService from "./services/ProfileService";
+import CheckInfo from "./components/CheckInfo";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -133,6 +134,11 @@ function App() {
 
   const createCheckLabel = "Створити чек";
 
+  enum ShowOnChecksPage {
+    showCheckInfo = 0,
+    showChecksTable,
+  }
+
   //#endregion
 
   //#region Column names
@@ -194,6 +200,10 @@ function App() {
   //#endregion
 
   //#region Variables
+  const [checksPageView, setChecksPageView] = useState(
+    ShowOnChecksPage.showChecksTable
+  );
+
   const [whatTableIsVisible, setTableVisible] = useState(-1);
 
   const [isPromotional, setIsPromotional] = useState("");
@@ -360,6 +370,10 @@ function App() {
   };
 
   const handleAddRow = async () => {};
+
+  const showCheckInfo = () => {
+    setChecksPageView(ShowOnChecksPage.showCheckInfo);
+  };
 
   //#endregion
 
@@ -1079,52 +1093,48 @@ function App() {
               />
             )}
             {showAddCheckForm && (
-              <div>
+              <div className="column-container" style={{ width: "95%" }}>
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  <div>
-                    <label>Каса: 1</label>
-                    <br />
-                    <label>Дата: 12.05.2023</label>
-                    <br />
-                    <label>Час: 13:46</label>
-                  </div>
+                  <div style={{ display: "flex", gap: "100px" }}>
+                    <div>
+                      {/* TODO оцей номер каси я не знаю звідки брати взагалі, але ладно */}
+                      <label>Каса: 1</label>
+                      <br />
+                      <label>
+                        Дата: {new Date().toLocaleDateString("uk-ua")}
+                      </label>
+                      <br />
+                      <label>Час: {new Date().toLocaleTimeString()}</label>
+                    </div>
 
-                  <div style={{ width: "200px", marginLeft: "150px" }}>
                     <AutocompleteTextField
                       options={UPCs}
                       onChange={handleOnChangeUPC}
                       label="Картка клієнтки"
+                      style={{ width: "200px" }}
                     />
                   </div>
 
-                  <button
-                    style={{ marginLeft: "480px", height: "40px" }}
-                    className="btn btn-secondary"
-                    onClick={saveCheck}
-                  >
-                    Зберегти чек
-                  </button>
+                  <div style={{ display: "flex", gap: "30px" }}>
+                    <button className="save-check-button" onClick={saveCheck}>
+                      Зберегти чек
+                    </button>
 
-                  <button
-                    style={{ marginLeft: "20px", height: "40px" }}
-                    className="btn btn-secondary"
-                    // onClick = saveCheck + printCheck
-                  >
-                    Роздрукувати чек
-                  </button>
+                    <button
+                      className="print-check-button"
+                      // onClick = saveCheck + printCheck
+                    >
+                      Роздрукувати чек
+                    </button>
+                  </div>
                 </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "25px",
-                    marginTop: "20px",
-                  }}
-                >
+                <div style={{ display: "flex", gap: "30px" }}>
                   <AddProductForm
                     options={UPCs}
                     onAdd={function (upc: string, amount: number): void {
@@ -1139,8 +1149,7 @@ function App() {
                       );
                     }}
                   />
-
-                  <div style={{ width: "50%" }}>
+                  <div style={{ flexGrow: 1 }}>
                     <TableObject
                       columnNames={checkColumnNames}
                       rows={checkRows}
@@ -1153,7 +1162,7 @@ function App() {
         )}
         {whatTableIsVisible === Table.Products && (
           <div style={{ display: "flex" }}>
-            <div style={{ flexGrow: 1 }}>
+            <div className="column-container" style={{ flexGrow: 1 }}>
               <div
                 style={{
                   display: "flex",
@@ -1204,14 +1213,7 @@ function App() {
             </div>
 
             <div style={{ width: "1px", backgroundColor: "grey" }}></div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "5px",
-                flexGrow: 1,
-              }}
-            >
+            <div className="column-container" style={{ flexGrow: 1 }}>
               <div style={{ display: "flex", gap: "10px" }}>
                 <AutocompleteTextField
                   label="Чи акційний товар"
@@ -1234,6 +1236,7 @@ function App() {
                     columnNames={storeProductsColumnNames}
                     service={storeProductsService}
                     updater={updater}
+                    withButtons={false}
                   />
                 )}
               </div>
@@ -1241,7 +1244,7 @@ function App() {
           </div>
         )}
         {whatTableIsVisible === Table.Clients && (
-          <div style={{ width: "95%" }}>
+          <div className="column-container" style={{ width: "95%" }}>
             <div
               style={{
                 display: "flex",
@@ -1271,7 +1274,9 @@ function App() {
               columnNames={clientsColumnNames}
               service={clientsService}
               updater={updater}
+              onlyEditButton={true}
             />
+
             <EditOrCreateWindow
               columnNames={clientsColumnNames}
               saveNewRow={setNewRow}
@@ -1281,14 +1286,7 @@ function App() {
         )}
         {whatTableIsVisible === Table.Checks && (
           <>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "start",
-                gap: "25px",
-                marginBottom: "15px",
-              }}
-            >
+            <div className="column-container" style={{ width: "90%" }}>
               <div style={{ width: "250px" }}>
                 <DateInput
                   dateRange={checksDateRangeManager}
@@ -1296,53 +1294,19 @@ function App() {
                 />
               </div>
 
-              <div style={{ width: "15%" }}>
-                <AutocompleteTextField
-                  options={clientsPercents}
-                  onChange={handleOnChangePercent}
-                  label="Cashier ID"
+              {checksPageView === ShowOnChecksPage.showChecksTable && (
+                <TableObject
+                  columnNames={checksColumnNames}
+                  service={checksService}
+                  updater={updater}
+                  withButtons={false}
+                  onDoubleClickRow={showCheckInfo}
                 />
-              </div>
-
-              <button
-                style={{ marginRight: "15px" }}
-                type="button"
-                className="btn btn-secondary"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasScrolling"
-                aria-controls="offcanvasScrolling"
-              >
-                Додати чек
-              </button>
-
-              <button
-                className="btn btn-secondary"
-                style={{
-                  height: "40px",
-                  marginTop: "12px",
-                  marginLeft: "40%",
-                }}
-              >
-                Загальна сума
-              </button>
-              <PrintReportButton
-                buttonStyle={{
-                  height: "40px",
-                  marginTop: "12px",
-                }}
-              />
+              )}
+              {checksPageView === ShowOnChecksPage.showCheckInfo && (
+                <CheckInfo />
+              )}
             </div>
-            <TableObject
-              columnNames={checksColumnNames}
-              service={checksService}
-              updater={updater}
-            />
-
-            <EditOrCreateWindow
-              columnNames={checksColumnNames}
-              saveNewRow={setNewRow}
-              onSave={handleAddRow}
-            />
           </>
         )}
         {whatTableIsVisible === Table.Profile && (
@@ -1351,53 +1315,8 @@ function App() {
           </div>
         )}
       </div>
-      {/* <div style={{ display: "flex", paddingTop: "10px" }}>
-        <div style={{ flexGrow: 1 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "30px",
-            }}
-          >
-            <AutocompleteTextField
-              label="Категорія"
-              options={categories}
-              onChange={handleOnChangeCategory}
-              style={{ width: "200px" }}
-            />
-
-            <AutocompleteTextField
-              label="Назва товару"
-              options={productNames}
-              onChange={handleOnChangeProductName}
-              style={{ width: "300px" }}
-            />
-          </div>
-          <div style={{ width: "80%" }}>
-            <TableObject
-              columnNames={productsColumnNames}
-              service={productsService}
-              updater={updater}
-              withButtons={false}
-            />
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }
 
 export default App;
-
-// name="John"
-//               surname="Doe"
-//               patronymic="Smith"
-//               employeeRole="Software Engineer"
-//               salary="$120,000"
-//               dateOfBirth="January 1, 1980"
-//               dateOfWorkStart="June 1, 2015"
-//               phoneNumber="(123) 456-7890"
-//               city="San Francisco"
-//               street="123 Main St"
-//               zipCode="12345"

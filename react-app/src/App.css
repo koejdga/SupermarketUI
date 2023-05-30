@@ -5,9 +5,39 @@
   }
   
   .full-page {
-    width: 100%;
     height: 100%;
     margin-left: 15px;
     margin-top: 55px;
   }
   
+  .column-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+.save-check-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.save-check-button:hover {
+  background-color: #45a049;
+}
+
+.print-check-button {
+  background-color: #ff5722;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.print-check-button:hover {
+  background-color: #e64a19;
+}

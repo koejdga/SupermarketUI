@@ -14,15 +14,23 @@ interface Props {
   service?: CategoriesService;
   rows?: TableRow[]; // треба видалити буде цю штуку взагалі, коли всі таблиці будуть з сервісами
   updater?: boolean;
+  onlyEditButton?: boolean;
+  onDoubleClickRow?: () => void;
 }
 
 interface RowActionsProps {
   rowIndex: number;
   onDelete: (rowIndex: number) => void;
   onSelect: (rowIndex: number) => void;
+  onlyEditButton?: boolean;
 }
 
-function RowActions({ rowIndex, onDelete, onSelect }: RowActionsProps) {
+function RowActions({
+  rowIndex,
+  onDelete,
+  onSelect,
+  onlyEditButton = false,
+}: RowActionsProps) {
   const [showActions, setShowActions] = useState(false);
   const buttonARef = useRef<HTMLButtonElement>(null);
   const buttonBRef = useRef<HTMLButtonElement>(null);
@@ -51,26 +59,31 @@ function RowActions({ rowIndex, onDelete, onSelect }: RowActionsProps) {
 
   return (
     <td>
-      <button onClick={handleSelect}>Вибрати</button>
+      {!onlyEditButton && <button onClick={handleSelect}>Вибрати</button>}
       {showActions && (
         <div>
-          <button ref={buttonBRef} onClick={handleEdit}>
-            Редагувати
-          </button>
           <button
-            type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasScrolling"
             aria-controls="offcanvasScrolling"
-            ref={buttonARef}
-            style={{ display: "none" }}
+            onClick={handleEdit}
           >
-            Невидима
+            Редагувати
           </button>
-          {/* TODO: подивитися чому воно тепер видаляє все, а не один рядок */}
           <button onClick={handleDelete}>Видалити</button>
           <button onClick={handleCancel}>Скасувати</button>
         </div>
+      )}
+
+      {onlyEditButton && (
+        <button
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasScrolling"
+          aria-controls="offcanvasScrolling"
+          onClick={handleEdit}
+        >
+          Редагувати
+        </button>
       )}
     </td>
   );
@@ -81,7 +94,9 @@ function TableObject({
   withButtons = true,
   service,
   rows: initialRows,
-  updater: testVar,
+  updater,
+  onlyEditButton = false,
+  onDoubleClickRow,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
@@ -89,7 +104,7 @@ function TableObject({
 
   useEffect(() => {
     getRows();
-  }, [testVar]);
+  }, [updater]);
 
   const getRows = async () => {
     try {
@@ -158,7 +173,6 @@ function TableObject({
 
   return (
     <div>
-      <label>{testVar}</label>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -177,11 +191,17 @@ function TableObject({
                     rowIndex={rowIndex}
                     onDelete={handleDeleteRow}
                     onSelect={handleSelectRow}
+                    onlyEditButton={onlyEditButton}
                   />
                 )}
 
                 {row.values.map((rowData, index) => (
-                  <td key={`${rowIndex}-${index}`}>{rowData}</td>
+                  <td
+                    key={`${rowIndex}-${index}`}
+                    onDoubleClick={onDoubleClickRow}
+                  >
+                    {rowData}
+                  </td>
                 ))}
               </tr>
             ))}
