@@ -125,6 +125,8 @@ function TableObject({
       console.log(error);
     }
   };
+  const [showModal, setShowModal] = useState(false);
+  let windowIs: string = "Помилка";
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -136,6 +138,11 @@ function TableObject({
     if (service) {
       service.updateRow(Number(updatedRow.id), updatedRow).then(() => {
         getRows();
+        setShowModal(true);
+        setTimeout(() => {
+          setShowModal(false);
+        }, 1000);
+        windowIs = "Успішно зміненою";
       });
     }
 
@@ -146,9 +153,12 @@ function TableObject({
   const handleCancelEditing = () => {
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
+    setShowModal(true);
+    setTimeout(() => {
+      setShowModal(false);
+    }, 1000);
+    windowIs = "Зміну відмінено";
   };
-
-  const [showModal, setShowModal] = useState(false);
 
   const handleDeleteRow = (rowIndex: number) => {
     let rowIndexDb = rows[rowIndex].id;
@@ -158,6 +168,7 @@ function TableObject({
     setTimeout(() => {
       setShowModal(false);
     }, 1000);
+    windowIs = "Успішно видалено";
     console.log(rowIndex + " - row index");
     console.log(rowIndexDb + " - row index database");
 
@@ -173,6 +184,11 @@ function TableObject({
     if (service) {
       rowIdsToDelete.forEach((rowId) => {
         service.deleteRow(Number(rowId));
+        setShowModal(true);
+        setTimeout(() => {
+          setShowModal(false);
+        }, 1000);
+        windowIs = "Усе видалено успішно";
       });
     }
   };
@@ -220,10 +236,10 @@ function TableObject({
       <Modal
         isOpen={showModal}
         onRequestClose={() => setShowModal(false)}
-        contentLabel="Рядок видалено"
+        contentLabel={windowIs}
         className="delete-button"
       >
-        <h2>Рядок видалено</h2>
+        <h2>{windowIs}</h2>
       </Modal>
       {selectedRow && (
         // <Resizable>
