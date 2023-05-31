@@ -13,7 +13,7 @@ interface Props {
   columnNames: string[];
   withButtons?: boolean;
   service?: CategoriesService;
-  rows?: TableRow[]; // треба видалити буде цю штуку взагалі, коли всі таблиці будуть з сервісами
+  rows?: TableRow[];
   updater?: boolean;
   onlyEditButton?: boolean;
   onDoubleClickRow?: () => void;
