@@ -62,6 +62,16 @@ class ClientsService extends Service<Client> {
     }
   }
 
+  async getRowsBySurname(surname: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(this.baseUrl + `/${surname}`);
+      return response.data.map((row: any) => clientToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
       await axios.put(`${this.baseUrl}/${id}`, tableRowToClient(data));

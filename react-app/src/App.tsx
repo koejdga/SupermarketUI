@@ -267,6 +267,8 @@ function App() {
   >([null, null]);
 
   const [newRow, setNewRow] = useState<TableRow>();
+
+  const [currentGet, setCurrentGet] = useState(0);
   //#endregion
 
   //#region useEffect
@@ -292,11 +294,15 @@ function App() {
   };
 
   const handleOnChangeCategory = (value: string) => {
-    setCategory(value);
+    productsService.category = value;
+    if (value !== "") {
+      setCurrentGet(1);
+    } else setCurrentGet(0);
   };
 
   const handleOnChangeProductName = (value: string) => {
-    setTovarName(value);
+    console.log("отут треба зробити");
+    // setCurrentGet(() => productsService.getRowsByCategory(value));
   };
 
   const handleOnChangeUPC = (value: string) => {
@@ -304,7 +310,7 @@ function App() {
   };
 
   const handleOnChangeSurname = (value: string) => {
-    setSelectedSurname(value);
+    // setCurrentGet(() => clientsService.getRowsBySurname(value));
   };
 
   const handleOnChangePercent = (value: string) => {
@@ -328,13 +334,10 @@ function App() {
     new TableRow(1, ["1", "Напої"]),
   ]);
 
-  let categories = [];
-  for (let i = 0; i < categoriesRows.length; i++) {
-    categories.push({
-      value: categoriesRows[i].values[1],
-      label: categoriesRows[i].values[1],
-    });
-  }
+  const categories: Option[] = categoriesRows.map((row) => ({
+    value: row.values[0],
+    label: row.values[1],
+  }));
 
   const [productNamesRows, setProductNamesRows] = useState([
     new TableRow(1, ["0", "Гречка"]),
@@ -448,123 +451,6 @@ function App() {
       </div>
     </div>
   );
-
-  // const cashierPage = (
-  //   <div>
-  //     <ButtonGroup
-  //       buttonNames={buttonNamesCashier}
-  //       onClickFunctions={onClickFunctionsCashier}
-  //     />
-  //     <div style={{ marginLeft: "15px", marginTop: "15px" }}>
-  //       {whatTableIsVisible === Table.Clients && (
-  //         <>
-  //           <TextField
-  //             label="Прізвище"
-  //             value={tovarName}
-  //             onChange={handleOnChangeName}
-  //           ></TextField>
-  //           <br />
-  //           <TableObject
-  //             columnNames={clientsColumnNames}
-  //             service={clientsService}
-  //           />
-  //         </>
-  //       )}
-  //       {whatTableIsVisible === Table.Products && (
-  //         <>
-  //           <div
-  //             style={{
-  //               display: "flex",
-  //               justifyContent: "start",
-  //               gap: "15px",
-  //             }}
-  //           >
-  //             <div style={{ width: "15%" }}>
-  //               <AutocompleteTextField
-  //                 options={UPCs}
-  //                 onChange={handleOnChangeUPC}
-  //                 label="UPC"
-  //               />
-  //             </div>
-
-  //             <div
-  //               style={{
-  //                 height: "100vh",
-  //                 overflow: "hidden",
-  //                 display: "inline-block",
-  //                 width: "50%",
-  //                 borderLeft: "1px solid grey",
-  //                 paddingLeft: "15px",
-  //               }}
-  //             >
-  //               {searchFields}
-  //               <div
-  //                 style={{
-  //                   width: "80%",
-  //                 }}
-  //               >
-  //                 {selectedUPC !== "" && (
-  //                   <TovarCard
-  //                     tovarName="Крупа гречана 'Геркулес' 500г"
-  //                     price="50.00"
-  //                     amount="40"
-  //                     unitOfMeasurement="шт."
-  //                   />
-  //                 )}
-
-  //                 {selectedUPC === "" && (
-  //                   <TableObject
-  //                     columnNames={productsColumnNames}
-  //                     rows={tovaryRows}
-  //                   />
-  //                 )}
-  //               </div>
-  //             </div>
-  //           </div>
-  //         </>
-  //       )}
-  //       {whatTableIsVisible === Table.Checks && (
-  //         <>
-  //           <DateInput
-  //             dateRange={checksDateRangeCashier}
-  //             setDateRange={setChecksDateRangeCashier}
-  //           />
-  //           <TableObject columnNames={checksColumnNames} rows={checksRows} />
-  //         </>
-  //       )}
-  //       {whatTableIsVisible === Table.Profile && (
-  //         <div style={{ width: "50%" }}>
-  //           <Profile
-  //             name="John"
-  //             surname="Doe"
-  //             patronymic="Smith"
-  //             employeeRole="Software Engineer"
-  //             salary="$120,000"
-  //             dateOfBirth="January 1, 1980"
-  //             dateOfWorkStart="June 1, 2015"
-  //             phoneNumber="(123) 456-7890"
-  //             city="San Francisco"
-  //             street="123 Main St"
-  //             zipCode="12345"
-  //           />
-  //         </div>
-  //       )}
-  //       {whatTableIsVisible === -1 && (
-  //         <button
-  //           className={"btn"}
-  //           style={{
-  //             width: "100%",
-  //             height: "100vh",
-  //             backgroundColor: "#4CAF50",
-  //             fontSize: 40,
-  //           }}
-  //         >
-  //           Створити чек
-  //         </button>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
 
   const managerPage = (
     <div>
@@ -1073,7 +959,7 @@ function App() {
 
               {selectedSurname !== "" && (
                 <div style={{ width: "50%" }}>
-                  <Profile />
+                  <Profile id_employee={id_employee} />
                 </div>
               )}
             </div>
@@ -1203,6 +1089,7 @@ function App() {
                   service={productsService}
                   updater={updater}
                   withButtons={false}
+                  getFunction={currentGet}
                 />
               </div>
             </div>

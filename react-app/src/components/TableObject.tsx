@@ -7,6 +7,7 @@ import CategoriesService from "../services/CategoriesService";
 import "./AddRowButton.css";
 import Modal from "react-modal";
 import "./TableObject.css";
+import ProductsService from "../services/ProductsService";
 
 interface Props {
   columnNames: string[];
@@ -16,6 +17,7 @@ interface Props {
   updater?: boolean;
   onlyEditButton?: boolean;
   onDoubleClickRow?: () => void;
+  getFunction?: number;
 }
 
 interface RowActionsProps {
@@ -97,6 +99,7 @@ function TableObject({
   updater,
   onlyEditButton = false,
   onDoubleClickRow,
+  getFunction = 0,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
@@ -104,11 +107,17 @@ function TableObject({
 
   useEffect(() => {
     getRows();
-  }, [updater]);
+  }, [updater, getFunction]);
 
   const getRows = async () => {
     try {
-      if (service) {
+      if (getFunction === 1) {
+        let productsService = new ProductsService();
+        const result = await productsService.getRowsByCategory(
+          productsService.category
+        );
+        setRows(result);
+      } else if (service && getFunction === 0) {
         const result = await service.getRows();
         setRows(result);
       }

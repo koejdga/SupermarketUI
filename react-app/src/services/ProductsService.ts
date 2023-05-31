@@ -32,6 +32,8 @@ export function tableRowToProduct(tableRow: TableRow): Product {
 }
 
 class ProductsService extends Service<Product> {
+  category = "";
+
   constructor() {
     super("http://26.133.25.6:8080/api/products");
   }
@@ -39,6 +41,18 @@ class ProductsService extends Service<Product> {
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl);
+      return response.data.map((row: any) => productToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsByCategory(category: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + `/by_category/${category}`
+      );
       return response.data.map((row: any) => productToTableRow(row));
     } catch (error) {
       console.log(error);
