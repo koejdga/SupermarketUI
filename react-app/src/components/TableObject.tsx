@@ -8,16 +8,30 @@ import "./AddRowButton.css";
 import Modal from "react-modal";
 import "./TableObject.css";
 import ProductsService from "../services/ProductsService";
+import Service from "../services/Service";
+import StoreProductsService from "../services/StoreProductsService";
 
 interface Props {
   columnNames: string[];
   withButtons?: boolean;
-  service?: CategoriesService;
+  service?: Service;
   rows?: TableRow[];
   updater?: boolean;
   onlyEditButton?: boolean;
   onDoubleClickRow?: () => void;
   getFunction?: number;
+}
+
+export enum Get {
+  Default = 0,
+  Category,
+  ProductName,
+  UPC,
+  Promo,
+  NotPromo,
+  SortByName,
+  SortByAmount,
+  Surname,
 }
 
 interface RowActionsProps {
@@ -111,16 +125,30 @@ function TableObject({
 
   const getRows = async () => {
     try {
-      if (getFunction === 1) {
+      let result;
+      if (service && getFunction === Get.Default) {
+        result = await service.getRows();
+      } else if (getFunction === Get.Category) {
         let productsService = new ProductsService();
-        const result = await productsService.getRowsByCategory(
-          productsService.category
+        result = await productsService.getRowsByCategory(
+          ProductsService.category
         );
-        setRows(result);
-      } else if (service && getFunction === 0) {
-        const result = await service.getRows();
-        setRows(result);
+      } else if (getFunction === Get.ProductName) {
+        let productsService = new ProductsService();
+        result = await productsService.getRowsByName(
+          ProductsService.productName
+        );
+      } else if (getFunction === Get.UPC) {
+        let storeProductsService = new StoreProductsService();
+        result = await storeProductsService.getRowsByUPC(
+          StoreProductsService.UPC
+        );
+      } else if (getFunction === Get.Promo) {
+        console.log("Not implemented");
+      } else if (getFunction === Get.Surname) {
+        console.log("Not implemented");
       }
+      if (result) setRows(result);
     } catch (error) {
       console.log(error);
     }
@@ -157,7 +185,7 @@ function TableObject({
     setTimeout(() => {
       setShowModal(false);
     }, 1000);
-    windowIs = "Зміну відмінено";
+    windowIs = "Зміну скасовано";
   };
 
   const handleDeleteRow = (rowIndex: number) => {

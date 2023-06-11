@@ -1,5 +1,5 @@
 import ButtonGroup from "./components/ButtonGroup";
-import TableObject from "./components/TableObject";
+import TableObject, { Get } from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
 import { useState, ChangeEvent, useEffect } from "react";
@@ -26,6 +26,7 @@ import StoreProductsService from "./services/StoreProductsService";
 import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
+import Service from "./services/Service";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -41,14 +42,15 @@ function App() {
   const productsService = new ProductsService();
   const checksService = new ChecksService();
   const storeProductsService = new StoreProductsService();
-  const [currentService, setCurrentService] = useState(categoriesService);
+  const [currentService, setCurrentService] =
+    useState<Service>(categoriesService);
 
   //#endregion
 
   //#region Constants
   const cashierID = "1";
 
-  const id_employee = "1";
+  const id_employee = "empl_00001";
 
   const isPromotionalOptions = [
     { value: "Всі", label: "Всі" },
@@ -219,10 +221,6 @@ function App() {
 
   const [whatTableIsVisible, setTableVisible] = useState(-1);
 
-  const [isPromotional, setIsPromotional] = useState("");
-
-  const [sortingStoreProducts, setSortingStoreProducts] = useState("");
-
   const [selectedUPC, setSelectedUPC] = useState<string>("");
 
   const [selectedSurname, setSelectedSurname] = useState("");
@@ -230,12 +228,6 @@ function App() {
   const [selectedPercent, setSelectedPercent] = useState("");
 
   const [soldProductsAmount, setSoldProductsAmount] = useState(300);
-
-  const [category, setCategory] = useState<string>("");
-
-  const [tovarName, setTovarName] = useState<string>("");
-
-  const [surname, setSurname] = useState<string>("");
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
 
@@ -285,28 +277,37 @@ function App() {
   //#endregion
 
   //#region HandleOnChange functions
+
   const handleOnChangeIsPromotional = (value: string) => {
-    setIsPromotional(value);
+    if (value === "Акційні") setCurrentGet(Get.Promo);
+    else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
+    else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeSortingStoreProducts = (value: string) => {
-    setSortingStoreProducts(value);
+    if (value === "За кількістю товару") setCurrentGet(Get.SortByAmount);
+    else if (value === "За назвою") setCurrentGet(Get.SortByName);
   };
 
   const handleOnChangeCategory = (value: string) => {
-    productsService.category = value;
+    ProductsService.category = value;
     if (value !== "") {
-      setCurrentGet(1);
-    } else setCurrentGet(0);
+      setCurrentGet(Get.Category);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeProductName = (value: string) => {
-    console.log("отут треба зробити");
-    // setCurrentGet(() => productsService.getRowsByCategory(value));
+    ProductsService.productName = value;
+    if (value !== "") {
+      setCurrentGet(Get.UPC);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeUPC = (value: string) => {
-    setSelectedUPC(value);
+    StoreProductsService.UPC = value;
+    if (value !== "") {
+      setCurrentGet(Get.UPC);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeSurname = (value: string) => {
@@ -328,49 +329,92 @@ function App() {
 
   //#region Variables that will be from the database but now are hard coded
 
-  const [categoriesRows, setCategoriesRows] = useState([
-    new TableRow(1, ["0", "Напівфабрикати"]),
-    new TableRow(1, ["2", "Крупи"]),
-    new TableRow(1, ["1", "Напої"]),
-  ]);
+  const getCategoriesOptions = async () => {
+    try {
+      const result = await categoriesService.getCategoriesIds();
+      return result.map((category) => ({
+        value: category,
+        label: category,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch category options:", error);
+      return [];
+    }
+  };
 
-  const categories: Option[] = categoriesRows.map((row) => ({
-    value: row.values[0],
-    label: row.values[1],
-  }));
+  const getProductNamesOptions = async () => {
+    try {
+      const result = await productsService.getProductNames();
+      return result.map((productName) => ({
+        value: productName,
+        label: productName,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch product name options:", error);
+      return [];
+    }
+  };
 
-  const [productNamesRows, setProductNamesRows] = useState([
-    new TableRow(1, ["0", "Гречка"]),
-    new TableRow(1, ["2", "Живчик"]),
-    new TableRow(1, ["1", "Вода"]),
-  ]);
+  const [categories, setCategories] = useState<Option[]>([]);
 
-  let productNames = [];
-  for (let i = 0; i < productNamesRows.length; i++) {
-    productNames.push({
-      value: productNamesRows[i].values[1],
-      label: categoriesRows[i].values[1],
-    });
-  }
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const options = await getCategoriesOptions();
+      setCategories(options);
+    };
 
-  // TODO зробити методи які будуть віддавати оці опції з бази даних
-  const upcFromDb = [123, 1230, 3423, 5343];
-  const UPCs: Option[] = [];
-  for (let i = 0; i < upcFromDb.length; i++) {
-    UPCs.push({
-      value: upcFromDb[i].toString(),
-      label: upcFromDb[i].toString(),
-    });
-  }
+    const fetchProductNames = async () => {
+      const options = await getProductNamesOptions();
+      setProductNames(options);
+    };
 
-  const surnamesFromDb = ["Шевченко", "Хоменко", "Тесленко", "Бойко"];
-  const surnames: Option[] = [];
-  for (let i = 0; i < surnamesFromDb.length; i++) {
-    surnames.push({
-      value: surnamesFromDb[i].toString(),
-      label: surnamesFromDb[i].toString(),
-    });
-  }
+    const fetchUPCs = async () => {
+      const options = await getUPCsOptions();
+      setUPCs(options);
+    };
+
+    const fetchSurnames = async () => {
+      const options = await getSurnamesOptions();
+      setSurnames(options);
+    };
+
+    fetchCategories();
+    fetchProductNames();
+    fetchUPCs();
+    fetchSurnames();
+  }, []);
+
+  const [productNames, setProductNames] = useState<Option[]>([]);
+
+  const getUPCsOptions = async () => {
+    try {
+      const result = await storeProductsService.getUPCs();
+      return result.map((UPC) => ({
+        value: UPC,
+        label: UPC,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch UPC options:", error);
+      return [];
+    }
+  };
+
+  const [UPCs, setUPCs] = useState<Option[]>([]);
+
+  const getSurnamesOptions = async () => {
+    try {
+      const result = await storeProductsService.getUPCs();
+      return result.map((UPC) => ({
+        value: UPC,
+        label: UPC,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch surnames options:", error);
+      return [];
+    }
+  };
+
+  const [surnames, setSurnames] = useState<Option[]>([]);
 
   const clientsPercents = [
     { value: "10", label: "10" },
@@ -403,54 +447,54 @@ function App() {
   //#endregion
 
   //#region Parts of return that should be separate components maybe (maybe not)
-  const searchFields = (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "10px",
-        height: "80px",
-        gap: "30px",
-      }}
-    >
-      <AutocompleteTextField
-        label="Категорія"
-        options={categories}
-        onChange={handleOnChangeCategory}
-        style={{ width: "150px" }}
-      />
-      <AutocompleteTextField
-        label="Чи акційний товар"
-        options={isPromotionalOptions}
-        onChange={handleOnChangeIsPromotional}
-        style={{ width: "200px" }}
-      />
-      {/* <TextField
-        className="text-field"
-        label="Пошук за назвою"
-        onChange={handleOnChangeProductName}
-        variant="outlined"
-        value={tovarName}
-        sx={{ m: 1, width: 180 }}
-      /> */}
+  // const searchFields = (
+  //   <div
+  //     style={{
+  //       display: "flex",
+  //       alignItems: "center",
+  //       marginBottom: "10px",
+  //       height: "80px",
+  //       gap: "30px",
+  //     }}
+  //   >
+  //     <AutocompleteTextField
+  //       label="Категорія"
+  //       options={categories}
+  //       onChange={handleOnChangeCategory}
+  //       style={{ width: "150px" }}
+  //     />
+  //     <AutocompleteTextField
+  //       label="Чи акційний товар"
+  //       options={isPromotionalOptions}
+  //       onChange={handleOnChangeIsPromotional}
+  //       style={{ width: "200px" }}
+  //     />
+  //     {/* <TextField
+  //       className="text-field"
+  //       label="Пошук за назвою"
+  //       onChange={handleOnChangeProductName}
+  //       variant="outlined"
+  //       value={tovarName}
+  //       sx={{ m: 1, width: 180 }}
+  //     /> */}
 
-      <button
-        type="button"
-        className={"btn btn-primary"}
-        onClick={() =>
-          console.log(
-            "Searching " + category + " category and name " + tovarName
-          )
-        }
-        // style={{ marginRight: "50px" }}
-      >
-        Search
-      </button>
-      <div style={{ marginLeft: "100px" }}>
-        <PrintReportButton />
-      </div>
-    </div>
-  );
+  //     <button
+  //       type="button"
+  //       className={"btn btn-primary"}
+  //       onClick={() =>
+  //         console.log(
+  //           "Searching " + category + " category and name " + tovarName
+  //         )
+  //       }
+  //       // style={{ marginRight: "50px" }}
+  //     >
+  //       Search
+  //     </button>
+  //     <div style={{ marginLeft: "100px" }}>
+  //       <PrintReportButton />
+  //     </div>
+  //   </div>
+  // );
 
   const managerPage = (
     <div>
@@ -580,7 +624,7 @@ function App() {
                 flexGrow: 1,
               }}
             >
-              {searchFields}
+              {/* {searchFields} */}
 
               <button
                 style={{ marginRight: "15px" }}
@@ -674,7 +718,7 @@ function App() {
                 flexGrow: 1,
               }}
             >
-              {searchFields}
+              {/* {searchFields} */}
 
               <button
                 style={{ marginRight: "15px" }}
@@ -1112,7 +1156,8 @@ function App() {
               />
             </div>
 
-            <div style={{ width: "1px", backgroundColor: "grey" }}></div>
+            <div style={{ width: "1px", backgroundColor: "grey" }} />
+
             <div className="column-container" style={{ flexGrow: 1 }}>
               <div style={{ display: "flex", gap: "10px" }}>
                 <AutocompleteTextField

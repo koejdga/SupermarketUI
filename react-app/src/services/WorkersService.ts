@@ -56,7 +56,7 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
   return client;
 }
 
-class WorkersService extends Service<Worker> {
+class WorkersService extends Service {
   constructor() {
     super("http://26.133.25.6:8080/api/employees");
   }

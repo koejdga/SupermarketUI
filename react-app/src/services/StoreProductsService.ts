@@ -37,15 +37,70 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
   return product;
 }
 
-class StoreProductsService extends Service<StoreProduct> {
+class StoreProductsService extends Service {
+  static UPC = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/store_products/by_products_number");
+    super("http://26.133.25.6:8080/api/store_products");
   }
 
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl);
       return response.data.map((row: any) => storeProductToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsSortedByName(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(this.baseUrl + "/by_product_name");
+      return response.data.map((row: any) => storeProductToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsByUPC(UPC: string): Promise<TableRow[]> {
+    try {
+      console.log(UPC);
+      console.log(this.baseUrl + "/" + UPC);
+      const response = await axios.get(this.baseUrl + "/" + UPC);
+      return response.data.map((row: any) => storeProductToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsOnlyPromo(): Promise<TableRow[]> {
+    try {
+      console.log(this.baseUrl + "/promo");
+      const response = await axios.get(this.baseUrl + "/promo");
+      return response.data.map((row: any) => storeProductToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsOnlyNotPromo(): Promise<TableRow[]> {
+    try {
+      console.log(this.baseUrl + "/not_promo");
+      const response = await axios.get(this.baseUrl + "/not_promo");
+      return response.data.map((row: any) => storeProductToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getUPCs(): Promise<string[]> {
+    try {
+      const response = await axios.get(this.baseUrl);
+      return response.data.map((storeProduct: any) => storeProduct.UPC);
     } catch (error) {
       console.log(error);
       throw error;

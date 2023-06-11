@@ -22,7 +22,7 @@ function tableRowToCategory(tableRow: TableRow): Category {
   return client;
 }
 
-class CategoriesService extends Service<Category> {
+class CategoriesService extends Service {
   constructor() {
     super("http://26.133.25.6:8080/api/categories");
   }
@@ -31,6 +31,18 @@ class CategoriesService extends Service<Category> {
     try {
       const response = await axios.get(this.baseUrl);
       return response.data.map((row: any) => categoryToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getCategoriesIds(): Promise<string[]> {
+    try {
+      const response = await axios.get(this.baseUrl);
+      return response.data.map((category: any) =>
+        category.category_number.toString()
+      );
     } catch (error) {
       console.log(error);
       throw error;

@@ -38,7 +38,7 @@ export function tableRowToCheck(tableRow: TableRow): Check {
   return check;
 }
 
-class ChecksService extends Service<Check> {
+class ChecksService extends Service {
   constructor() {
     let left_date = formatDateForDb(new Date());
     let right_date = left_date;

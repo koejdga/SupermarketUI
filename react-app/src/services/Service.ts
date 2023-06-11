@@ -1,7 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 
-abstract class Service<T> {
+abstract class Service {
   protected baseUrl: string;
 
   constructor(baseUrl: string) {
