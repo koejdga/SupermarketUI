@@ -522,7 +522,7 @@ function App() {
   const saveCheck = () => {
     const checksService = new ChecksService();
     setCurrentCheck(createCheck());
-    if (currentCheck) checksService.createRow(currentCheck, sales);
+    if (currentCheck) checksService.createCheck(currentCheck, sales);
     console.log("Check is saved");
     setShowAddCheckForm(false);
   };
@@ -652,20 +652,7 @@ function App() {
                     marginTop: "20px",
                   }}
                 >
-                  <AddProductForm
-                    options={UPCs}
-                    onAdd={function (upc: string, amount: number): void {
-                      addCheckRowwww(
-                        new TableRow(1, [
-                          upc,
-                          "Персик",
-                          amount.toString(),
-                          "2",
-                          "40",
-                        ])
-                      );
-                    }}
-                  />
+                  <AddProductForm options={UPCs} onAdd={addCheckRow} />
 
                   <div style={{ width: "50%" }}>
                     <TableObject

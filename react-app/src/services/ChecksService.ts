@@ -39,14 +39,15 @@ export function tableRowToCheck(tableRow: TableRow): Check {
   return check;
 }
 
-class ChecksService {
-  baseUrl: string;
+class ChecksService extends Service {
   constructor() {
     let left_date = formatDateForDb(new Date());
     let right_date = left_date;
 
     let id_employee = 0;
-    this.baseUrl = `http://26.133.25.6:8080/api/checks/${id_employee}/${left_date}/${right_date}`;
+    super(
+      `http://26.133.25.6:8080/api/checks/${id_employee}/${left_date}/${right_date}`
+    );
   }
 
   async getRows(): Promise<TableRow[]> {
@@ -70,13 +71,23 @@ class ChecksService {
     }
   }
 
-  createRow = async (check: Check, sales: Sale[]): Promise<void> => {
+  createCheck = async (check: Check, sales: Sale[]): Promise<void> => {
     try {
       console.log("not checked");
       await axios.post("http://26.133.25.6:8080/api/checks", {
         check: check,
         products: sales,
       });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  createRow = async (row: TableRow): Promise<void> => {
+    try {
+      console.log(tableRowToCheck(row));
+      await axios.post(this.baseUrl, tableRowToCheck(row));
     } catch (error) {
       console.log(error);
       throw error;
