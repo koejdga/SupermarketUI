@@ -47,6 +47,7 @@ export function tableRowToClient(tableRow: TableRow): Client {
 }
 
 class ClientsService extends Service {
+  static surname = "";
   constructor() {
     super("http://26.133.25.6:8080/api/customer_cards");
   }
@@ -64,7 +65,10 @@ class ClientsService extends Service {
 
   async getRowsBySurname(surname: string): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl + `/${surname}`);
+      const response = await axios.get(
+        this.baseUrl + `/with_surname/${surname}`
+      );
+      console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -75,7 +79,9 @@ class ClientsService extends Service {
   async getSurnames(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl);
-      return response.data.map((client: any) => client.surname);
+      let result = response.data.map((client: any) => client.cust_surname);
+      result = [...new Set(result)];
+      return result;
     } catch (error) {
       console.log(error);
       throw error;

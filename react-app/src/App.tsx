@@ -311,7 +311,12 @@ function App() {
   };
 
   const handleOnChangeSurname = (value: string) => {
-    // setCurrentGet(() => clientsService.getRowsBySurname(value));
+    ClientsService.surname = value;
+    console.log(value);
+    if (value !== "") {
+      console.log("hello");
+      setCurrentGet(Get.ClientSurname);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangePercent = (value: string) => {
@@ -403,10 +408,10 @@ function App() {
 
   const getSurnamesOptions = async () => {
     try {
-      const result = await storeProductsService.getUPCs();
-      return result.map((UPC) => ({
-        value: UPC,
-        label: UPC,
+      let result = await clientsService.getSurnames();
+      return result.map((surname) => ({
+        value: surname,
+        label: surname,
       }));
     } catch (error) {
       console.error("Failed to fetch surnames options:", error);
@@ -1176,7 +1181,7 @@ function App() {
                 />
               </div>
               <div>
-                {selectedUPC === "" && (
+                {currentGet !== Get.UPC && (
                   <TableObject
                     columnNames={storeProductsColumnNames}
                     service={storeProductsService}
@@ -1184,7 +1189,7 @@ function App() {
                     withButtons={false}
                   />
                 )}
-                {selectedUPC !== "" && (
+                {currentGet === Get.UPC && (
                   <div
                     style={{
                       display: "flex",
@@ -1198,24 +1203,6 @@ function App() {
                       amount="40"
                       unitOfMeasurement="шт."
                     />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                        width: "700px",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <label>
-                        Кількість проданих одиниць товару: {soldProductsAmount}
-                      </label>
-
-                      <DateInput
-                        dateRange={tovarDateRange}
-                        setDateRange={setTovarDateRange}
-                      />
-                    </div>
                   </div>
                 )}
               </div>
@@ -1254,6 +1241,7 @@ function App() {
               service={clientsService}
               updater={updater}
               onlyEditButton={true}
+              getFunction={currentGet}
             />
 
             <EditOrCreateWindow
@@ -1315,3 +1303,24 @@ function App() {
 }
 
 export default App;
+
+{
+  /* <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        width: "700px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <label>
+                        Кількість проданих одиниць товару: {soldProductsAmount}
+                      </label>
+
+                      <DateInput
+                        dateRange={tovarDateRange}
+                        setDateRange={setTovarDateRange}
+                      />
+                    </div> */
+}

@@ -10,6 +10,7 @@ import "./TableObject.css";
 import ProductsService from "../services/ProductsService";
 import Service from "../services/Service";
 import StoreProductsService from "../services/StoreProductsService";
+import ClientsService from "../services/ClientsService";
 
 interface Props {
   columnNames: string[];
@@ -31,7 +32,7 @@ export enum Get {
   NotPromo,
   SortByName,
   SortByAmount,
-  Surname,
+  ClientSurname,
 }
 
 interface RowActionsProps {
@@ -140,13 +141,15 @@ function TableObject({
         );
       } else if (getFunction === Get.UPC) {
         let storeProductsService = new StoreProductsService();
-        result = await storeProductsService.getRowsByUPC(
+        result = await storeProductsService.getRowByUPC(
           StoreProductsService.UPC
         );
       } else if (getFunction === Get.Promo) {
         console.log("Not implemented");
-      } else if (getFunction === Get.Surname) {
-        console.log("Not implemented");
+      } else if (getFunction === Get.ClientSurname) {
+        console.log("we are here, everything is right");
+        let clientsService = new ClientsService();
+        result = await clientsService.getRowsBySurname(ClientsService.surname);
       }
       if (result) setRows(result);
     } catch (error) {
