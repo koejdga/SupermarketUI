@@ -88,6 +88,16 @@ class ClientsService extends Service {
     }
   }
 
+  async getClientCards(): Promise<string[]> {
+    try {
+      const response = await axios.get(this.baseUrl);
+      return response.data.map((client: any) => client.card_number);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
       await axios.put(`${this.baseUrl}/${id}`, tableRowToClient(data));

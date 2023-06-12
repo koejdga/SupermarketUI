@@ -1,7 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 
-interface Sale {
+export interface Sale {
   UPC: string;
   product_name: string;
   product_number: number;
@@ -9,7 +9,7 @@ interface Sale {
   total: number;
 }
 
-function saleToTableRow(sale: Sale): TableRow {
+export function saleToTableRow(sale: Sale): TableRow {
   const values: string[] = [
     sale.UPC,
     sale.product_name,

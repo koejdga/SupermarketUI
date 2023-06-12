@@ -27,6 +27,7 @@ import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
 import Service from "./services/Service";
+import { Sale, saleToTableRow } from "./services/SalesService";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -261,6 +262,11 @@ function App() {
   const [newRow, setNewRow] = useState<TableRow>();
 
   const [currentGet, setCurrentGet] = useState(0);
+
+  const [sales, setSales] = useState<Sale[]>([]);
+
+  const [currentCheck, setCurrentCheck] = useState<Check>();
+
   //#endregion
 
   //#region useEffect
@@ -299,7 +305,7 @@ function App() {
   const handleOnChangeProductName = (value: string) => {
     ProductsService.productName = value;
     if (value !== "") {
-      setCurrentGet(Get.UPC);
+      setCurrentGet(Get.ProductName);
     } else setCurrentGet(Get.Default);
   };
 
@@ -314,9 +320,14 @@ function App() {
     ClientsService.surname = value;
     console.log(value);
     if (value !== "") {
-      console.log("hello");
       setCurrentGet(Get.ClientSurname);
     } else setCurrentGet(Get.Default);
+  };
+
+  const [selectedClientCard, setSelectedClientCard] = useState("");
+
+  const handleOnChangeClientCard = (value: string) => {
+    setSelectedClientCard(value);
   };
 
   const handleOnChangePercent = (value: string) => {
@@ -362,33 +373,6 @@ function App() {
 
   const [categories, setCategories] = useState<Option[]>([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const options = await getCategoriesOptions();
-      setCategories(options);
-    };
-
-    const fetchProductNames = async () => {
-      const options = await getProductNamesOptions();
-      setProductNames(options);
-    };
-
-    const fetchUPCs = async () => {
-      const options = await getUPCsOptions();
-      setUPCs(options);
-    };
-
-    const fetchSurnames = async () => {
-      const options = await getSurnamesOptions();
-      setSurnames(options);
-    };
-
-    fetchCategories();
-    fetchProductNames();
-    fetchUPCs();
-    fetchSurnames();
-  }, []);
-
   const [productNames, setProductNames] = useState<Option[]>([]);
 
   const getUPCsOptions = async () => {
@@ -421,6 +405,54 @@ function App() {
 
   const [surnames, setSurnames] = useState<Option[]>([]);
 
+  const getClientCardsOptions = async () => {
+    try {
+      let result = await clientsService.getClientCards();
+      return result.map((clientCard) => ({
+        value: clientCard,
+        label: clientCard,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch surnames options:", error);
+      return [];
+    }
+  };
+
+  const [сlientCards, setClientCards] = useState<Option[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const options = await getCategoriesOptions();
+      setCategories(options);
+    };
+
+    const fetchProductNames = async () => {
+      const options = await getProductNamesOptions();
+      setProductNames(options);
+    };
+
+    const fetchUPCs = async () => {
+      const options = await getUPCsOptions();
+      setUPCs(options);
+    };
+
+    const fetchSurnames = async () => {
+      const options = await getSurnamesOptions();
+      setSurnames(options);
+    };
+
+    const fetchClientCards = async () => {
+      const options = await getClientCardsOptions();
+      setClientCards(options);
+    };
+
+    fetchCategories();
+    fetchProductNames();
+    fetchUPCs();
+    fetchSurnames();
+    fetchClientCards();
+  }, []);
+
   const clientsPercents = [
     { value: "10", label: "10" },
     { value: "20", label: "20" },
@@ -430,7 +462,8 @@ function App() {
   //#endregion
 
   //#region Functions
-  const addCheckRow = (newRow: TableRow) => {
+
+  const addCheckRowToUITable = (newRow: TableRow) => {
     if (checkRows.length === 0) {
       setCheckRows([newRow]);
     } else {
@@ -438,7 +471,58 @@ function App() {
     }
   };
 
+  const addSaleToSales = (sale: Sale) => {
+    if (sales.length === 0) {
+      setSales([sale]);
+    } else {
+      setSales([...sales, sale]);
+    }
+  };
+
+  const addCheckRow = async function (
+    upc: string,
+    amount: number
+  ): Promise<void> {
+    const storeProductService = new StoreProductsService();
+    const result = await storeProductService.getRowByUPC(upc);
+
+    const newSale = {
+      UPC: upc,
+      product_name: result.product_name,
+      product_number: amount,
+      selling_price: result.selling_price,
+      total: amount * result.selling_price,
+    };
+
+    addCheckRowToUITable(saleToTableRow(newSale));
+    addSaleToSales(newSale);
+  };
+
+  const countSumTotal = () => {
+    let result = 0;
+    for (let i = 0; i < sales.length; i++) {
+      result += sales[i].selling_price;
+    }
+    return result;
+  };
+
+  const createCheck = (): Check => {
+    const sum_total = countSumTotal();
+
+    return {
+      check_number: "-1",
+      id_employee: id_employee,
+      card_number: selectedClientCard,
+      print_date: new Date(),
+      sum_total: sum_total,
+      vat: sum_total * 0.2,
+    };
+  };
+
   const saveCheck = () => {
+    const checksService = new ChecksService();
+    setCurrentCheck(createCheck());
+    if (currentCheck) checksService.createRow(currentCheck, sales);
     console.log("Check is saved");
     setShowAddCheckForm(false);
   };
@@ -503,23 +587,14 @@ function App() {
 
   const managerPage = (
     <div>
-      <div
-        style={{
-          backgroundColor: "#ffee99",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          zIndex: 999,
-          width: "100%",
-        }}
-      >
+      <div className="button-panel">
         <ButtonGroup
-          buttonNames={buttonNamesManager}
-          onClickFunctions={onClickFunctionsManager}
+          buttonNames={buttonNamesCashier}
+          onClickFunctions={onClickFunctionsCashier}
           defaultValue={0}
         />
       </div>
-      <div className="page">
+      <div className="full-page">
         {whatTableIsVisible === Table.Main && (
           <div>
             {!showAddCheckForm && (
@@ -580,7 +655,7 @@ function App() {
                   <AddProductForm
                     options={UPCs}
                     onAdd={function (upc: string, amount: number): void {
-                      addCheckRow(
+                      addCheckRowwww(
                         new TableRow(1, [
                           upc,
                           "Персик",
@@ -1017,21 +1092,13 @@ function App() {
       </div>
     </div>
   );
+
   //#endregion
 
   return (
     // Cashier page
     <div>
-      <div
-        style={{
-          backgroundColor: "#ffee99",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          zIndex: 999,
-          width: "100%",
-        }}
-      >
+      <div className="button-panel">
         <ButtonGroup
           buttonNames={buttonNamesCashier}
           onClickFunctions={onClickFunctionsCashier}
@@ -1062,8 +1129,8 @@ function App() {
                     <BasicCheckInfo cashierID={cashierID} />
 
                     <AutocompleteTextField
-                      options={UPCs}
-                      onChange={handleOnChangeUPC}
+                      options={сlientCards}
+                      onChange={handleOnChangeClientCard}
                       label="Картка клієнтки"
                       style={{ width: "200px" }}
                     />
@@ -1083,20 +1150,7 @@ function App() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "30px" }}>
-                  <AddProductForm
-                    options={UPCs}
-                    onAdd={function (upc: string, amount: number): void {
-                      addCheckRow(
-                        new TableRow(1, [
-                          upc,
-                          "Персик",
-                          amount.toString(),
-                          "2",
-                          "40",
-                        ])
-                      );
-                    }}
-                  />
+                  <AddProductForm options={UPCs} onAdd={addCheckRow} />
                   <div style={{ flexGrow: 1 }}>
                     <TableObject
                       columnNames={checkColumnNames}

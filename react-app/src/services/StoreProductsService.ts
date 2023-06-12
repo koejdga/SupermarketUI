@@ -63,13 +63,13 @@ class StoreProductsService extends Service {
     }
   }
 
-  async getRowByUPC(UPC: string): Promise<TableRow[]> {
+  async getRowByUPC(UPC: string): Promise<StoreProduct> {
     try {
       console.log(UPC);
       console.log(this.baseUrl + "/" + UPC);
       const response = await axios.get(this.baseUrl + "/" + UPC);
       console.log(response);
-      return response.data.map((row: any) => storeProductToTableRow(row));
+      return response.data;
     } catch (error) {
       console.log(error);
       throw error;
@@ -101,7 +101,6 @@ class StoreProductsService extends Service {
   async getUPCs(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl);
-      console.log(response);
       return response.data.map((storeProduct: any) => storeProduct.upc);
     } catch (error) {
       console.log(error);

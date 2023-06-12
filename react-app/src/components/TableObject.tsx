@@ -122,11 +122,14 @@ function TableObject({
 
   useEffect(() => {
     getRows();
-  }, [updater, getFunction]);
+  }, [updater, getFunction, initialRows]);
 
   const getRows = async () => {
     try {
       let result;
+      if (initialRows) {
+        setRows(initialRows);
+      }
       if (service && getFunction === Get.Default) {
         result = await service.getRows();
       } else if (getFunction === Get.Category) {
@@ -140,10 +143,11 @@ function TableObject({
           ProductsService.productName
         );
       } else if (getFunction === Get.UPC) {
-        let storeProductsService = new StoreProductsService();
-        result = await storeProductsService.getRowByUPC(
-          StoreProductsService.UPC
-        );
+        console.log("це взагалі треба видалити");
+        // let storeProductsService = new StoreProductsService();
+        // result = await storeProductsService.getRowByUPC(
+        //   StoreProductsService.UPC
+        // );
       } else if (getFunction === Get.Promo) {
         console.log("Not implemented");
       } else if (getFunction === Get.ClientSurname) {
