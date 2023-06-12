@@ -7,7 +7,7 @@ import DateInput from "./components/DateInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
 import { Checkbox, FormControlLabel, SelectChangeEvent } from "@mui/material";
-import PrintReportButton from "./components/PrintReportButton";
+import PrintReportButton, { printReport } from "./components/PrintReportButton";
 import AddProductForm from "./components/AddProductForm";
 import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
@@ -27,7 +27,7 @@ import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
 import Service from "./services/Service";
-import { Sale, saleToTableRow } from "./services/SalesService";
+import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -510,7 +510,7 @@ function App() {
     const sum_total = countSumTotal();
 
     return {
-      check_number: "-1",
+      check_number: "9999999987",
       id_employee: id_employee,
       card_number: selectedClientCard,
       print_date: new Date(),
@@ -519,10 +519,13 @@ function App() {
     };
   };
 
-  const saveCheck = () => {
+  const saveCheck = async () => {
     const checksService = new ChecksService();
     setCurrentCheck(createCheck());
-    if (currentCheck) checksService.createCheck(currentCheck, sales);
+
+    let salesForDb = sales.map((sale) => saleToSaleForDb(sale));
+
+    if (currentCheck) await checksService.createCheck(currentCheck, salesForDb);
     console.log("Check is saved");
     setShowAddCheckForm(false);
   };
@@ -531,6 +534,10 @@ function App() {
 
   const showCheckInfo = () => {
     setChecksPageView(ShowOnChecksPage.showCheckInfo);
+  };
+
+  const printCheck = () => {
+    console.log("not implemented");
   };
 
   //#endregion
@@ -1130,7 +1137,10 @@ function App() {
 
                     <button
                       className="print-check-button"
-                      // onClick = saveCheck + printCheck
+                      onClick={() => {
+                        saveCheck();
+                        printCheck();
+                      }}
                     >
                       Роздрукувати чек
                     </button>

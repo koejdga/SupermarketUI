@@ -7,6 +7,34 @@ interface Props {
   buttonStyle?: React.CSSProperties;
 }
 
+export const printReport = (report: string) => {
+  const printWindow = window.open("", "_blank", "width=800,height=600");
+
+  if (printWindow) {
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>Print Report</title>
+      </head>
+      <body>
+        ${report}
+        <script>
+          // Automatically trigger print dialog when the window finishes loading
+          window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+              window.close();
+            };
+          };
+        </script>
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+  }
+};
+
 const PrintReportButton = ({ buttonStyle = {} }: Props) => {
   const handlePrint = () => {
     const workers = [
@@ -255,34 +283,6 @@ const PrintReportButton = ({ buttonStyle = {} }: Props) => {
   };
 
   const generateReport = () => {};
-
-  const printReport = (report: string) => {
-    const printWindow = window.open("", "_blank", "width=800,height=600");
-
-    if (printWindow) {
-      printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Report</title>
-        </head>
-        <body>
-          ${report}
-          <script>
-            // Automatically trigger print dialog when the window finishes loading
-            window.onload = function() {
-              window.print();
-              window.onafterprint = function() {
-                window.close();
-              };
-            };
-          </script>
-        </body>
-      </html>
-    `);
-
-      printWindow.document.close();
-    }
-  };
 
   return (
     <button

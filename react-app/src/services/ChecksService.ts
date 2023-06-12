@@ -2,7 +2,7 @@ import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
 import { formatDate, formatDateForDb } from "../utils/Utils";
-import { Sale } from "./SalesService";
+import { Sale, SaleForDb } from "./SalesService";
 
 export interface Check {
   check_number: string;
@@ -44,7 +44,7 @@ class ChecksService extends Service {
     let left_date = formatDateForDb(new Date());
     let right_date = left_date;
 
-    let id_employee = 0;
+    let id_employee = "empl_00001";
     super(
       `http://26.133.25.6:8080/api/checks/${id_employee}/${left_date}/${right_date}`
     );
@@ -71,9 +71,9 @@ class ChecksService extends Service {
     }
   }
 
-  createCheck = async (check: Check, sales: Sale[]): Promise<void> => {
+  createCheck = async (check: Check, sales: SaleForDb[]): Promise<void> => {
     try {
-      console.log("not checked");
+      console.log("creating check in db");
       await axios.post("http://26.133.25.6:8080/api/checks", {
         check: check,
         products: sales,

@@ -9,6 +9,15 @@ export interface Sale {
   total: number;
 }
 
+export interface SaleForDb {
+  first: string;
+  second: number;
+}
+
+export function saleToSaleForDb(sale: Sale): SaleForDb {
+  return { first: sale.UPC, second: sale.product_number };
+}
+
 export function saleToTableRow(sale: Sale): TableRow {
   const values: string[] = [
     sale.UPC,
