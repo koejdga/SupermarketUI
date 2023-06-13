@@ -90,9 +90,15 @@ class ClientsService extends Service {
     }
   }
 
+  // TODO переглянути чи норм передається пароль(тут дані паролю просто для тесту)
   async getClientCards(): Promise<string[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, {
+        auth: {
+          username: "admin",
+          password: "password",
+        },
+      });
       return response.data.map((client: any) => client.card_number);
     } catch (error) {
       console.log(error);
