@@ -284,7 +284,6 @@ function TableObject({
         <EditOrCreateWindow
           columnNames={columnNames}
           selectedRow={selectedRow}
-          onSave={handleSaveChanges}
           onCancel={handleCancelEditing}
         />
         // </Resizable>

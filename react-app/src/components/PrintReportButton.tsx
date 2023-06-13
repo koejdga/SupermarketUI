@@ -2,9 +2,17 @@ import React from "react";
 import TableRow from "../classes/TableRow";
 import { tableRowToWorker, Worker } from "../services/WorkersService";
 import { Client, tableRowToClient } from "../services/ClientsService";
+import Service from "../services/Service";
+import { Category, tableRowToCategory } from "../services/CategoriesService";
 
 interface Props {
+  service?: Service;
+  tableType?: TableType;
   buttonStyle?: React.CSSProperties;
+}
+
+export enum TableType {
+  Category = 0,
 }
 
 export const printReport = (report: string) => {
@@ -35,8 +43,15 @@ export const printReport = (report: string) => {
   }
 };
 
-const PrintReportButton = ({ buttonStyle = {} }: Props) => {
-  const handlePrint = () => {
+const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
+  const handlePrint = async () => {
+    let report = await generateReport();
+    printReport(report);
+  };
+
+  const generateReport = async () => {
+    const rows = await service?.getRows();
+    if (!rows) return "";
     const workers = [
       new TableRow(1, [
         "1",
@@ -118,6 +133,66 @@ const PrintReportButton = ({ buttonStyle = {} }: Props) => {
       ]),
     ];
 
+    switch (tableType) {
+      case TableType.Category: {
+        let categories: Category[] = [];
+        for (let i = 0; i < rows.length; i++) {
+          categories.push(tableRowToCategory(rows[i]));
+        }
+
+        const categoriesReport = `<!DOCTYPE html>
+        <html>
+        <head>
+          <title>Categories Report</title>
+          <style>
+            h1 {
+              text-align: center;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Супермаркет “ZLAGODA”</h1>
+          <h2>Категорії</h2>
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>Категорія</th>
+            </tr>
+            ${categories
+              .map(
+                (row) => `
+              <tr>
+                <td>${row.category_number}</td>
+                <td>${row.category_name}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </table>
+          <p>Дата: <span id="date"></span></p>
+          
+          <script>
+            const dateElement = document.getElementById("date");
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = today.toLocaleDateString(undefined, options);
+          </script>
+        </body>
+        </html>`;
+
+        return categoriesReport;
+      }
+    }
+
     let workerss: Worker[] = [];
     for (let i = 0; i < workers.length; i++) {
       workerss.push(tableRowToWorker(workers[i]));
@@ -127,12 +202,6 @@ const PrintReportButton = ({ buttonStyle = {} }: Props) => {
     for (let i = 0; i < clients.length; i++) {
       clientss.push(tableRowToClient(clients[i]));
     }
-
-    const categoriesRows = [
-      new TableRow(1, ["0", "Напівфабрикати"]),
-      new TableRow(1, ["2", "Крупи"]),
-      new TableRow(1, ["1", "Напої"]),
-    ];
 
     const clientsReport = `<!DOCTYPE html>
     <html>
@@ -230,59 +299,9 @@ const PrintReportButton = ({ buttonStyle = {} }: Props) => {
       </script>
     </body>
     </html>`;
-    const categoriesReport = `<!DOCTYPE html>
-    <html>
-    <head>
-      <title>Categories Report</title>
-      <style>
-        h1 {
-          text-align: center;
-        }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-        }
-        th, td {
-          border: 1px solid black;
-          padding: 8px;
-          text-align: left;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Супермаркет “ZLAGODA”</h1>
-      <h2>Категорії</h2>
-      <table>
-        <tr>
-          <th>ID</th>
-          <th>Category</th>
-        </tr>
-        ${categoriesRows
-          .map(
-            (row) => `
-          <tr>
-            <td>${row.id}</td>
-            <td>${row.values[1]}</td>
-          </tr>
-        `
-          )
-          .join("")}
-      </table>
-      <p>Дата: <span id="date"></span></p>
-      
-      <script>
-        const dateElement = document.getElementById("date");
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent = today.toLocaleDateString(undefined, options);
-      </script>
-    </body>
-    </html>`;
 
-    printReport(workersReport);
+    return "";
   };
-
-  const generateReport = () => {};
 
   return (
     <button

@@ -25,6 +25,7 @@ const EditOrCreateWindow = ({
 
   const row: TableRow = new TableRow(-1, Array(columnNames.length).fill(""));
   const [editedRow, setEditedRow] = useState(selectedRow || row);
+  const isEditing = selectedRow ? true : false;
 
   const handleChanges = (columnIndex: number, value: string) => {
     if (editedRow) {
@@ -53,7 +54,7 @@ const EditOrCreateWindow = ({
     >
       <div className="offcanvas-header" style={{ backgroundColor: "#857" }}>
         <h5 className="offcanvas-title" id="offcanvasScrollingLabel">
-          Редагування
+          {isEditing ? "Редагування" : "Додавання"}
         </h5>
         <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
           <button

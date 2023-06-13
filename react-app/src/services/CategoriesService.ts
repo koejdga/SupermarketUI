@@ -2,7 +2,7 @@ import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
 
-interface Category {
+export interface Category {
   category_number: string;
   category_name: string;
 }
@@ -13,7 +13,7 @@ function categoryToTableRow(category: Category): TableRow {
   return new TableRow(Number(category.category_number), values);
 }
 
-function tableRowToCategory(tableRow: TableRow): Category {
+export function tableRowToCategory(tableRow: TableRow): Category {
   let client: Category;
   if (tableRow.values.length === 2) {
     client = {
