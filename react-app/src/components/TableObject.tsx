@@ -11,6 +11,7 @@ import ProductsService from "../services/ProductsService";
 import Service from "../services/Service";
 import StoreProductsService from "../services/StoreProductsService";
 import ClientsService from "../services/ClientsService";
+import ChecksService from "../services/ChecksService";
 
 interface Props {
   columnNames: string[];
@@ -33,6 +34,7 @@ export enum Get {
   SortByName,
   SortByAmount,
   ClientSurname,
+  ChecksDateRangeCashier,
 }
 
 interface RowActionsProps {
@@ -154,6 +156,9 @@ function TableObject({
         console.log("we are here, everything is right");
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
+      } else if (getFunction === Get.ChecksDateRangeCashier) {
+        let checksService = new ChecksService();
+        result = await checksService.getRows();
       }
       if (result) setRows(result);
     } catch (error) {

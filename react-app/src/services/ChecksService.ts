@@ -40,19 +40,25 @@ export function tableRowToCheck(tableRow: TableRow): Check {
 }
 
 class ChecksService extends Service {
-  constructor() {
-    let left_date = formatDateForDb(new Date());
-    let right_date = left_date;
+  today = new Date();
+  id_employee = "empl_00001";
 
-    let id_employee = "empl_00001";
-    super(
-      `http://26.133.25.6:8080/api/checks/${id_employee}/${left_date}/${right_date}`
-    );
+  static left_date = new Date();
+  static right_date = new Date();
+
+  constructor() {
+    super(`http://26.133.25.6:8080/api/checks`);
   }
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(
+        this.baseUrl +
+          `/${this.id_employee}/${formatDateForDb(
+            ChecksService.left_date
+          )}/${formatDateForDb(ChecksService.right_date)}`
+      );
+
       console.log("responce");
       console.log(response);
       return response.data.map((row: any) => checkToTableRow(row));
@@ -74,7 +80,7 @@ class ChecksService extends Service {
   createCheck = async (check: Check, sales: SaleForDb[]): Promise<void> => {
     try {
       console.log("creating check in db");
-      await axios.post("http://26.133.25.6:8080/api/checks", {
+      await axios.post(this.baseUrl, {
         check: check,
         products: sales,
       });

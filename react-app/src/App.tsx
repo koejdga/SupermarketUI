@@ -282,6 +282,48 @@ function App() {
     }
   }, [newRow]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const options = await getCategoriesOptions();
+      setCategories(options);
+    };
+
+    const fetchProductNames = async () => {
+      const options = await getProductNamesOptions();
+      setProductNames(options);
+    };
+
+    const fetchUPCs = async () => {
+      const options = await getUPCsOptions();
+      setUPCs(options);
+    };
+
+    const fetchSurnames = async () => {
+      const options = await getSurnamesOptions();
+      setSurnames(options);
+    };
+
+    const fetchClientCards = async () => {
+      const options = await getClientCardsOptions();
+      setClientCards(options);
+    };
+
+    fetchCategories();
+    fetchProductNames();
+    fetchUPCs();
+    fetchSurnames();
+    fetchClientCards();
+  }, []);
+
+  useEffect(() => {
+    if (checksDateRangeCashier[0] && checksDateRangeCashier[1]) {
+      ChecksService.left_date = checksDateRangeCashier[0];
+      ChecksService.right_date = checksDateRangeCashier[1];
+    }
+
+    setCurrentGet(Get.ChecksDateRangeCashier);
+  }, [checksDateRangeCashier]);
+
   //#endregion
 
   //#region HandleOnChange functions
@@ -421,39 +463,6 @@ function App() {
   };
 
   const [сlientCards, setClientCards] = useState<Option[]>([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const options = await getCategoriesOptions();
-      setCategories(options);
-    };
-
-    const fetchProductNames = async () => {
-      const options = await getProductNamesOptions();
-      setProductNames(options);
-    };
-
-    const fetchUPCs = async () => {
-      const options = await getUPCsOptions();
-      setUPCs(options);
-    };
-
-    const fetchSurnames = async () => {
-      const options = await getSurnamesOptions();
-      setSurnames(options);
-    };
-
-    const fetchClientCards = async () => {
-      const options = await getClientCardsOptions();
-      setClientCards(options);
-    };
-
-    fetchCategories();
-    fetchProductNames();
-    fetchUPCs();
-    fetchSurnames();
-    fetchClientCards();
-  }, []);
 
   const clientsPercents = [
     { value: "10", label: "10" },
@@ -1374,8 +1383,8 @@ function App() {
                 <div className="column-container">
                   <div style={{ width: "250px" }}>
                     <DateInput
-                      dateRange={checksDateRangeManager}
-                      setDateRange={setChecksDateRangeManager}
+                      dateRange={checksDateRangeCashier}
+                      setDateRange={setChecksDateRangeCashier}
                     />
                   </div>
 
