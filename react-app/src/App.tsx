@@ -17,7 +17,7 @@ import EditOrCreateWindow from "./components/EditOrCreateWindow";
 import { Link, Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 import ClientsService from "./services/ClientsService";
-import WorkersService from "./services/WorkersService";
+import WorkersService, { tableRowToWorker } from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
 import ProductsService from "./services/ProductsService";
@@ -28,6 +28,8 @@ import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
 import Service from "./services/Service";
 import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
+import { Worker } from "./services/WorkersService";
+import ReactDOMServer from "react-dom/server";
 
 function App() {
   // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
@@ -527,6 +529,7 @@ function App() {
 
     if (currentCheck) await checksService.createCheck(currentCheck, salesForDb);
     console.log("Check is saved");
+    console.log("TODO add alert check is saved");
     setShowAddCheckForm(false);
   };
 
@@ -537,7 +540,69 @@ function App() {
   };
 
   const printCheck = () => {
-    console.log("not implemented");
+    let testSale = {
+      UPC: "11111",
+      product_name: "Aпельсин",
+      product_number: 10,
+      selling_price: 3,
+      total: 30,
+    };
+
+    setSales([testSale]);
+
+    const checkForPrinting = `<!DOCTYPE html>
+    <html>
+    <head>
+      <title>Check</title>
+      <style>
+        h1 {
+          text-align: center;
+        }
+        .sale-info {
+          display: flex;
+          justify-content: space-between;
+          width: 12rem;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Супермаркет “ZLAGODA”</h1>
+      <div>
+      <label>ID касир/ки: ${cashierID}</label>
+      <br />
+      <label>
+        Дата: ${new Date().toLocaleDateString("uk-ua")}
+      </label>
+      <br />
+      <label>
+        Час: ${new Date().toLocaleTimeString("uk-ua")}
+      </label>
+    </div>
+    <br />
+      ${sales
+        .map(
+          (sale) => `
+          <label>${sale.product_name}</label>
+          <div class="sale-info">
+            <label>${sale.selling_price} х ${sale.product_number}</label>
+            <label>${sale.total}</label>
+          </div>
+        <hr>
+      `
+        )
+        .join("")}
+
+        <br />
+        <h3>Total: ${currentCheck?.sum_total}</h3>
+      
+      
+      <script>
+      
+      </script>
+    </body>
+    </html>`;
+
+    printReport(checkForPrinting);
   };
 
   //#endregion
