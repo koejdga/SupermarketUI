@@ -6,7 +6,7 @@ interface Props {
   defaultValue?: number;
 }
 
-const ButtonGroup = ({
+const ButtonPanel = ({
   buttonNames,
   onClickFunctions,
   defaultValue,
@@ -61,4 +61,4 @@ const ButtonGroup = ({
   );
 };
 
-export default ButtonGroup;
+export default ButtonPanel;

@@ -1,4 +1,4 @@
-import ButtonGroup from "./components/ButtonGroup";
+import ButtonPanel from "./components/ButtonGroup";
 import TableObject, { Get } from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
@@ -625,7 +625,7 @@ function App() {
   const managerPage = (
     <div>
       <div className="button-panel">
-        <ButtonGroup
+        <ButtonPanel
           buttonNames={buttonNamesManager}
           onClickFunctions={onClickFunctionsManager}
           defaultValue={0}
@@ -1049,7 +1049,7 @@ function App() {
   const cashierPage = (
     <div>
       <div className="button-panel">
-        <ButtonGroup
+        <ButtonPanel
           buttonNames={buttonNamesCashier}
           onClickFunctions={onClickFunctionsCashier}
           defaultValue={0}
