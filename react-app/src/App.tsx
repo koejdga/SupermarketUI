@@ -53,6 +53,8 @@ function App() {
   //#region Constants
   const cashierID = "1";
 
+  const isCashier = true;
+
   const id_employee = "empl_00001";
 
   const isPromotionalOptions = [
@@ -387,7 +389,7 @@ function App() {
 
   //#endregion
 
-  //#region Variables that will be from the database but now are hard coded
+  //#region Variables that are taken from the database
 
   const getCategoriesOptions = async () => {
     try {
@@ -1161,10 +1163,7 @@ function App() {
     </div>
   );
 
-  //#endregion
-
-  return (
-    // Cashier page
+  const cashierPage = (
     <div>
       <div className="button-panel">
         <ButtonGroup
@@ -1424,6 +1423,13 @@ function App() {
         )}
       </div>
     </div>
+  );
+
+  //#endregion
+
+  return (
+    // Cashier page
+    <div>{isCashier ? cashierPage : managerPage}</div>
   );
 }
 
