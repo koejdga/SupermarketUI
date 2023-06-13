@@ -6,7 +6,6 @@ import "./ButtonLabelInEditWindow.css";
 interface Props {
   columnNames: string[];
   selectedRow?: TableRow;
-  onSave: (tableRow: TableRow) => void;
   onCancel?: () => void;
   saveNewRow?: (row: TableRow) => void;
 }
@@ -14,7 +13,6 @@ interface Props {
 const EditOrCreateWindow = ({
   columnNames,
   selectedRow,
-  onSave,
   onCancel,
   saveNewRow,
 }: Props) => {
@@ -37,17 +35,11 @@ const EditOrCreateWindow = ({
     }
   };
 
-  console.log("we are in EditWindow");
+  // console.log("we are in EditWindow");
 
   const handleSave = () => {
     if (saveNewRow) saveNewRow(editedRow);
-    onSave(editedRow);
   };
-
-  useEffect(() => {
-    console.log("Редагований рядок: ", editedRow);
-  }),
-    [editedRow];
 
   return (
     <div

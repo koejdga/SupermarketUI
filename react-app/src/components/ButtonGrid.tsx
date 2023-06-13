@@ -2,9 +2,9 @@ import "./ButtonGrid.css";
 
 interface Props {
   buttonLabels: string[];
-  addCheckButtonLabel: string;
+  addCheckButtonLabel?: string;
   onClickFunctions: (() => void)[];
-  onClickAddCheckButton: () => void;
+  onClickAddCheckButton?: () => void;
 }
 
 const ButtonGrid = ({
@@ -23,9 +23,13 @@ const ButtonGrid = ({
   return (
     <div className="container">
       <h2>Супермаркет "ZLAGODA"</h2>
-      <button onClick={onClickAddCheckButton} className="add-check-button">
-        {addCheckButtonLabel}
-      </button>
+      {addCheckButtonLabel && onClickAddCheckButton ? (
+        <button onClick={onClickAddCheckButton} className="add-check-button">
+          {addCheckButtonLabel}
+        </button>
+      ) : (
+        <br />
+      )}
       <div className="button-container">
         {buttonLabels.map((buttonLabel, index) => (
           <button

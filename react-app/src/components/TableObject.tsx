@@ -131,8 +131,7 @@ function TableObject({
       let result;
       if (initialRows) {
         setRows(initialRows);
-      }
-      if (service && getFunction === Get.Default) {
+      } else if (service && getFunction === Get.Default) {
         result = await service.getRows();
       } else if (getFunction === Get.Category) {
         let productsService = new ProductsService();
@@ -153,7 +152,6 @@ function TableObject({
       } else if (getFunction === Get.Promo) {
         console.log("Not implemented");
       } else if (getFunction === Get.ClientSurname) {
-        console.log("we are here, everything is right");
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
       } else if (getFunction === Get.ChecksDateRangeCashier) {

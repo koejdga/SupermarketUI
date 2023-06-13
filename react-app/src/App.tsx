@@ -53,7 +53,7 @@ function App() {
   //#region Constants
   const cashierID = "1";
 
-  const isCashier = true;
+  const isCashier = false;
 
   const id_employee = "empl_00001";
 
@@ -167,7 +167,7 @@ function App() {
 
   const productsColumnNames = [
     "ID",
-    "Категорія",
+    "ID категорії",
     "Назва продукту",
     "Характеристики",
   ];
@@ -265,7 +265,7 @@ function App() {
 
   const [newRow, setNewRow] = useState<TableRow>();
 
-  const [currentGet, setCurrentGet] = useState(0);
+  const [currentGet, setCurrentGet] = useState(Get.Default);
 
   const [sales, setSales] = useState<Sale[]>([]);
 
@@ -321,9 +321,8 @@ function App() {
     if (checksDateRangeCashier[0] && checksDateRangeCashier[1]) {
       ChecksService.left_date = checksDateRangeCashier[0];
       ChecksService.right_date = checksDateRangeCashier[1];
+      setCurrentGet(Get.ChecksDateRangeCashier);
     }
-
-    setCurrentGet(Get.ChecksDateRangeCashier);
   }, [checksDateRangeCashier]);
 
   //#endregion
@@ -544,8 +543,6 @@ function App() {
     setShowAddCheckForm(false);
   };
 
-  const handleAddRow = async () => {};
-
   const showCheckInfo = () => {
     setChecksPageView(ShowOnChecksPage.showCheckInfo);
   };
@@ -616,9 +613,13 @@ function App() {
     printReport(checkForPrinting);
   };
 
+  const getWithoutId = (array: string[]) => {
+    return array.slice(1);
+  };
+
   //#endregion
 
-  //#region Parts of return that should be separate components maybe (maybe not)
+  //#region Parts of return
   // const searchFields = (
   //   <div
   //     style={{
@@ -672,8 +673,8 @@ function App() {
     <div>
       <div className="button-panel">
         <ButtonGroup
-          buttonNames={buttonNamesCashier}
-          onClickFunctions={onClickFunctionsCashier}
+          buttonNames={buttonNamesManager}
+          onClickFunctions={onClickFunctionsManager}
           defaultValue={0}
         />
       </div>
@@ -683,9 +684,7 @@ function App() {
             {!showAddCheckForm && (
               <ButtonGrid
                 buttonLabels={buttonNamesManager.slice(1)}
-                addCheckButtonLabel={createCheckLabel}
                 onClickFunctions={onClickFunctionsManager.slice(1)}
-                onClickAddCheckButton={() => setShowAddCheckForm(true)}
               />
             )}
             {showAddCheckForm && (
@@ -836,7 +835,6 @@ function App() {
                 <EditOrCreateWindow
                   columnNames={productsColumnNames}
                   saveNewRow={setNewRow}
-                  onSave={handleAddRow}
                 />
               </div>
             </div>
@@ -930,7 +928,6 @@ function App() {
                 <EditOrCreateWindow
                   columnNames={storeProductsColumnNames}
                   saveNewRow={setNewRow}
-                  onSave={handleAddRow}
                 />
               </div>
             </div>
@@ -940,8 +937,8 @@ function App() {
           <div
             style={{
               display: "flex",
-              justifyContent: "start",
-              gap: "15px",
+              justifyContent: "space-between",
+              marginRight: "1rem",
             }}
           >
             <div style={{ width: "30%" }}>
@@ -953,8 +950,6 @@ function App() {
             </div>
             <div
               style={{
-                position: "relative",
-                left: "42%",
                 height: "50px",
               }}
             >
@@ -970,9 +965,8 @@ function App() {
               </button>
               <PrintReportButton />
               <EditOrCreateWindow
-                columnNames={categoriesColumnNames}
+                columnNames={getWithoutId(categoriesColumnNames)}
                 saveNewRow={setNewRow}
-                onSave={handleAddRow}
               />
             </div>
           </div>
@@ -1012,7 +1006,6 @@ function App() {
             <EditOrCreateWindow
               columnNames={clientsColumnNames}
               saveNewRow={setNewRow}
-              onSave={handleAddRow}
             />
           </>
         )}
@@ -1042,17 +1035,6 @@ function App() {
               </div>
 
               <button
-                style={{ marginRight: "15px" }}
-                type="button"
-                className="btn btn-secondary"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasScrolling"
-                aria-controls="offcanvasScrolling"
-              >
-                Додати чек
-              </button>
-
-              <button
                 className="btn btn-secondary"
                 style={{
                   height: "40px",
@@ -1073,12 +1055,6 @@ function App() {
               columnNames={checksColumnNames}
               service={checksService}
               updater={updater}
-            />
-
-            <EditOrCreateWindow
-              columnNames={checksColumnNames}
-              saveNewRow={setNewRow}
-              onSave={handleAddRow}
             />
           </>
         )}
@@ -1146,7 +1122,6 @@ function App() {
                   <EditOrCreateWindow
                     columnNames={workersColumnNames}
                     saveNewRow={setNewRow}
-                    onSave={handleAddRow}
                   />
                 </>
               )}
@@ -1362,7 +1337,7 @@ function App() {
 
             <TableObject
               columnNames={clientsColumnNames}
-              service={clientsService}
+              service={currentService}
               updater={updater}
               onlyEditButton={true}
               getFunction={currentGet}
@@ -1371,7 +1346,6 @@ function App() {
             <EditOrCreateWindow
               columnNames={clientsColumnNames}
               saveNewRow={setNewRow}
-              onSave={handleAddRow}
             />
           </div>
         )}

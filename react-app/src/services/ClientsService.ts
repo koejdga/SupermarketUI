@@ -56,6 +56,8 @@ class ClientsService extends Service {
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl);
+      console.log("get client cards");
+      console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
     } catch (error) {
       console.log(error);

@@ -59,7 +59,7 @@ class ChecksService extends Service {
           )}/${formatDateForDb(ChecksService.right_date)}`
       );
 
-      console.log("responce");
+      console.log("get checks");
       console.log(response);
       return response.data.map((row: any) => checkToTableRow(row));
     } catch (error) {

@@ -14,10 +14,18 @@ function categoryToTableRow(category: Category): TableRow {
 }
 
 function tableRowToCategory(tableRow: TableRow): Category {
-  const client: Category = {
-    category_number: tableRow.values[0],
-    category_name: tableRow.values[1],
-  };
+  let client: Category;
+  if (tableRow.values.length === 2) {
+    client = {
+      category_number: tableRow.values[0],
+      category_name: tableRow.values[1],
+    };
+  } else {
+    client = {
+      category_number: "-1",
+      category_name: tableRow.values[0],
+    };
+  }
 
   return client;
 }
@@ -61,7 +69,6 @@ class CategoriesService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       await axios.post(this.baseUrl, tableRowToCategory(row));
-      console.log("created new category");
     } catch (error) {
       console.log(error);
       throw error;
