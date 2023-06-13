@@ -49,7 +49,7 @@ export function tableRowToClient(tableRow: TableRow): Client {
 class ClientsService extends Service {
   static surname = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/customer_cards");
+    super("http://26.133.25.6:8080/api/user/customer_cards");
   }
 
   // TODO можливо можна зробити колонку адреса й там місто, вулиця та зіпкод

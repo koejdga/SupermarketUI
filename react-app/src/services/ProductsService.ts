@@ -36,7 +36,7 @@ class ProductsService extends Service {
   static productName = "";
 
   constructor() {
-    super("http://26.133.25.6:8080/api/products");
+    super("http://26.133.25.6:8080/api/user/products");
   }
 
   async getRows(): Promise<TableRow[]> {

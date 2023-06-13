@@ -32,7 +32,7 @@ export function tableRowToCategory(tableRow: TableRow): Category {
 
 class CategoriesService extends Service {
   constructor() {
-    super("http://26.133.25.6:8080/api/categories");
+    super("http://26.133.25.6:8080/api/user/categories");
   }
 
   async getRows(): Promise<TableRow[]> {

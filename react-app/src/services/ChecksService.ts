@@ -47,7 +47,7 @@ class ChecksService extends Service {
   static right_date = new Date();
 
   constructor() {
-    super(`http://26.133.25.6:8080/api/checks`);
+    super(`http://26.133.25.6:8080/api/user/checks`);
   }
 
   async getRows(): Promise<TableRow[]> {

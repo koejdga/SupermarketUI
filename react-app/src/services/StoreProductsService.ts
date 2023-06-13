@@ -40,7 +40,7 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
 class StoreProductsService extends Service {
   static UPC = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/store_products");
+    super("http://26.133.25.6:8080/api/user/store_products");
   }
 
   async getRows(): Promise<TableRow[]> {

@@ -7,7 +7,10 @@ import DateInput from "./components/DateInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
 import { Checkbox, FormControlLabel, SelectChangeEvent } from "@mui/material";
-import PrintReportButton, { printReport } from "./components/PrintReportButton";
+import PrintReportButton, {
+  TableType,
+  printReport,
+} from "./components/PrintReportButton";
 import AddProductForm from "./components/AddProductForm";
 import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
@@ -32,8 +35,6 @@ import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 
 function App() {
-  // TODO зробити друкування (типу щоб кнопка надрукувати звіт працювала)
-  // TODO спробувати зробити, щоб кнопка надрукувати звіт була в одному місці
   // TODO заповнити таблиці даними
   // TODO зробити щоб кнопка додавання й редагування приймала аргументи
   // TODO розібратися з таблицею Товари
@@ -301,8 +302,8 @@ function App() {
     };
 
     const fetchSurnames = async () => {
-      const options = await getSurnamesOptions();
-      setSurnames(options);
+      const options = await getClientSurnamesOptions();
+      setClientSurnames(options);
     };
 
     const fetchClientCards = async () => {
@@ -361,7 +362,7 @@ function App() {
     } else setCurrentGet(Get.Default);
   };
 
-  const handleOnChangeSurname = (value: string) => {
+  const handleOnChangeClientSurname = (value: string) => {
     ClientsService.surname = value;
     console.log(value);
     if (value !== "") {
@@ -435,7 +436,7 @@ function App() {
 
   const [UPCs, setUPCs] = useState<Option[]>([]);
 
-  const getSurnamesOptions = async () => {
+  const getClientSurnamesOptions = async () => {
     try {
       let result = await clientsService.getSurnames();
       return result.map((surname) => ({
@@ -448,7 +449,7 @@ function App() {
     }
   };
 
-  const [surnames, setSurnames] = useState<Option[]>([]);
+  const [clientSurnames, setClientSurnames] = useState<Option[]>([]);
 
   const getClientCardsOptions = async () => {
     try {
@@ -620,54 +621,6 @@ function App() {
   //#endregion
 
   //#region Parts of return
-  // const searchFields = (
-  //   <div
-  //     style={{
-  //       display: "flex",
-  //       alignItems: "center",
-  //       marginBottom: "10px",
-  //       height: "80px",
-  //       gap: "30px",
-  //     }}
-  //   >
-  //     <AutocompleteTextField
-  //       label="Категорія"
-  //       options={categories}
-  //       onChange={handleOnChangeCategory}
-  //       style={{ width: "150px" }}
-  //     />
-  //     <AutocompleteTextField
-  //       label="Чи акційний товар"
-  //       options={isPromotionalOptions}
-  //       onChange={handleOnChangeIsPromotional}
-  //       style={{ width: "200px" }}
-  //     />
-  //     {/* <TextField
-  //       className="text-field"
-  //       label="Пошук за назвою"
-  //       onChange={handleOnChangeProductName}
-  //       variant="outlined"
-  //       value={tovarName}
-  //       sx={{ m: 1, width: 180 }}
-  //     /> */}
-
-  //     <button
-  //       type="button"
-  //       className={"btn btn-primary"}
-  //       onClick={() =>
-  //         console.log(
-  //           "Searching " + category + " category and name " + tovarName
-  //         )
-  //       }
-  //       // style={{ marginRight: "50px" }}
-  //     >
-  //       Search
-  //     </button>
-  //     <div style={{ marginLeft: "100px" }}>
-  //       <PrintReportButton />
-  //     </div>
-  //   </div>
-  // );
 
   const managerPage = (
     <div>
@@ -748,95 +701,58 @@ function App() {
           </div>
         )}
         {whatTableIsVisible === Table.Products && (
-          <div
-            style={{
-              display: "flex",
-              gap: "15px",
-            }}
-          >
-            <div style={{ width: "15%" }}>
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+                marginRight: "2rem",
+                height: "80px",
+                gap: "30px",
+              }}
+            >
               <AutocompleteTextField
-                options={UPCs}
-                onChange={handleOnChangeUPC}
-                label="UPC"
+                label="Категорія"
+                options={categories}
+                onChange={handleOnChangeCategory}
+                style={{ width: "10rem" }}
               />
+
+              <div>
+                <button
+                  style={{ marginRight: "1rem" }}
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasScrolling"
+                  aria-controls="offcanvasScrolling"
+                >
+                  Додати товар
+                </button>
+                <PrintReportButton
+                  service={productsService}
+                  tableType={TableType.Product}
+                />
+              </div>
             </div>
 
             <div
               style={{
-                height: "100vh",
-                overflow: "hidden",
-                display: "inline-block",
-                width: "50%",
-                borderLeft: "1px solid grey",
-                paddingLeft: "15px",
-                flexGrow: 1,
+                width: "80%",
               }}
             >
-              {/* {searchFields} */}
+              <TableObject
+                columnNames={productsColumnNames}
+                service={productsService}
+                updater={updater}
+              />
 
-              <button
-                style={{ marginRight: "15px" }}
-                type="button"
-                className="btn btn-secondary"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasScrolling"
-                aria-controls="offcanvasScrolling"
-              >
-                Додати товар
-              </button>
-              <div
-                style={{
-                  width: "80%",
-                }}
-              >
-                {selectedUPC !== "" && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "start",
-                      gap: "15px",
-                      width: "100vh",
-                    }}
-                  >
-                    <TovarCard
-                      tovarName="Крупа гречана 'Геркулес' 500г"
-                      price="50.00"
-                      amount="40"
-                      unitOfMeasurement="шт."
-                    />
-                    <div
-                      style={{
-                        width: "700px",
-                        marginTop: "10px",
-                        marginLeft: "40px",
-                      }}
-                    >
-                      <label style={{ marginBottom: "10px" }}>
-                        Кількість проданих одиниць товару: {soldProductsAmount}
-                      </label>
-
-                      <DateInput
-                        dateRange={tovarDateRange}
-                        setDateRange={setTovarDateRange}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {selectedUPC === "" && (
-                  <TableObject
-                    columnNames={productsColumnNames}
-                    service={productsService}
-                    updater={updater}
-                  />
-                )}
-
-                <EditOrCreateWindow
-                  columnNames={productsColumnNames}
-                  saveNewRow={setNewRow}
-                />
-              </div>
+              <EditOrCreateWindow
+                columnNames={productsColumnNames}
+                saveNewRow={setNewRow}
+              />
             </div>
           </div>
         )}
@@ -844,10 +760,12 @@ function App() {
           <div
             style={{
               display: "flex",
+              width: "90%",
+              minHeight: "100vh",
               gap: "15px",
             }}
           >
-            <div style={{ width: "15%" }}>
+            <div style={{ minWidth: "200px" }}>
               <AutocompleteTextField
                 options={UPCs}
                 onChange={handleOnChangeUPC}
@@ -855,40 +773,57 @@ function App() {
               />
             </div>
 
-            <div
-              style={{
-                height: "100vh",
-                overflow: "hidden",
-                display: "inline-block",
-                width: "50%",
-                borderLeft: "1px solid grey",
-                paddingLeft: "15px",
-                flexGrow: 1,
-              }}
-            >
-              {/* {searchFields} */}
+            <div style={{ width: "1px", backgroundColor: "grey" }} />
 
-              <button
-                style={{ marginRight: "15px" }}
-                type="button"
-                className="btn btn-secondary"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasScrolling"
-                aria-controls="offcanvasScrolling"
-              >
-                Додати товар у магазині
-              </button>
+            <div className="column-container" style={{ flexGrow: 1 }}>
               <div
                 style={{
-                  width: "80%",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                {selectedUPC !== "" && (
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  <AutocompleteTextField
+                    label="Чи акційний товар"
+                    options={isPromotionalOptions}
+                    onChange={handleOnChangeIsPromotional}
+                    defaultValue={isPromotionalOptions[0]}
+                    style={{ width: "200px" }}
+                  />
+                  <AutocompleteTextField
+                    label="Сортування"
+                    options={sortingStoreProductsOptions}
+                    onChange={handleOnChangeSortingStoreProducts}
+                    defaultValue={sortingStoreProductsOptions[0]}
+                    style={{ width: "250px" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasScrolling"
+                    aria-controls="offcanvasScrolling"
+                  >
+                    Додати товар у магазині
+                  </button>
+                  <PrintReportButton />
+                </div>
+              </div>
+              <div>
+                {currentGet !== Get.UPC && (
+                  <TableObject
+                    columnNames={storeProductsColumnNames}
+                    service={storeProductsService}
+                    updater={updater}
+                  />
+                )}
+                {currentGet === Get.UPC && (
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "start",
-                      gap: "15px",
+                      gap: "55px",
                       width: "100vh",
                     }}
                   >
@@ -898,39 +833,14 @@ function App() {
                       amount="40"
                       unitOfMeasurement="шт."
                     />
-                    <div
-                      style={{
-                        width: "700px",
-                        marginTop: "10px",
-                        marginLeft: "40px",
-                      }}
-                    >
-                      <label style={{ marginBottom: "10px" }}>
-                        Кількість проданих одиниць товару: {soldProductsAmount}
-                      </label>
-
-                      <DateInput
-                        dateRange={tovarDateRange}
-                        setDateRange={setTovarDateRange}
-                      />
-                    </div>
                   </div>
                 )}
-
-                {selectedUPC === "" && (
-                  <TableObject
-                    columnNames={storeProductsColumnNames}
-                    service={storeProductsService}
-                    updater={updater}
-                  />
-                )}
-
-                <EditOrCreateWindow
-                  columnNames={storeProductsColumnNames}
-                  saveNewRow={setNewRow}
-                />
               </div>
             </div>
+            <EditOrCreateWindow
+              columnNames={storeProductsColumnNames}
+              saveNewRow={setNewRow}
+            />
           </div>
         )}
         {whatTableIsVisible === Table.Categories && (
@@ -963,7 +873,10 @@ function App() {
               >
                 Додати категорію
               </button>
-              <PrintReportButton />
+              <PrintReportButton
+                service={categoriesService}
+                tableType={TableType.Category}
+              />
               <EditOrCreateWindow
                 columnNames={getWithoutId(categoriesColumnNames)}
                 saveNewRow={setNewRow}
@@ -973,7 +886,13 @@ function App() {
         )}
         {whatTableIsVisible === Table.Clients && (
           <>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem",
+              }}
+            >
               <div style={{ width: "15%" }}>
                 <AutocompleteTextField
                   options={clientsPercents}
@@ -982,21 +901,19 @@ function App() {
                 />
               </div>
               <div style={{ marginRight: "25px" }}>
+                <button
+                  style={{ marginRight: "15px" }}
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasScrolling"
+                  aria-controls="offcanvasScrolling"
+                >
+                  Додати клієнт/ку
+                </button>
                 <PrintReportButton />
               </div>
             </div>
-            <br />
-            <button
-              style={{ marginRight: "15px" }}
-              type="button"
-              className="btn btn-secondary"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#offcanvasScrolling"
-              aria-controls="offcanvasScrolling"
-            >
-              Додати клієнт/ку
-            </button>
-            <PrintReportButton />
 
             <TableObject
               columnNames={clientsColumnNames}
@@ -1062,75 +979,66 @@ function App() {
           <div
             style={{
               display: "flex",
-              justifyContent: "start",
+              width: "90%",
+              minHeight: "100vh",
               gap: "15px",
             }}
           >
-            <div style={{ width: "15%" }}>
+            <div style={{ minWidth: "200px" }}>
               <AutocompleteTextField
-                options={UPCs}
-                onChange={handleOnChangeSurname}
+                options={clientSurnames}
+                onChange={handleOnChangeClientSurname}
                 label="Прізвище"
               />
-            </div>
-
-            <div
-              style={{
-                height: "100vh",
-                overflow: "hidden",
-                display: "inline-block",
-                borderLeft: "1px solid grey",
-                paddingLeft: "15px",
-                width: "80%",
-              }}
-            >
-              {selectedSurname === "" && (
-                <>
-                  <div
-                    style={{
-                      height: "40px",
-                      marginBottom: "10px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="Лише касир/ки"
-                      onChange={handleOnChangeOnlyCashiers}
-                    />
-                    <div>
-                      <button
-                        style={{ marginRight: "15px" }}
-                        type="button"
-                        className="btn btn-secondary"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasScrolling"
-                        aria-controls="offcanvasScrolling"
-                      >
-                        Додати робітника/цю
-                      </button>
-
-                      <PrintReportButton />
-                    </div>
-                  </div>
-                  <TableObject
-                    columnNames={workersColumnNames}
-                    service={workersService}
-                    updater={updater}
-                  />
-                  <EditOrCreateWindow
-                    columnNames={workersColumnNames}
-                    saveNewRow={setNewRow}
-                  />
-                </>
-              )}
-
-              {selectedSurname !== "" && (
-                <div style={{ width: "50%" }}>
-                  <Profile id_employee={id_employee} />
+              {WorkersService.surname !== "" && (
+                <div>
+                  <h3>{WorkersService.surname}</h3>
                 </div>
               )}
+            </div>
+
+            <div style={{ width: "1px", backgroundColor: "grey" }} />
+
+            <div className="column-container" style={{ flexGrow: 1 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "10px",
+                }}
+              >
+                <FormControlLabel
+                  control={<Checkbox defaultChecked />}
+                  label="Лише касир/ки"
+                  onChange={handleOnChangeOnlyCashiers}
+                />
+                <div>
+                  <button
+                    style={{ marginRight: "15px" }}
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasScrolling"
+                    aria-controls="offcanvasScrolling"
+                  >
+                    Додати робітника/цю
+                  </button>
+
+                  <PrintReportButton />
+                </div>
+              </div>
+              <div>
+                <TableObject
+                  columnNames={workersColumnNames}
+                  service={workersService}
+                  updater={updater}
+                />
+
+                <EditOrCreateWindow
+                  columnNames={getWithoutId(workersColumnNames)}
+                  saveNewRow={setNewRow}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -1318,8 +1226,8 @@ function App() {
               }}
             >
               <AutocompleteTextField
-                options={surnames}
-                onChange={handleOnChangeSurname}
+                options={clientSurnames}
+                onChange={handleOnChangeClientSurname}
                 label="Прізвище"
                 style={{ width: "200px" }}
               />

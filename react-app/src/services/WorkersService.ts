@@ -38,6 +38,9 @@ function workerToTableRow(worker: Worker): TableRow {
 }
 
 export function tableRowToWorker(tableRow: TableRow): Worker {
+  if (tableRow.values.length === 11) {
+    tableRow = new TableRow(tableRow.id, ["-1"].concat(tableRow.values));
+  }
   const client: Worker = {
     id_employee: tableRow.values[0],
     empl_surname: tableRow.values[1],
@@ -57,8 +60,9 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
 }
 
 class WorkersService extends Service {
+  static surname = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/employees");
+    super("http://26.133.25.6:8080/api/admin/employees");
   }
 
   // TODO можливо можна зробити колонку адреса й там місто, вулиця та зіпкод

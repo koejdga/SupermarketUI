@@ -4,6 +4,7 @@ import { tableRowToWorker, Worker } from "../services/WorkersService";
 import { Client, tableRowToClient } from "../services/ClientsService";
 import Service from "../services/Service";
 import { Category, tableRowToCategory } from "../services/CategoriesService";
+import { Product, tableRowToProduct } from "../services/ProductsService";
 
 interface Props {
   service?: Service;
@@ -13,6 +14,7 @@ interface Props {
 
 export enum TableType {
   Category = 0,
+  Product,
 }
 
 export const printReport = (report: string) => {
@@ -50,7 +52,9 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
   };
 
   const generateReport = async () => {
-    const rows = await service?.getRows();
+    const rows = await service?.getRows().catch((error) => {
+      console.log(error);
+    });
     if (!rows) return "";
     const workers = [
       new TableRow(1, [
@@ -190,6 +194,67 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
         </html>`;
 
         return categoriesReport;
+      }
+      case TableType.Product: {
+        let products: Product[] = [];
+        for (let i = 0; i < rows.length; i++) {
+          products.push(tableRowToProduct(rows[i]));
+        }
+
+        const productsReport = `<!DOCTYPE html>
+        <html>
+        <head>
+          <title>Products Report</title>
+          <style>
+            h1 {
+              text-align: center;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Супермаркет “ZLAGODA”</h1>
+          <h2>Товари</h2>
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>ID категорії</th>
+              <th>Назва товару</th>
+              <th>Характеристики</th>
+            </tr>
+            ${products
+              .map(
+                (row) => `
+              <tr>
+                <td>${row.id_product}</td>
+                <td>${row.category_number}</td>
+                <td>${row.product_name}</td>
+                <td>${row.characteristics}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </table>
+          <p>Дата: <span id="date"></span></p>
+          
+          <script>
+            const dateElement = document.getElementById("date");
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = today.toLocaleDateString(undefined, options);
+          </script>
+        </body>
+        </html>`;
+
+        return productsReport;
       }
     }
 
