@@ -62,7 +62,10 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
 class WorkersService extends Service {
   static surname = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/admin/employees");
+    super(
+      "http://26.133.25.6:8080/api/admin/employees",
+      "http://26.133.25.6:8080/api/admin/employees"
+    );
   }
 
   // TODO можливо можна зробити колонку адреса й там місто, вулиця та зіпкод
@@ -78,7 +81,7 @@ class WorkersService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.baseUrl}/${id}`, tableRowToWorker(data));
+      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToWorker(data));
     } catch (error) {
       console.log(error);
       throw error;
@@ -88,7 +91,7 @@ class WorkersService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       console.log(tableRowToWorker(row));
-      await axios.post(this.baseUrl, tableRowToWorker(row));
+      await axios.post(this.postUpdateUrl, tableRowToWorker(row));
     } catch (error) {
       console.log(error);
       throw error;

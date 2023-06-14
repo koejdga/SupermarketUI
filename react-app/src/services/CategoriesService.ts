@@ -32,7 +32,10 @@ export function tableRowToCategory(tableRow: TableRow): Category {
 
 class CategoriesService extends Service {
   constructor() {
-    super("http://26.133.25.6:8080/api/user/categories");
+    super(
+      "http://26.133.25.6:8080/api/user/categories",
+      "http://26.133.25.6:8080/api/admin/categories"
+    );
   }
 
   async getRows(): Promise<TableRow[]> {
@@ -59,7 +62,7 @@ class CategoriesService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.baseUrl}/${id}`, tableRowToCategory(data));
+      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToCategory(data));
     } catch (error) {
       console.log(error);
       throw error;
@@ -68,7 +71,7 @@ class CategoriesService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      await axios.post(this.baseUrl, tableRowToCategory(row));
+      await axios.post(this.postUpdateUrl, tableRowToCategory(row));
     } catch (error) {
       console.log(error);
       throw error;

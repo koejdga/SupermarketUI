@@ -49,7 +49,10 @@ export function tableRowToClient(tableRow: TableRow): Client {
 class ClientsService extends Service {
   static surname = "";
   constructor() {
-    super("http://26.133.25.6:8080/api/user/customer_cards");
+    super(
+      "http://26.133.25.6:8080/api/user/customer_cards",
+      "http://26.133.25.6:8080/api/user/customer_cards"
+    );
   }
 
   // TODO можливо можна зробити колонку адреса й там місто, вулиця та зіпкод
@@ -108,7 +111,7 @@ class ClientsService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.baseUrl}/${id}`, tableRowToClient(data));
+      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToClient(data));
     } catch (error) {
       console.log(error);
       throw error;
@@ -117,7 +120,7 @@ class ClientsService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      await axios.post(this.baseUrl, tableRowToClient(row));
+      await axios.post(this.postUpdateUrl, tableRowToClient(row));
     } catch (error) {
       console.log(error);
       throw error;

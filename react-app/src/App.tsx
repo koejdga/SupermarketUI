@@ -35,7 +35,6 @@ import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 
 function App() {
-  // TODO заповнити таблиці даними
   // TODO зробити щоб кнопка додавання й редагування приймала аргументи
   // TODO розібратися з таблицею Товари
 
@@ -54,9 +53,9 @@ function App() {
   //#region Constants
   const cashierID = "1";
 
-  const isCashier = false;
+  const isCashier = true;
 
-  const id_employee = "empl_00001";
+  const id_employee = "em_1";
 
   const isPromotionalOptions = [
     { value: "Всі", label: "Всі" },
@@ -177,6 +176,14 @@ function App() {
     "UPC",
     "Акційне UPC",
     "Назва",
+    "Ціна",
+    "Кількість одиниць",
+    "Акційний",
+  ];
+  const storeProductsColumnNamesToPost = [
+    "UPC",
+    "Акційне UPC",
+    "ID товару",
     "Ціна",
     "Кількість одиниць",
     "Акційний",
@@ -501,7 +508,7 @@ function App() {
 
     const newSale = {
       UPC: upc,
-      product_name: result.product_name,
+      product_name: result.product_name.toString(),
       product_number: amount,
       selling_price: result.selling_price,
       total: amount * result.selling_price,
@@ -514,16 +521,17 @@ function App() {
   const countSumTotal = () => {
     let result = 0;
     for (let i = 0; i < sales.length; i++) {
-      result += sales[i].selling_price;
+      result += sales[i].total;
     }
     return result;
   };
 
   const createCheck = (): Check => {
     const sum_total = countSumTotal();
+    console.log("created check and sum_total = " + sum_total);
 
     return {
-      check_number: "9999999987",
+      check_number: "-1",
       id_employee: id_employee,
       card_number: selectedClientCard,
       print_date: new Date(),
@@ -549,16 +557,6 @@ function App() {
   };
 
   const printCheck = () => {
-    let testSale = {
-      UPC: "11111",
-      product_name: "Aпельсин",
-      product_number: 10,
-      selling_price: 3,
-      total: 30,
-    };
-
-    setSales([testSale]);
-
     const checkForPrinting = `<!DOCTYPE html>
     <html>
     <head>
@@ -603,7 +601,6 @@ function App() {
 
         <br />
         <h3>Total: ${currentCheck?.sum_total}</h3>
-      
       
       <script>
       
@@ -798,7 +795,12 @@ function App() {
                     style={{ width: "250px" }}
                   />
                 </div>
-                <div style={{ display: "flex", gap: "1rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                  }}
+                >
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -838,7 +840,7 @@ function App() {
               </div>
             </div>
             <EditOrCreateWindow
-              columnNames={storeProductsColumnNames}
+              columnNames={storeProductsColumnNamesToPost}
               saveNewRow={setNewRow}
             />
           </div>
@@ -1087,14 +1089,23 @@ function App() {
                   </div>
 
                   <div style={{ display: "flex", gap: "30px" }}>
-                    <button className="save-check-button" onClick={saveCheck}>
+                    <button
+                      className="save-check-button"
+                      onClick={async () => {
+                        await saveCheck();
+                      }}
+                    >
                       Зберегти чек
                     </button>
 
                     <button
                       className="print-check-button"
-                      onClick={() => {
-                        saveCheck();
+                      onClick={async () => {
+                        try {
+                          await saveCheck();
+                        } catch (error) {
+                          console.log(error);
+                        }
                         printCheck();
                       }}
                     >

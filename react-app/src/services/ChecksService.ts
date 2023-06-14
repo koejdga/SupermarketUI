@@ -41,13 +41,16 @@ export function tableRowToCheck(tableRow: TableRow): Check {
 
 class ChecksService extends Service {
   today = new Date();
-  id_employee = "empl_00001";
+  id_employee = "em_1";
 
   static left_date = new Date();
   static right_date = new Date();
 
   constructor() {
-    super(`http://26.133.25.6:8080/api/user/checks`);
+    super(
+      "http://26.133.25.6:8080/api/user/checks",
+      "http://26.133.25.6:8080/api/user/checks"
+    );
   }
 
   async getRows(): Promise<TableRow[]> {
@@ -80,7 +83,9 @@ class ChecksService extends Service {
   createCheck = async (check: Check, sales: SaleForDb[]): Promise<void> => {
     try {
       console.log("creating check in db");
-      await axios.post(this.baseUrl, {
+      console.log(check);
+      console.log(sales);
+      await axios.post(this.postUpdateUrl, {
         check: check,
         products: sales,
       });

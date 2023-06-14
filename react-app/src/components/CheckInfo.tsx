@@ -16,6 +16,7 @@ const CheckInfo = ({ check, checkColumnNames }: Props) => {
 
   useEffect(() => {
     const fetchCheckRows = async () => {
+      console.log(check.check_number);
       const salesService = new SalesService(check.check_number);
       const result = await salesService.getRows();
       setCheckRows(result);

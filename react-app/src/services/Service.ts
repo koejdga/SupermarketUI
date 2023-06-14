@@ -3,9 +3,11 @@ import TableRow from "../classes/TableRow";
 
 abstract class Service {
   protected baseUrl: string;
+  protected postUpdateUrl: string;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, postUpdateUrl: string) {
     this.baseUrl = baseUrl;
+    this.postUpdateUrl = postUpdateUrl;
   }
 
   abstract getRows(): Promise<TableRow[]>;
@@ -21,7 +23,7 @@ abstract class Service {
 
   async deleteRow(id: number): Promise<void> {
     try {
-      await axios.delete(`${this.baseUrl}/${id}`);
+      await axios.delete(`${this.postUpdateUrl}/${id}`);
       console.log("deleted from db");
     } catch (error) {
       console.log(error);

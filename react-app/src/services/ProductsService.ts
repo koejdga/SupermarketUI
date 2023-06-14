@@ -36,7 +36,10 @@ class ProductsService extends Service {
   static productName = "";
 
   constructor() {
-    super("http://26.133.25.6:8080/api/user/products");
+    super(
+      "http://26.133.25.6:8080/api/user/products",
+      "http://26.133.25.6:8080/api/admin/products"
+    );
   }
 
   async getRows(): Promise<TableRow[]> {
@@ -85,7 +88,7 @@ class ProductsService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.baseUrl}/${id}`, tableRowToProduct(data));
+      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToProduct(data));
     } catch (error) {
       console.log(error);
       throw error;
@@ -95,7 +98,7 @@ class ProductsService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       console.log(tableRowToProduct(row));
-      await axios.post(this.baseUrl, tableRowToProduct(row));
+      await axios.post(this.postUpdateUrl, tableRowToProduct(row));
     } catch (error) {
       console.log(error);
       throw error;

@@ -33,12 +33,14 @@ export function saleToTableRow(sale: Sale): TableRow {
 class SalesService {
   url: string;
   constructor(check_number: string) {
-    this.url = `http://26.133.25.6:8080/api/sales/${check_number}`;
+    this.url = `http://26.133.25.6:8080/api/user/sales/${check_number}`;
   }
 
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.url);
+      console.log("sales");
+      console.log(response);
       return response.data.map((row: any) => saleToTableRow(row));
     } catch (error) {
       console.log(error);
