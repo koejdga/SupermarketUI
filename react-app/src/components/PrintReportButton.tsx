@@ -146,51 +146,51 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
         const categoriesReport = `<!DOCTYPE html>
         <html>
-        <head>
-          <title>Categories Report</title>
-          <style>
-            h1 {
-              text-align: center;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 8px;
-              text-align: left;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Супермаркет “ZLAGODA”</h1>
-          <h2>Категорії</h2>
-          <table>
-            <tr>
-              <th>ID</th>
-              <th>Категорія</th>
-            </tr>
-            ${categories
-              .map(
-                (row) => `
+          <head>
+            <title>Categories Report</title>
+            <style>
+              h1 {
+                text-align: center;
+              }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>Супермаркет “ZLAGODA”</h1>
+            <h2>Категорії</h2>
+            <table>
               <tr>
-                <td>${row.category_number}</td>
-                <td>${row.category_name}</td>
+                <th>ID</th>
+                <th>Категорія</th>
               </tr>
-            `
-              )
-              .join("")}
-          </table>
-          <p>Дата: <span id="date"></span></p>
+              ${categories
+                .map(
+                  (row) => `
+                <tr>
+                  <td>${row.category_number}</td>
+                  <td>${row.category_name}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </table>
+            <p>Дата: <span id="date"></span></p>
           
-          <script>
-            const dateElement = document.getElementById("date");
-            const today = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            dateElement.textContent = today.toLocaleDateString(undefined, options);
-          </script>
-        </body>
+            <script>
+              const dateElement = document.getElementById("date");
+              const today = new Date();
+              const options = { year: 'numeric', month: 'long', day: 'numeric' };
+              dateElement.textContent = today.toLocaleDateString(undefined, options);
+            </script>
+          </body>
         </html>`;
 
         return categoriesReport;
@@ -203,55 +203,55 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
         const productsReport = `<!DOCTYPE html>
         <html>
-        <head>
-          <title>Products Report</title>
-          <style>
-            h1 {
-              text-align: center;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 8px;
-              text-align: left;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Супермаркет “ZLAGODA”</h1>
-          <h2>Товари</h2>
-          <table>
-            <tr>
-              <th>ID</th>
-              <th>ID категорії</th>
-              <th>Назва товару</th>
-              <th>Характеристики</th>
-            </tr>
-            ${products
-              .map(
-                (row) => `
+          <head>
+            <title>Products Report</title>
+            <style>
+              h1 {
+                text-align: center;
+              }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>Супермаркет “ZLAGODA”</h1>
+            <h2>Товари</h2>
+            <table>
               <tr>
-                <td>${row.id_product}</td>
-                <td>${row.category_number}</td>
-                <td>${row.product_name}</td>
-                <td>${row.characteristics}</td>
+                <th>ID</th>
+                <th>ID категорії</th>
+                <th>Назва товару</th>
+                <th>Характеристики</th>
               </tr>
-            `
-              )
-              .join("")}
-          </table>
-          <p>Дата: <span id="date"></span></p>
+              ${products
+                .map(
+                  (row) => `
+                <tr>
+                  <td>${row.id_product}</td>
+                  <td>${row.category_number}</td>
+                  <td>${row.product_name}</td>
+                  <td>${row.characteristics}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </table>
+            <p>Дата: <span id="date"></span></p>
           
-          <script>
-            const dateElement = document.getElementById("date");
-            const today = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            dateElement.textContent = today.toLocaleDateString(undefined, options);
-          </script>
-        </body>
+            <script>
+              const dateElement = document.getElementById("date");
+              const today = new Date();
+              const options = { year: 'numeric', month: 'long', day: 'numeric' };
+              dateElement.textContent = today.toLocaleDateString(undefined, options);
+            </script>
+          </body>
         </html>`;
 
         return productsReport;
@@ -270,99 +270,102 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
     const clientsReport = `<!DOCTYPE html>
     <html>
-    <head>
-      <title>Clients Report</title>
-      <style>
-        h1 {
-          text-align: center;
-        }
-        p {
-          margin-bottom: 10px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Супермаркет “ZLAGODA”</h1>
-      <h2>Звіт про клієнток</h2>
-      ${clientss
-        .map(
-          (client) => `
-        <p>Номер картки: ${client.card_number}</p>
-        <p>Знижка: ${client.percent}%</p>
-        <p>П.І.Б.: ${client.cust_surname} ${client.cust_name} ${client.cust_patronymic}</p>
-        <p>Номер телефону: ${client.phone_number}</p>
-        <p>Адреса: вул. ${client.street}, м. ${client.city} ${client.zip_code}</p>
-        <hr>
-      `
-        )
-        .join("")}
+      <head>
+        <title>Clients Report</title>
+        <style>
+          h1 {
+            text-align: center;
+          }
+          p {
+            margin-bottom: 10px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Супермаркет “ZLAGODA”</h1>
+        <h2>Звіт про клієнток</h2>
+        ${clientss
+          .map(
+            (client) => `
+          <p>Номер картки: ${client.card_number}</p>
+          <p>Знижка: ${client.percent}%</p>
+          <p>П.І.Б.: ${client.cust_surname} ${client.cust_name} ${client.cust_patronymic}</p>
+          <p>Номер телефону: ${client.phone_number}</p>
+          <p>Адреса: вул. ${client.street}, м. ${client.city} ${client.zip_code}</p>
+          <hr>
+        `
+          )
+          .join("")}
       
-      <p>Дата: <span id="date"></span></p>
+        <p>Дата: <span id="date"></span></p>
       
-      <script>
-        const dateElement = document.getElementById("date");
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent = today.toLocaleDateString(undefined, options);
-      </script>
-    </body>
+        <script>
+          const dateElement = document.getElementById("date");
+          const today = new Date();
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          dateElement.textContent = today.toLocaleDateString(undefined, options);
+        </script>
+      </body>
     </html>`;
     const workersReport = `<!DOCTYPE html>
     <html>
-    <head>
-      <title>Workers Report</title>
-      <style>
-        h1 {
-          text-align: center;
-        }
-        p {
-          margin-bottom: 10px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Супермаркет “ZLAGODA”</h1>
-      <h2>Звіт про працівників</h2>
-      ${workerss
-        .map(
-          (worker) => `
-        <p>ID: ${worker.id_employee}</p>
-        <p>П.І.Б.: ${worker.empl_surname} ${worker.empl_name} ${
-            worker.empl_patronymic
-          }</p>
-        <p>Посада: ${worker.empl_role}</p>
-        <p>Зарплата: ${worker.salary} грн.</p>
-        <p>Дата народження: ${worker.date_of_birth.toLocaleDateString("uk-UA", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })}</p>
-        <p>Дата початку роботи: ${worker.date_of_start.toLocaleDateString(
-          "uk-UA",
-          {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
+      <head>
+        <title>Workers Report</title>
+        <style>
+          h1 {
+            text-align: center;
           }
-        )}</p>
-        <p>Номер телефону: ${worker.phone_number}</p>
-        <p>Адреса: вул. ${worker.street}, м. ${worker.city} ${
-            worker.zip_code
-          }</p>
-        <hr>
-      `
-        )
-        .join("")}
+          p {
+            margin-bottom: 10px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Супермаркет “ZLAGODA”</h1>
+        <h2>Звіт про працівників</h2>
+        ${workerss
+          .map(
+            (worker) => `
+          <p>ID: ${worker.id_employee}</p>
+          <p>П.І.Б.: ${worker.empl_surname} ${worker.empl_name} ${
+              worker.empl_patronymic
+            }</p>
+          <p>Посада: ${worker.empl_role}</p>
+          <p>Зарплата: ${worker.salary} грн.</p>
+          <p>Дата народження: ${worker.date_of_birth.toLocaleDateString(
+            "uk-UA",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}</p>
+          <p>Дата початку роботи: ${worker.date_of_start.toLocaleDateString(
+            "uk-UA",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}</p>
+          <p>Номер телефону: ${worker.phone_number}</p>
+          <p>Адреса: вул. ${worker.street}, м. ${worker.city} ${
+              worker.zip_code
+            }</p>
+          <hr>
+        `
+          )
+          .join("")}
       
-      <p>Дата: <span id="date"></span></p>
+        <p>Дата: <span id="date"></span></p>
       
-      <script>
-        const dateElement = document.getElementById("date");
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent = today.toLocaleDateString(undefined, options);
-      </script>
-    </body>
+        <script>
+          const dateElement = document.getElementById("date");
+          const today = new Date();
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          dateElement.textContent = today.toLocaleDateString(undefined, options);
+        </script>
+      </body>
     </html>`;
 
     return "";
