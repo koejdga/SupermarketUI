@@ -559,53 +559,49 @@ function App() {
   const printCheck = () => {
     const checkForPrinting = `<!DOCTYPE html>
     <html>
-    <head>
-      <title>Check</title>
-      <style>
-        h1 {
-          text-align: center;
-        }
-        .sale-info {
-          display: flex;
-          justify-content: space-between;
-          width: 12rem;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Супермаркет “ZLAGODA”</h1>
-      <div>
-      <label>ID касир/ки: ${cashierID}</label>
+      <head>
+        <title>Check</title>
+        <style>
+          h1 {
+            text-align: center;
+          }
+          .sale-info {
+            display: flex;
+            justify-content: space-between;
+           width: 12rem;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Супермаркет “ZLAGODA”</h1>
+        <div>
+          <label>ID касир/ки: ${cashierID}</label>
+            <br />
+            <label>
+              Дата: ${new Date().toLocaleDateString("uk-ua")}
+            </label>
+            <br />
+          <label>
+            Час: ${new Date().toLocaleTimeString("uk-ua")}
+          </label>
+        </div>
       <br />
-      <label>
-        Дата: ${new Date().toLocaleDateString("uk-ua")}
-      </label>
+        ${sales
+          .map(
+            (sale) => `
+            <label>${sale.product_name}</label>
+              <div class="sale-info">
+                <label>${sale.selling_price} х ${sale.product_number}</label>
+                <label>${sale.total}</label>
+              </div>
+            <hr>
+          `
+          )
+          .join("")}
       <br />
-      <label>
-        Час: ${new Date().toLocaleTimeString("uk-ua")}
-      </label>
-    </div>
-    <br />
-      ${sales
-        .map(
-          (sale) => `
-          <label>${sale.product_name}</label>
-          <div class="sale-info">
-            <label>${sale.selling_price} х ${sale.product_number}</label>
-            <label>${sale.total}</label>
-          </div>
-        <hr>
-      `
-        )
-        .join("")}
-
-        <br />
         <h3>Total: ${currentCheck?.sum_total}</h3>
       
-      <script>
-      
-      </script>
-    </body>
+      </body>
     </html>`;
 
     printReport(checkForPrinting);
