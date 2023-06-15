@@ -68,7 +68,6 @@ class WorkersService extends Service {
     );
   }
 
-  // TODO можливо можна зробити колонку адреса й там місто, вулиця та зіпкод
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl);

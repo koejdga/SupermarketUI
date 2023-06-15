@@ -11,7 +11,7 @@ import PrintReportButton, {
   TableType,
   printReport,
 } from "./components/PrintReportButton";
-import AddProductForm from "./components/AddProductForm";
+import AddProductInCheckForm from "./components/AddProductInCheckForm";
 import type { Option } from "./components/AutocompleteTextField";
 import AlertComponent from "./components/AlertComponent";
 import TextField from "@mui/material/TextField";
@@ -35,9 +35,6 @@ import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 
 function App() {
-  // TODO зробити щоб кнопка додавання й редагування приймала аргументи
-  // TODO розібратися з таблицею Товари
-
   //#region Services
   const categoriesService = new CategoriesService();
   const clientsService = new ClientsService();
@@ -189,7 +186,6 @@ function App() {
     "Акційний",
   ];
 
-  // TODO можливо ініціали теж не варто розділяти на окремі колонки, типу навіщо це (і адресу)
   const clientsColumnNames = [
     "Номер картки",
     "Прізвище",
@@ -294,7 +290,7 @@ function App() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const options = await getCategoriesOptions();
+      const options = await categoriesService.getCategoriesOptions();
       setCategories(options);
     };
 
@@ -397,19 +393,6 @@ function App() {
   //#endregion
 
   //#region Variables that are taken from the database
-
-  const getCategoriesOptions = async () => {
-    try {
-      const result = await categoriesService.getCategoriesIds();
-      return result.map((category) => ({
-        value: category,
-        label: category,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch category options:", error);
-      return [];
-    }
-  };
 
   const getProductNamesOptions = async () => {
     try {
@@ -627,70 +610,10 @@ function App() {
       <div className="full-page">
         {whatTableIsVisible === Table.Main && (
           <div>
-            {!showAddCheckForm && (
-              <ButtonGrid
-                buttonLabels={buttonNamesManager.slice(1)}
-                onClickFunctions={onClickFunctionsManager.slice(1)}
-              />
-            )}
-            {showAddCheckForm && (
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <div>
-                    <label>Каса: 1</label>
-                    <br />
-                    <label>Дата: 12.05.2023</label>
-                    <br />
-                    <label>Час: 13:46</label>
-                  </div>
-
-                  <div style={{ width: "200px", marginLeft: "150px" }}>
-                    <AutocompleteTextField
-                      options={UPCs}
-                      onChange={handleOnChangeUPC}
-                      label="Картка клієнтки"
-                    />
-                  </div>
-
-                  <button
-                    style={{ marginLeft: "480px", height: "40px" }}
-                    className="btn btn-secondary"
-                    onClick={saveCheck}
-                  >
-                    Зберегти чек
-                  </button>
-
-                  <button
-                    style={{ marginLeft: "20px", height: "40px" }}
-                    className="btn btn-secondary"
-                    // onClick = saveCheck + printCheck
-                  >
-                    Роздрукувати чек
-                  </button>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "25px",
-                    marginTop: "20px",
-                  }}
-                >
-                  <AddProductForm options={UPCs} onAdd={addCheckRow} />
-
-                  <div style={{ width: "50%" }}>
-                    <TableObject
-                      columnNames={checkColumnNames}
-                      rows={checkRows}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+            <ButtonGrid
+              buttonLabels={buttonNamesManager.slice(1)}
+              onClickFunctions={onClickFunctionsManager.slice(1)}
+            />
           </div>
         )}
         {whatTableIsVisible === Table.Products && (
@@ -743,7 +666,7 @@ function App() {
               />
 
               <EditOrCreateWindow
-                columnNames={productsColumnNames}
+                columnNames={getWithoutId(productsColumnNames)}
                 saveNewRow={setNewRow}
               />
             </div>
@@ -1110,7 +1033,7 @@ function App() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "30px" }}>
-                  <AddProductForm options={UPCs} onAdd={addCheckRow} />
+                  <AddProductInCheckForm options={UPCs} onAdd={addCheckRow} />
                   <div style={{ flexGrow: 1 }}>
                     <TableObject
                       columnNames={checkColumnNames}

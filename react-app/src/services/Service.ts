@@ -12,9 +12,6 @@ abstract class Service {
 
   abstract getRows(): Promise<TableRow[]>;
 
-  // TODO розкоментувати ці штуки, бо вони нормально написані,
-  // просто мені для простоти треба були такі, які зараз не закоментовані
-
   // abstract updateRow(id: number, data: T): Promise<void>;
   abstract updateRow(id: number, data: TableRow): Promise<void>;
 

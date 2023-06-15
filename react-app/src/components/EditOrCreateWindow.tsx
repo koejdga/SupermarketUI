@@ -2,6 +2,7 @@ import { TextField } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
 import TableRow from "../classes/TableRow";
 import "./ButtonLabelInEditWindow.css";
+import AddProductForm from "./AddProductForm";
 
 interface Props {
   columnNames: string[];
@@ -33,10 +34,9 @@ const EditOrCreateWindow = ({
       updatedRowValues[columnIndex] = value;
       const updatedRow = new TableRow(editedRow.id, updatedRowValues);
       setEditedRow(updatedRow);
+      console.log(updatedRow);
     }
   };
-
-  // console.log("we are in EditWindow");
 
   const handleSave = () => {
     if (saveNewRow) saveNewRow(editedRow);
@@ -86,7 +86,12 @@ const EditOrCreateWindow = ({
           tabIndex={0}
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          {columnNames.map((columnName, index) => (
+          <AddProductForm
+            columnNames={columnNames}
+            editedRow={editedRow}
+            handleChanges={handleChanges}
+          />
+          {/* {columnNames.map((columnName, index) => (
             <TextField
               className="text-field"
               key={index}
@@ -96,7 +101,7 @@ const EditOrCreateWindow = ({
               value={editedRow?.values[index] || ""}
               fullWidth
             />
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

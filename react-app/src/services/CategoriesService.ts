@@ -60,6 +60,19 @@ class CategoriesService extends Service {
     }
   }
 
+  getCategoriesOptions = async () => {
+    try {
+      const result = await this.getCategoriesIds();
+      return result.map((category) => ({
+        value: category,
+        label: category,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch category options:", error);
+      return [];
+    }
+  };
+
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
       await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToCategory(data));

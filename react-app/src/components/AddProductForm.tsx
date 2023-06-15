@@ -1,84 +1,66 @@
-import AutocompleteTextField from "./AutocompleteTextField";
-import { useState } from "react";
-import type { Option } from "./AutocompleteTextField";
-import "./AddProductForm.css";
 import TextField from "@mui/material/TextField";
-import AlertComponent from "./AlertComponent";
+import React, { useEffect, useState } from "react";
+import TableRow from "../classes/TableRow";
+import AutocompleteTextField from "./AutocompleteTextField";
+import type { Option } from "./AutocompleteTextField";
+import CategoriesService from "../services/CategoriesService";
 
 interface Props {
-  options: Option[];
-  onAdd: (upc: string, amount: number) => void;
+  handleChanges: (columnIndex: number, value: string) => void;
+  editedRow: TableRow;
+  columnNames: string[];
 }
 
-const AddProductForm = ({ options, onAdd }: Props) => {
-  const defaultAmountValue = 1;
-  const errorValue = -1;
-  const [upc, setUpc] = useState("");
-  const [amount, setAmount] = useState(defaultAmountValue);
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+const AddProductForm = ({ handleChanges, editedRow, columnNames }: Props) => {
+  const [categories, setCategories] = useState<Option[]>();
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const categoriesService = new CategoriesService();
+      const categories = await categoriesService.getCategoriesOptions();
+      setCategories(categories);
+    };
 
-  const handleOnChangeUPC = (value: string) => {
-    setUpc(value);
-  };
-
-  const handleAmountOfProductInCheckChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (!isNaN(Number(event.target.value))) {
-      setAmount(Number(event.target.value));
-    } else {
-      setAmount(errorValue);
-    }
-  };
-
-  const handleAddProduct = () => {
-    if (upc === "") {
-      showErrorFunction("Неправильно введено UPC");
-    } else if (amount === errorValue) {
-      showErrorFunction("Неправильно введено кількість товару");
-    } else {
-      onAdd(upc, amount);
-    }
-  };
-
-  const showErrorFunction = (errorMessage?: string) => {
-    if (errorMessage) {
-      setErrorMessage(errorMessage);
-    }
-    setShowError(true);
-    setTimeout(() => {
-      setShowError(false);
-    }, 3000);
-  };
+    fetchCategories();
+  }, []);
 
   return (
-    <div className="add-product-form">
-      <h3>Додати продукт</h3>
-      <AutocompleteTextField
-        className="autocomplete-field"
-        options={options}
-        onChange={handleOnChangeUPC}
-        label="UPC"
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {categories ? (
+        <AutocompleteTextField
+          label={columnNames[0]}
+          key={"category"}
+          options={categories}
+          onChange={(value) => handleChanges(0, value)}
+        />
+      ) : (
+        <TextField
+          className="text-field"
+          key={"category"}
+          label={columnNames[1]}
+          onChange={(event) => handleChanges(0, event.target.value)}
+          variant="outlined"
+          value={editedRow?.values[0] || ""}
+          fullWidth
+        />
+      )}
+      <TextField
+        className="text-field"
+        key={"product_name"}
+        label={columnNames[1]}
+        onChange={(event) => handleChanges(1, event.target.value)}
+        variant="outlined"
+        value={editedRow?.values[1] || ""}
+        fullWidth
       />
       <TextField
         className="text-field"
-        label="Кількість"
-        onChange={handleAmountOfProductInCheckChange}
+        key={"characteristics"}
+        label={columnNames[2]}
+        onChange={(event) => handleChanges(2, event.target.value)}
         variant="outlined"
-        defaultValue={defaultAmountValue}
+        value={editedRow?.values[2] || ""}
         fullWidth
       />
-      <button className="btn btn-secondary" onClick={handleAddProduct}>
-        Додати продукт
-      </button>
-
-      {showError && (
-        <AlertComponent
-          onClose={() => setShowError(false)}
-          errorMessage={errorMessage}
-        />
-      )}
     </div>
   );
 };

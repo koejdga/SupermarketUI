@@ -1,4 +1,4 @@
-.add-product-form {
+.add-product-in-check-form {
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -11,7 +11,7 @@
   gap: 15px;
 }
 
-.add-product-form h3 {
+.add-product-in-check-form h3 {
   font-size: 24px;
   margin: 0;
   padding: 12px;
@@ -21,11 +21,11 @@
   text-align: center;
 }
 
-.add-product-form .autocomplete-field {
+.add-product-in-check-form .autocomplete-field {
   margin-top: 5px;
   width: 100%;
 }
 
-.add-product-form .form-group .text-field {
+.add-product-in-check-form .form-group .text-field {
   width: 100%;
 }
