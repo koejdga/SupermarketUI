@@ -1,7 +1,7 @@
 import AutocompleteTextField from "./AutocompleteTextField";
 import { useState } from "react";
 import type { Option } from "./AutocompleteTextField";
-import "./AddProductInCheckForm.css";
+import "./AddProductForm.css";
 import TextField from "@mui/material/TextField";
 import AlertComponent from "./AlertComponent";
 
@@ -32,13 +32,18 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
     }
   };
 
+  let alertMessage = "Помилка";
+
   const handleAddProduct = () => {
+    alertMessage = "Test";
     if (upc === "") {
       showErrorFunction("Неправильно введено UPC");
     } else if (amount === errorValue) {
       showErrorFunction("Неправильно введено кількість товару");
     } else {
+      console.log("Added");
       onAdd(upc, amount);
+      alertMessage = "Успішно додано";
     }
   };
 
@@ -52,8 +57,20 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
     }, 3000);
   };
 
+  const [alertOpen, setAlertOpen] = useState(true);
+  const handleCloseAlert = () => {
+    // Дії, які треба виконати при закритті сповіщення
+    setAlertOpen(false);
+  };
+
   return (
-    <div className="add-product-in-check-form">
+    <div className="add-product-form">
+      {alertOpen && alertMessage !== "Помилка" && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessage}
+        />
+      )}
       <h3>Додати продукт</h3>
       <AutocompleteTextField
         className="autocomplete-field"
@@ -72,13 +89,6 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
       <button className="btn btn-secondary" onClick={handleAddProduct}>
         Додати продукт
       </button>
-
-      {showError && (
-        <AlertComponent
-          onClose={() => setShowError(false)}
-          errorMessage={errorMessage}
-        />
-      )}
     </div>
   );
 };
