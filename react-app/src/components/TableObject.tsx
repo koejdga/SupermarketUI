@@ -12,6 +12,7 @@ import Service from "../services/Service";
 import StoreProductsService from "../services/StoreProductsService";
 import ClientsService from "../services/ClientsService";
 import ChecksService from "../services/ChecksService";
+import AlertComponent from "./AlertComponent";
 
 interface Props {
   columnNames: string[];
@@ -163,8 +164,9 @@ function TableObject({
       console.log(error);
     }
   };
-  const [showModal, setShowModal] = useState(false);
-  let windowIs: string = "Помилка";
+  //const [showModal, setShowModal] = useState(false);
+  // let windowIs: string = "Помилка";
+  let alertMessage = "Помилка";
 
   const handleSelectRow = (rowIndex: number) => {
     console.log("Select row:", rowIndex);
@@ -176,11 +178,12 @@ function TableObject({
     if (service) {
       service.updateRow(Number(updatedRow.id), updatedRow).then(() => {
         getRows();
-        setShowModal(true);
-        setTimeout(() => {
-          setShowModal(false);
-        }, 1000);
-        windowIs = "Успішно зміненою";
+        alertMessage = "Успішно зміненою";
+        //setShowModal(true);
+        // setTimeout(() => {
+        //   setShowModal(false);
+        // }, 1000);
+        //windowIs = "Успішно зміненою";
       });
     }
 
@@ -191,26 +194,34 @@ function TableObject({
   const handleCancelEditing = () => {
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
-    setShowModal(true);
-    setTimeout(() => {
-      setShowModal(false);
-    }, 1000);
-    windowIs = "Зміну скасовано";
+    alertMessage = "Зміну скасовано";
+    ////  setShowModal(true);
+    // setTimeout(() => {
+    // setShowModal(false);
+    //}, 1000);
+    // windowIs = "Зміну скасовано";
   };
 
   const handleDeleteRow = (rowIndex: number) => {
     let rowIndexDb = rows[rowIndex].id;
     const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
-    setShowModal(true);
-    setTimeout(() => {
-      setShowModal(false);
-    }, 1000);
-    windowIs = "Успішно видалено";
+    alertMessage = "Успішно видалено";
+    //setShowModal(true);
+    // setTimeout(() => {
+    //  setShowModal(false);
+    // }, 1000);
+    // windowIs = "Успішно видалено";
     console.log(rowIndex + " - row index");
     console.log(rowIndexDb + " - row index database");
 
     if (service) service.deleteRow(Number(rowIndexDb));
+  };
+  const [alertOpen, setAlertOpen] = useState(true);
+
+  const handleCloseAlert = () => {
+    // Дії, які треба виконати при закритті сповіщення
+    setAlertOpen(false);
   };
 
   const handleDeleteAll = () => {
@@ -222,17 +233,28 @@ function TableObject({
     if (service) {
       rowIdsToDelete.forEach((rowId) => {
         service.deleteRow(Number(rowId));
-        setShowModal(true);
-        setTimeout(() => {
-          setShowModal(false);
-        }, 1000);
-        windowIs = "Усе видалено успішно";
+        alertMessage = "Усе видалено успішно";
+        //setShowModal(true);
+        // setTimeout(() => {
+        //   setShowModal(false);
+        // }, 1000);
+        // windowIs = "Усе видалено успішно";
       });
     }
   };
 
   if (rows.length > 0 && columnNames.length !== rows[0].values.length)
     return <div>Error</div>;
+
+  /*
+    <Modal> 
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        contentLabel={windowIs}
+        className="delete-button"
+        <h2>{windowIs}</h2>
+      </Modal>
+    */
 
   return (
     <div>
@@ -271,14 +293,13 @@ function TableObject({
           </tbody>
         }
       </Table>
-      <Modal
-        isOpen={showModal}
-        onRequestClose={() => setShowModal(false)}
-        contentLabel={windowIs}
-        className="delete-button"
-      >
-        <h2>{windowIs}</h2>
-      </Modal>
+      {alertOpen && alertMessage !== "Помилка" && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessage}
+        />
+      )}
+
       {selectedRow && (
         // <Resizable>
         <EditOrCreateWindow

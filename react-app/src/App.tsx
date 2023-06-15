@@ -53,7 +53,7 @@ function App() {
   //#region Constants
   const cashierID = "1";
 
-  const isCashier = true;
+  const isCashier = false;
 
   const id_employee = "em_1";
 
