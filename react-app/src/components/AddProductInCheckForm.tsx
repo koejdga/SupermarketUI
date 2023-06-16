@@ -64,7 +64,7 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
   };
 
   return (
-    <div className="add-product-form">
+    <div className="add-product-in-check-form">
       {alertOpen && alertMessage !== "Помилка" && (
         <AlertComponent
           onClose={handleCloseAlert}

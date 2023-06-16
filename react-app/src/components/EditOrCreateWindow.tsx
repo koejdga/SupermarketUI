@@ -32,7 +32,23 @@ const EditOrCreateWindow = ({
   const handleChanges = (columnIndex: number, value: string) => {
     if (editedRow) {
       const updatedRowValues = [...editedRow.values];
-      updatedRowValues[columnIndex] = value;
+      if (value === "change checkbox") {
+        if (updatedRowValues[columnIndex] === "так") {
+          updatedRowValues[columnIndex] = "ні";
+        } else if (
+          updatedRowValues[columnIndex] === "ні" ||
+          updatedRowValues[columnIndex] === ""
+        ) {
+          updatedRowValues[columnIndex] = "так";
+        } else {
+          console.log("ERROR with checkbox in add store product form");
+        }
+      }
+
+      if (value !== "change checkbox") {
+        updatedRowValues[columnIndex] = value;
+      }
+
       const updatedRow = new TableRow(editedRow.id, updatedRowValues);
       setEditedRow(updatedRow);
       console.log(updatedRow);
