@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import TableRow from "../classes/TableRow";
 import "./ButtonLabelInEditWindow.css";
 import AddProductForm from "./AddProductForm";
+import AddStoreProductForm from "./AddStoreProductForm";
 
 interface Props {
   columnNames: string[];
@@ -86,7 +87,12 @@ const EditOrCreateWindow = ({
           tabIndex={0}
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <AddProductForm
+          {/* <AddProductForm
+            columnNames={columnNames}
+            editedRow={editedRow}
+            handleChanges={handleChanges}
+          /> */}
+          <AddStoreProductForm
             columnNames={columnNames}
             editedRow={editedRow}
             handleChanges={handleChanges}

@@ -50,7 +50,7 @@ function App() {
   //#region Constants
   const cashierID = "1";
 
-  const isCashier = true;
+  const isCashier = false;
 
   const id_employee = "em_1";
 
@@ -164,7 +164,7 @@ function App() {
 
   const productsColumnNames = [
     "ID",
-    "ID категорії",
+    "Категорія",
     "Назва продукту",
     "Характеристики",
   ];
@@ -173,14 +173,6 @@ function App() {
     "UPC",
     "Акційне UPC",
     "Назва",
-    "Ціна",
-    "Кількість одиниць",
-    "Акційний",
-  ];
-  const storeProductsColumnNamesToPost = [
-    "UPC",
-    "Акційне UPC",
-    "ID товару",
     "Ціна",
     "Кількість одиниць",
     "Акційний",
@@ -295,7 +287,7 @@ function App() {
     };
 
     const fetchProductNames = async () => {
-      const options = await getProductNamesOptions();
+      const options = await productsService.getProductNamesOptions();
       setProductNames(options);
     };
 
@@ -393,19 +385,6 @@ function App() {
   //#endregion
 
   //#region Variables that are taken from the database
-
-  const getProductNamesOptions = async () => {
-    try {
-      const result = await productsService.getProductNames();
-      return result.map((productName) => ({
-        value: productName,
-        label: productName,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch product name options:", error);
-      return [];
-    }
-  };
 
   const [categories, setCategories] = useState<Option[]>([]);
 
@@ -759,7 +738,7 @@ function App() {
               </div>
             </div>
             <EditOrCreateWindow
-              columnNames={storeProductsColumnNamesToPost}
+              columnNames={storeProductsColumnNames}
               saveNewRow={setNewRow}
             />
           </div>

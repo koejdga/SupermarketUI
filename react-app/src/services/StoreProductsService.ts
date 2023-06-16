@@ -72,7 +72,7 @@ class StoreProductsService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       console.log("get store products");
       console.log(response);
       return response.data.map((row: any) => storeProductToTableRow(row));
@@ -84,7 +84,10 @@ class StoreProductsService extends Service {
 
   async getRowsSortedByName(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl + "/by_product_name");
+      const response = await axios.get(
+        this.baseUrl + "/by_product_name",
+        Service.config
+      );
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -96,7 +99,10 @@ class StoreProductsService extends Service {
     try {
       console.log(UPC);
       console.log(this.baseUrl + "/" + UPC);
-      const response = await axios.get(this.baseUrl + "/" + UPC);
+      const response = await axios.get(
+        this.baseUrl + "/" + UPC,
+        Service.config
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -108,7 +114,7 @@ class StoreProductsService extends Service {
   async getRowsOnlyPromo(): Promise<TableRow[]> {
     try {
       console.log(this.baseUrl + "/promo");
-      const response = await axios.get(this.baseUrl + "/promo");
+      const response = await axios.get(this.baseUrl + "/promo", Service.config);
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -119,7 +125,10 @@ class StoreProductsService extends Service {
   async getRowsOnlyNotPromo(): Promise<TableRow[]> {
     try {
       console.log(this.baseUrl + "/not_promo");
-      const response = await axios.get(this.baseUrl + "/not_promo");
+      const response = await axios.get(
+        this.baseUrl + "/not_promo",
+        Service.config
+      );
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -129,7 +138,7 @@ class StoreProductsService extends Service {
 
   async getUPCs(): Promise<string[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((storeProduct: any) => storeProduct.upc);
     } catch (error) {
       console.log(error);
@@ -141,7 +150,8 @@ class StoreProductsService extends Service {
     try {
       await axios.put(
         `${this.postUpdateUrl}/${id}`,
-        tableRowToStoreProductToPost(data)
+        tableRowToStoreProductToPost(data),
+        Service.config
       );
     } catch (error) {
       console.log(error);
@@ -152,7 +162,11 @@ class StoreProductsService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       console.log(tableRowToStoreProductToPost(row));
-      await axios.post(this.postUpdateUrl, tableRowToStoreProductToPost(row));
+      await axios.post(
+        this.postUpdateUrl,
+        tableRowToStoreProductToPost(row),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;

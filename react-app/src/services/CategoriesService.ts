@@ -40,7 +40,7 @@ class CategoriesService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => categoryToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -48,24 +48,25 @@ class CategoriesService extends Service {
     }
   }
 
-  async getCategoriesIds(): Promise<string[]> {
-    try {
-      const response = await axios.get(this.baseUrl);
-      return response.data.map((category: any) =>
-        category.category_number.toString()
-      );
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
+  // deprecated
+  // async getCategoriesIds(): Promise<string[]> {
+  //   try {
+  //     const response = await axios.get(this.baseUrl);
+  //     return response.data.map((category: any) =>
+  //       category.category_number.toString()
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw error;
+  //   }
+  // }
 
   getCategoriesOptions = async () => {
     try {
-      const result = await this.getCategoriesIds();
-      return result.map((category) => ({
-        value: category,
-        label: category,
+      const response = await axios.get(this.baseUrl, Service.config);
+      return response.data.map((category: Category) => ({
+        value: category.category_number,
+        label: category.category_name,
       }));
     } catch (error) {
       console.error("Failed to fetch category options:", error);
@@ -75,7 +76,11 @@ class CategoriesService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToCategory(data));
+      await axios.put(
+        `${this.postUpdateUrl}/${id}`,
+        tableRowToCategory(data),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -84,7 +89,11 @@ class CategoriesService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      await axios.post(this.postUpdateUrl, tableRowToCategory(row));
+      await axios.post(
+        this.postUpdateUrl,
+        tableRowToCategory(row),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;

@@ -70,7 +70,7 @@ class WorkersService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => workerToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -80,7 +80,11 @@ class WorkersService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToWorker(data));
+      await axios.put(
+        `${this.postUpdateUrl}/${id}`,
+        tableRowToWorker(data),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -90,7 +94,11 @@ class WorkersService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       console.log(tableRowToWorker(row));
-      await axios.post(this.postUpdateUrl, tableRowToWorker(row));
+      await axios.post(
+        this.postUpdateUrl,
+        tableRowToWorker(row),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;

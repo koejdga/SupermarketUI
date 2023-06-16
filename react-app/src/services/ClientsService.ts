@@ -57,7 +57,7 @@ class ClientsService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       console.log("get client cards");
       console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
@@ -70,7 +70,8 @@ class ClientsService extends Service {
   async getRowsBySurname(surname: string): Promise<TableRow[]> {
     try {
       const response = await axios.get(
-        this.baseUrl + `/with_surname/${surname}`
+        this.baseUrl + `/with_surname/${surname}`,
+        Service.config
       );
       console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
@@ -82,7 +83,7 @@ class ClientsService extends Service {
 
   async getSurnames(): Promise<string[]> {
     try {
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.baseUrl, Service.config);
       let result = response.data.map((client: any) => client.cust_surname);
       result = [...new Set(result)];
       return result;
@@ -95,12 +96,7 @@ class ClientsService extends Service {
   // TODO переглянути чи норм передається пароль(тут дані паролю просто для тесту)
   async getClientCards(): Promise<string[]> {
     try {
-      const response = await axios.get(this.baseUrl, {
-        auth: {
-          username: "admin",
-          password: "password",
-        },
-      });
+      const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((client: any) => client.card_number);
     } catch (error) {
       console.log(error);
@@ -110,7 +106,11 @@ class ClientsService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(`${this.postUpdateUrl}/${id}`, tableRowToClient(data));
+      await axios.put(
+        `${this.postUpdateUrl}/${id}`,
+        tableRowToClient(data),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -119,7 +119,11 @@ class ClientsService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      await axios.post(this.postUpdateUrl, tableRowToClient(row));
+      await axios.post(
+        this.postUpdateUrl,
+        tableRowToClient(row),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;

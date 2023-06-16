@@ -59,7 +59,8 @@ class ChecksService extends Service {
         this.baseUrl +
           `/${this.id_employee}/${formatDateForDb(
             ChecksService.left_date
-          )}/${formatDateForDb(ChecksService.right_date)}`
+          )}/${formatDateForDb(ChecksService.right_date)}`,
+        Service.config
       );
 
       console.log("get checks");
@@ -72,8 +73,13 @@ class ChecksService extends Service {
   }
 
   async updateRow(id: number, data: TableRow): Promise<void> {
+    // TODO delete this method (leave mock method for interface)
     try {
-      await axios.put(`${this.baseUrl}/${id}`, tableRowToCheck(data));
+      await axios.put(
+        `${this.baseUrl}/${id}`,
+        tableRowToCheck(data),
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -85,10 +91,14 @@ class ChecksService extends Service {
       console.log("creating check in db");
       console.log(check);
       console.log(sales);
-      await axios.post(this.postUpdateUrl, {
-        check: check,
-        products: sales,
-      });
+      await axios.post(
+        this.postUpdateUrl,
+        {
+          check: check,
+          products: sales,
+        },
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -96,9 +106,10 @@ class ChecksService extends Service {
   };
 
   createRow = async (row: TableRow): Promise<void> => {
+    // TODO delete this method (leave mock method for interface)
     try {
       console.log(tableRowToCheck(row));
-      await axios.post(this.baseUrl, tableRowToCheck(row));
+      await axios.post(this.baseUrl, tableRowToCheck(row), Service.config);
     } catch (error) {
       console.log(error);
       throw error;

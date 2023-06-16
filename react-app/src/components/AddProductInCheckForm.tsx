@@ -1,7 +1,7 @@
 import AutocompleteTextField from "./AutocompleteTextField";
 import { useState } from "react";
 import type { Option } from "./AutocompleteTextField";
-import "./AddProductForm.css";
+import "./AddProductInCheckForm.css";
 import TextField from "@mui/material/TextField";
 import AlertComponent from "./AlertComponent";
 

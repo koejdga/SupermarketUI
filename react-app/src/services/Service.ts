@@ -4,6 +4,12 @@ import TableRow from "../classes/TableRow";
 abstract class Service {
   protected baseUrl: string;
   protected postUpdateUrl: string;
+  static config = {
+    headers: {
+      Authorization: `Basic ${btoa("admin:password")} `,
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  };
 
   constructor(baseUrl: string, postUpdateUrl: string) {
     this.baseUrl = baseUrl;

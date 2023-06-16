@@ -1,5 +1,6 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
+import Service from "./Service";
 
 export interface Sale {
   UPC: string;
@@ -32,8 +33,10 @@ export function saleToTableRow(sale: Sale): TableRow {
 
 class SalesService {
   url: string;
+  config = {};
   constructor(check_number: string) {
     this.url = `http://26.133.25.6:8080/api/user/sales/${check_number}`;
+    this.config = Service.config;
   }
 
   async getRows(): Promise<TableRow[]> {
