@@ -1,10 +1,10 @@
 import TextField from "@mui/material/TextField";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TableRow from "../classes/TableRow";
 import AutocompleteTextField from "./AutocompleteTextField";
 import type { Option } from "./AutocompleteTextField";
-import CategoriesService from "../services/CategoriesService";
 import ProductsService from "../services/ProductsService";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 interface Props {
   handleChanges: (columnIndex: number, value: string) => void;
@@ -76,14 +76,14 @@ const AddStoreProductForm = ({
         value={editedRow?.values[4] || ""}
         fullWidth
       />
-      <TextField
-        className="text-field"
+      <FormControlLabel
+        control={<Checkbox />}
+        label="Акційний"
         key={"prom"}
-        label={columnNames[5]}
-        onChange={(event) => handleChanges(5, event.target.value)}
-        variant="outlined"
-        value={editedRow?.values[5] || ""}
-        fullWidth
+        onChange={(event) => {
+          console.log(event);
+          handleChanges(5, "change checkbox");
+        }}
       />
     </div>
   );
