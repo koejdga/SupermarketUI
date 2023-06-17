@@ -14,6 +14,7 @@ import ClientsService from "../services/ClientsService";
 import ChecksService from "../services/ChecksService";
 import AlertComponent from "./AlertComponent";
 import { is } from "date-fns/locale";
+import WorkersService from "../services/WorkersService";
 
 interface Props {
   columnNames: string[];
@@ -37,12 +38,14 @@ export enum Get {
   SortByAmount,
   ClientSurname,
   ChecksDateRangeCashier,
+  OnlyCashiers,
+  WorkerSurname,
 }
 
 interface RowActionsProps {
-  rowIndex: number;
-  onDelete: (rowIndex: number) => void;
-  onSelect: (rowIndex: number) => void;
+  rowIndex: number | string;
+  onDelete: (rowIndex: number | string) => void;
+  onSelect: (rowIndex: number | string) => void;
   onlyEditButton?: boolean;
 }
 
@@ -132,7 +135,7 @@ function TableObject({
   getFunction = 0,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | string>(-1);
   const [selectedRow, setSelectedRow] = useState<TableRow>();
 
   useEffect(() => {
@@ -170,6 +173,9 @@ function TableObject({
       } else if (getFunction === Get.ChecksDateRangeCashier) {
         let checksService = new ChecksService();
         result = await checksService.getRows();
+      } else if (getFunction === Get.OnlyCashiers) {
+        let workersService = new WorkersService();
+        result = await workersService.getOnlyCashiers();
       }
       if (result) setRows(result);
     } catch (error) {
@@ -185,10 +191,10 @@ function TableObject({
     setAlertOpen(false);
   };
 
-  const handleSelectRow = (rowIndex: number) => {
+  const handleSelectRow = (rowIndex: number | string) => {
     console.log("Select row:", rowIndex);
-    setSelectedRowIndex(Number(rows[rowIndex].id));
-    setSelectedRow(rows[rowIndex]);
+    setSelectedRowIndex(rowIndex);
+    setSelectedRow(rows.filter((row) => row.id === rowIndex)[0]);
   };
 
   const handleSaveChanges = (updatedRow: TableRow) => {
@@ -208,14 +214,13 @@ function TableObject({
     setAlertMessage("Скасовано");
   };
 
-  const handleDeleteRow = (rowIndex: number) => {
-    let rowIndexDb = rows[rowIndex].id;
+  const handleDeleteRow = (rowIndexDb: number | string) => {
+    // let rowIndexDb = rows[rowIndex].id;
     const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
     setRows(updatedRows);
-    console.log(rowIndex + " - row index");
     console.log(rowIndexDb + " - row index database");
 
-    if (service) service.deleteRow(Number(rowIndexDb));
+    if (service) service.deleteRow(rowIndexDb);
     setAlertMessage("Видалено");
   };
 
@@ -234,7 +239,7 @@ function TableObject({
   };
 
   if (rows.length > 0 && columnNames.length !== rows[0].values.length)
-    return <div>Error</div>;
+    return <div>Error: Rows length and column names length is different</div>;
 
   return (
     <div>
@@ -253,7 +258,7 @@ function TableObject({
               <tr key={rowIndex}>
                 {withButtons && (
                   <RowActions
-                    rowIndex={rowIndex}
+                    rowIndex={rows[rowIndex].id}
                     onDelete={handleDeleteRow}
                     onSelect={handleSelectRow}
                     onlyEditButton={onlyEditButton}

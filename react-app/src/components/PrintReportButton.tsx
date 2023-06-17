@@ -1,10 +1,14 @@
 import React from "react";
 import TableRow from "../classes/TableRow";
-import { tableRowToWorker, Worker } from "../services/WorkersService";
+import WorkersService, {
+  tableRowToWorker,
+  Worker,
+} from "../services/WorkersService";
 import { Client, tableRowToClient } from "../services/ClientsService";
 import Service from "../services/Service";
 import { Category, tableRowToCategory } from "../services/CategoriesService";
 import { Product, tableRowToProduct } from "../services/ProductsService";
+import { convertStringToDate, formatDate } from "../utils/Utils";
 
 interface Props {
   service?: Service;
@@ -13,9 +17,9 @@ interface Props {
 }
 
 export enum TableType {
-  Category = 0,
-  Product,
-  StoreProduct,
+  Categories = 0,
+  Products,
+  StoreProducts,
   Workers,
 }
 
@@ -140,7 +144,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
     ];
 
     switch (tableType) {
-      case TableType.Category: {
+      case TableType.Categories: {
         let categories: Category[] = [];
         for (let i = 0; i < rows.length; i++) {
           categories.push(tableRowToCategory(rows[i]));
@@ -197,7 +201,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
         return categoriesReport;
       }
-      case TableType.Product: {
+      case TableType.Products: {
         let products: Product[] = [];
         for (let i = 0; i < rows.length; i++) {
           products.push(tableRowToProduct(rows[i]));
@@ -257,6 +261,68 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
         </html>`;
 
         return productsReport;
+      }
+      case TableType.Workers: {
+        let workers: Worker[] = [];
+        for (let i = 0; i < rows.length; i++) {
+          workers.push(tableRowToWorker(rows[i]));
+        }
+
+        const workersReport = `<!DOCTYPE html>
+    <html>
+      <head>
+        <title>Workers Report</title>
+        <style>
+          h1 {
+            text-align: center;
+          }
+          p {
+            margin-bottom: 10px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Супермаркет “ZLAGODA”</h1>
+        <h2>Звіт про працівників</h2>
+        ${workers
+          .map(
+            (worker) => `
+          <p>ID: ${worker.id_employee}</p>
+          <p>П.І.Б.: ${worker.empl_surname} ${worker.empl_name} ${
+              worker.empl_patronymic
+            }</p>
+          <p>Посада: ${worker.empl_role}</p>
+          <p>Зарплата: ${worker.salary} грн.</p>
+          <p>Дата народження: ${formatDate(worker.date_of_birth)}</p>
+          <p>Дата початку роботи: ${worker.date_of_start.toLocaleDateString(
+            "uk-UA",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}</p>
+          <p>Номер телефону: ${worker.phone_number}</p>
+          <p>Адреса: вул. ${worker.street}, м. ${worker.city} ${
+              worker.zip_code
+            }</p>
+          <hr>
+        `
+          )
+          .join("")}
+      
+        <p>Дата: <span id="date"></span></p>
+      
+        <script>
+          const dateElement = document.getElementById("date");
+          const today = new Date();
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          dateElement.textContent = today.toLocaleDateString(undefined, options);
+        </script>
+      </body>
+        </html>`;
+
+        return workersReport;
       }
     }
 

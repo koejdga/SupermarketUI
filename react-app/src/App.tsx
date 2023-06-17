@@ -20,7 +20,10 @@ import EditOrCreateWindow from "./components/EditOrCreateWindow";
 import { Link, Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 import ClientsService from "./services/ClientsService";
-import WorkersService, { tableRowToWorker } from "./services/WorkersService";
+import WorkersService, {
+  WorkerData,
+  tableRowToWorker,
+} from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
 import ProductsService from "./services/ProductsService";
@@ -296,7 +299,7 @@ function App() {
       setUPCs(options);
     };
 
-    const fetchSurnames = async () => {
+    const fetchClientSurnames = async () => {
       const options = await getClientSurnamesOptions();
       setClientSurnames(options);
     };
@@ -306,11 +309,17 @@ function App() {
       setClientCards(options);
     };
 
+    const fetchWorkerSurnames = async () => {
+      const options = await getWorkerSurnamesOptions();
+      setWorkerSurnames(options);
+    };
+
     fetchCategories();
     fetchProductNames();
     fetchUPCs();
-    fetchSurnames();
+    fetchClientSurnames();
     fetchClientCards();
+    fetchWorkerSurnames();
   }, []);
 
   useEffect(() => {
@@ -359,10 +368,23 @@ function App() {
 
   const handleOnChangeClientSurname = (value: string) => {
     ClientsService.surname = value;
-    console.log(value);
     if (value !== "") {
       setCurrentGet(Get.ClientSurname);
     } else setCurrentGet(Get.Default);
+  };
+
+  const [workersData, setWorkersData] = useState<WorkerData[]>([
+    { phone_number: "+234234", street: "uuu", city: "kkk", zip_code: "oooo" },
+  ]);
+
+  const handleOnChangeWorkerSurname = async (value: string) => {
+    WorkersService.surname = value;
+    if (value !== "") {
+      const result = await workersService.getRowsBySurname(
+        WorkersService.surname
+      );
+      setWorkersData(result);
+    }
   };
 
   const [selectedClientCard, setSelectedClientCard] = useState("");
@@ -379,6 +401,11 @@ function App() {
     _event: React.SyntheticEvent<Element, Event>,
     checked: boolean
   ) => {
+    if (checked) {
+      setCurrentGet(Get.OnlyCashiers);
+    } else {
+      setCurrentGet(Get.Default);
+    }
     setOnlyCashiers(!onlyCashiers);
   };
 
@@ -413,12 +440,27 @@ function App() {
         label: surname,
       }));
     } catch (error) {
-      console.error("Failed to fetch surnames options:", error);
+      console.error("Failed to fetch clients surnames options:", error);
       return [];
     }
   };
 
   const [clientSurnames, setClientSurnames] = useState<Option[]>([]);
+
+  const getWorkerSurnamesOptions = async () => {
+    try {
+      let result = await workersService.getSurnames();
+      return result.map((surname) => ({
+        value: surname,
+        label: surname,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch workers surnames options:", error);
+      return [];
+    }
+  };
+
+  const [workerSurnames, setWorkerSurnames] = useState<Option[]>([]);
 
   const getClientCardsOptions = async () => {
     try {
@@ -628,7 +670,7 @@ function App() {
                 </button>
                 <PrintReportButton
                   service={productsService}
-                  tableType={TableType.Product}
+                  tableType={TableType.Products}
                 />
               </div>
             </div>
@@ -647,7 +689,7 @@ function App() {
               <EditOrCreateWindow
                 columnNames={getWithoutId(productsColumnNames)}
                 saveNewRow={setNewRow}
-                tableType={TableType.Product}
+                tableType={TableType.Products}
               />
             </div>
           </div>
@@ -741,7 +783,7 @@ function App() {
             <EditOrCreateWindow
               columnNames={storeProductsColumnNames}
               saveNewRow={setNewRow}
-              tableType={TableType.StoreProduct}
+              tableType={TableType.StoreProducts}
             />
           </div>
         )}
@@ -777,7 +819,7 @@ function App() {
               </button>
               <PrintReportButton
                 service={categoriesService}
-                tableType={TableType.Category}
+                tableType={TableType.Categories}
               />
               <EditOrCreateWindow
                 columnNames={getWithoutId(categoriesColumnNames)}
@@ -888,13 +930,33 @@ function App() {
           >
             <div style={{ minWidth: "200px" }}>
               <AutocompleteTextField
-                options={clientSurnames}
-                onChange={handleOnChangeClientSurname}
+                options={workerSurnames}
+                onChange={handleOnChangeWorkerSurname}
                 label="Прізвище"
               />
               {WorkersService.surname !== "" && (
                 <div>
-                  <h3>{WorkersService.surname}</h3>
+                  <br />
+                  {workersData &&
+                    workersData.map((data) => (
+                      <div>
+                        <div
+                          style={{
+                            borderRadius: "10px",
+                            padding: "10px",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
+                            backgroundColor: "InfoBackground",
+                          }}
+                        >
+                          <div>Номер телефону: {data.phone_number}</div>
+                          <div>
+                            Адреса: вул. {data.street}, м. {data.city}{" "}
+                            {data.zip_code}
+                          </div>
+                        </div>
+                        <br />
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
@@ -926,7 +988,10 @@ function App() {
                     Додати робітника/цю
                   </button>
 
-                  <PrintReportButton />
+                  <PrintReportButton
+                    service={workersService}
+                    tableType={TableType.Workers}
+                  />
                 </div>
               </div>
               <div>
@@ -934,6 +999,7 @@ function App() {
                   columnNames={workersColumnNames}
                   service={workersService}
                   updater={updater}
+                  getFunction={currentGet}
                 />
 
                 <EditOrCreateWindow

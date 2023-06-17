@@ -24,13 +24,14 @@ abstract class Service {
   // abstract createRow(data: T): Promise<void>;
   abstract createRow(row: TableRow): Promise<void>;
 
-  async deleteRow(id: number | string): Promise<void> {
+  async deleteRow(id: number | string): Promise<boolean> {
     try {
-      await axios.delete(`${this.postUpdateUrl}/${id}`);
+      await axios.delete(`${this.postUpdateUrl}/${id}`, Service.config);
       console.log("deleted from db");
+      return true;
     } catch (error) {
       console.log(error);
-      throw error;
+      return false;
     }
   }
 }

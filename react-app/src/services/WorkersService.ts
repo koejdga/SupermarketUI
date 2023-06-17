@@ -1,7 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
-import { formatDate } from "../utils/Utils";
+import { convertStringToDate, formatDate } from "../utils/Utils";
 
 export interface Worker {
   id_employee: string;
@@ -12,6 +12,13 @@ export interface Worker {
   salary: number;
   date_of_birth: Date;
   date_of_start: Date;
+  phone_number: string;
+  city: string;
+  street: string;
+  zip_code: string;
+}
+
+export interface WorkerData {
   phone_number: string;
   city: string;
   street: string;
@@ -39,10 +46,12 @@ function workerToTableRow(worker: Worker): TableRow {
 
 export function tableRowToWorker(tableRow: TableRow): Worker {
   let worker: Worker;
+  // without id
   if (tableRow.values.length === 11) {
     tableRow = new TableRow(tableRow.id, ["-1"].concat(tableRow.values));
   }
 
+  // without id but with username and password
   if (tableRow.values.length === 13) {
     worker = {
       id_employee: "-1",
@@ -70,8 +79,8 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
       empl_patronymic: tableRow.values[3],
       empl_role: tableRow.values[4],
       salary: Number(tableRow.values[5]),
-      date_of_birth: new Date(tableRow.values[6]),
-      date_of_start: new Date(tableRow.values[7]),
+      date_of_birth: convertStringToDate(tableRow.values[6]),
+      date_of_start: convertStringToDate(tableRow.values[7]),
       phone_number: tableRow.values[8],
       city: tableRow.values[9],
       street: tableRow.values[10],
@@ -83,7 +92,7 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
 }
 
 class WorkersService extends Service {
-  static surname = "";
+  static surname = "g";
   constructor() {
     super(
       "http://26.133.25.6:8080/api/admin/employees",
@@ -95,6 +104,45 @@ class WorkersService extends Service {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => workerToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getOnlyCashiers(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + "/cashiers",
+        Service.config
+      );
+      return response.data.map((row: any) => workerToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsBySurname(surname: string): Promise<WorkerData[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + `/with_surname/${surname}`,
+        Service.config
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getSurnames(): Promise<string[]> {
+    try {
+      const response = await axios.get(this.baseUrl, Service.config);
+      let result = response.data.map((worker: any) => worker.empl_surname);
+      result = [...new Set(result)];
+      return result;
     } catch (error) {
       console.log(error);
       throw error;

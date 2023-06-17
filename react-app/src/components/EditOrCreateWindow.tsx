@@ -108,14 +108,14 @@ const EditOrCreateWindow = ({
           tabIndex={0}
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          {tableType && tableType === TableType.Product && (
+          {tableType && tableType === TableType.Products && (
             <AddProductForm
               columnNames={columnNames}
               editedRow={editedRow}
               handleChanges={handleChanges}
             />
           )}
-          {tableType && tableType === TableType.StoreProduct && (
+          {tableType && tableType === TableType.StoreProducts && (
             <AddStoreProductForm
               columnNames={columnNames}
               editedRow={editedRow}
