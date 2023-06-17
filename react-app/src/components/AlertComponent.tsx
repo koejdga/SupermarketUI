@@ -22,7 +22,7 @@ const AlertComponent = ({ onClose, errorMessage }: Props) => {
       open={true}
       autoHideDuration={3000}
     >
-      <Alert onClose={handleClose} severity="error">
+      <Alert onClose={handleClose} severity="success">
         {errorMessage ? errorMessage : "Неправильно введені дані"}
       </Alert>
     </Snackbar>
