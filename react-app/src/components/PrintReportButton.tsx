@@ -15,6 +15,8 @@ interface Props {
 export enum TableType {
   Category = 0,
   Product,
+  StoreProduct,
+  Workers,
 }
 
 export const printReport = (report: string) => {

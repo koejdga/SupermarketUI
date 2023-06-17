@@ -24,7 +24,7 @@ abstract class Service {
   // abstract createRow(data: T): Promise<void>;
   abstract createRow(row: TableRow): Promise<void>;
 
-  async deleteRow(id: number): Promise<void> {
+  async deleteRow(id: number | string): Promise<void> {
     try {
       await axios.delete(`${this.postUpdateUrl}/${id}`);
       console.log("deleted from db");

@@ -50,3 +50,7 @@ body {
 .print-check-button:hover {
   background-color: #e64a19;
 }
+
+.edit-or-create-button-window {
+  background-color: #efcfe3;
+}

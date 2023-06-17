@@ -38,25 +38,48 @@ function workerToTableRow(worker: Worker): TableRow {
 }
 
 export function tableRowToWorker(tableRow: TableRow): Worker {
+  let worker: Worker;
   if (tableRow.values.length === 11) {
     tableRow = new TableRow(tableRow.id, ["-1"].concat(tableRow.values));
   }
-  const client: Worker = {
-    id_employee: tableRow.values[0],
-    empl_surname: tableRow.values[1],
-    empl_name: tableRow.values[2],
-    empl_patronymic: tableRow.values[3],
-    empl_role: tableRow.values[4],
-    salary: Number(tableRow.values[5]),
-    date_of_birth: new Date(tableRow.values[6]),
-    date_of_start: new Date(tableRow.values[7]),
-    phone_number: tableRow.values[8],
-    city: tableRow.values[9],
-    street: tableRow.values[10],
-    zip_code: tableRow.values[11],
-  };
 
-  return client;
+  if (tableRow.values.length === 13) {
+    worker = {
+      id_employee: "-1",
+      empl_surname: tableRow.values[0],
+      empl_name: tableRow.values[1],
+      empl_patronymic: tableRow.values[2],
+      empl_role: tableRow.values[3],
+      salary: Number(tableRow.values[4]),
+      date_of_birth:
+        tableRow.values[5] !== ""
+          ? new Date(tableRow.values[5])
+          : new Date("01/01/2000"),
+      date_of_start:
+        tableRow.values[6] !== "" ? new Date(tableRow.values[6]) : new Date(),
+      phone_number: tableRow.values[7],
+      city: tableRow.values[8],
+      street: tableRow.values[9],
+      zip_code: tableRow.values[10],
+    };
+  } else {
+    worker = {
+      id_employee: tableRow.values[0],
+      empl_surname: tableRow.values[1],
+      empl_name: tableRow.values[2],
+      empl_patronymic: tableRow.values[3],
+      empl_role: tableRow.values[4],
+      salary: Number(tableRow.values[5]),
+      date_of_birth: new Date(tableRow.values[6]),
+      date_of_start: new Date(tableRow.values[7]),
+      phone_number: tableRow.values[8],
+      city: tableRow.values[9],
+      street: tableRow.values[10],
+      zip_code: tableRow.values[11],
+    };
+  }
+
+  return worker;
 }
 
 class WorkersService extends Service {
@@ -96,7 +119,11 @@ class WorkersService extends Service {
       console.log(tableRowToWorker(row));
       await axios.post(
         this.postUpdateUrl,
-        tableRowToWorker(row),
+        {
+          worker: tableRowToWorker(row),
+          user: row.values[11],
+          password: row.values[12],
+        },
         Service.config
       );
     } catch (error) {

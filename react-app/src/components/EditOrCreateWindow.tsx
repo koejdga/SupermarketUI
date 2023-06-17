@@ -4,12 +4,16 @@ import TableRow from "../classes/TableRow";
 import "./ButtonLabelInEditWindow.css";
 import AddProductForm from "./AddProductForm";
 import AddStoreProductForm from "./AddStoreProductForm";
+import { TableType } from "./PrintReportButton";
+import AddWorkerForm from "./AddWorkerForm";
+import "../App.css";
 
 interface Props {
   columnNames: string[];
   selectedRow?: TableRow;
   onCancel?: () => void;
   saveNewRow?: (row: TableRow) => void;
+  tableType?: TableType;
 }
 
 const EditOrCreateWindow = ({
@@ -17,6 +21,7 @@ const EditOrCreateWindow = ({
   selectedRow,
   onCancel,
   saveNewRow,
+  tableType,
 }: Props) => {
   var buttonStyle = {
     color: "#fff",
@@ -61,13 +66,13 @@ const EditOrCreateWindow = ({
 
   return (
     <div
-      className="offcanvas offcanvas-start"
+      className="edit-or-create-button-window offcanvas offcanvas-start"
       data-bs-scroll="true"
       data-bs-backdrop="false"
       tabIndex={-1}
       id="offcanvasScrolling"
       aria-labelledby="offcanvasScrollingLabel"
-      style={{ backgroundColor: "#efcfe3", width: "400px" }}
+      style={{ width: "400px" }}
     >
       <div className="offcanvas-header" style={{ backgroundColor: "#857" }}>
         <h5 className="offcanvas-title" id="offcanvasScrollingLabel">
@@ -93,7 +98,7 @@ const EditOrCreateWindow = ({
           </button>
         </div>
       </div>
-      <div className="offcanvas-body">
+      <div className="edit-or-create-button-window offcanvas-body">
         {/* Scrollspy */}
         <div
           data-bs-spy="scroll"
@@ -103,27 +108,41 @@ const EditOrCreateWindow = ({
           tabIndex={0}
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          {/* <AddProductForm
-            columnNames={columnNames}
-            editedRow={editedRow}
-            handleChanges={handleChanges}
-          /> */}
-          <AddStoreProductForm
-            columnNames={columnNames}
-            editedRow={editedRow}
-            handleChanges={handleChanges}
-          />
-          {/* {columnNames.map((columnName, index) => (
-            <TextField
-              className="text-field"
-              key={index}
-              label={columnName}
-              onChange={(event) => handleChanges(index, event.target.value)}
-              variant="outlined"
-              value={editedRow?.values[index] || ""}
-              fullWidth
+          {tableType && tableType === TableType.Product && (
+            <AddProductForm
+              columnNames={columnNames}
+              editedRow={editedRow}
+              handleChanges={handleChanges}
             />
-          ))} */}
+          )}
+          {tableType && tableType === TableType.StoreProduct && (
+            <AddStoreProductForm
+              columnNames={columnNames}
+              editedRow={editedRow}
+              handleChanges={handleChanges}
+            />
+          )}
+
+          {tableType && tableType === TableType.Workers && (
+            <AddWorkerForm
+              columnNames={columnNames}
+              editedRow={editedRow}
+              handleChanges={handleChanges}
+            />
+          )}
+
+          {!tableType &&
+            columnNames.map((columnName, index) => (
+              <TextField
+                className="text-field"
+                key={index}
+                label={columnName}
+                onChange={(event) => handleChanges(index, event.target.value)}
+                variant="outlined"
+                value={editedRow?.values[index] || ""}
+                fullWidth
+              />
+            ))}
         </div>
       </div>
     </div>

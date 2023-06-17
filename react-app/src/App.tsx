@@ -3,7 +3,7 @@ import TableObject, { Get } from "./components/TableObject";
 import TableRow from "./classes/TableRow";
 import Profile from "./components/Profile";
 import { useState, ChangeEvent, useEffect } from "react";
-import DateInput from "./components/DateInput";
+import DateRangeInput from "./components/DateRangeInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
 import { Checkbox, FormControlLabel, SelectChangeEvent } from "@mui/material";
@@ -647,6 +647,7 @@ function App() {
               <EditOrCreateWindow
                 columnNames={getWithoutId(productsColumnNames)}
                 saveNewRow={setNewRow}
+                tableType={TableType.Product}
               />
             </div>
           </div>
@@ -740,6 +741,7 @@ function App() {
             <EditOrCreateWindow
               columnNames={storeProductsColumnNames}
               saveNewRow={setNewRow}
+              tableType={TableType.StoreProduct}
             />
           </div>
         )}
@@ -837,7 +839,7 @@ function App() {
               }}
             >
               <div style={{ width: "250px" }}>
-                <DateInput
+                <DateRangeInput
                   dateRange={checksDateRangeManager}
                   setDateRange={setChecksDateRangeManager}
                 />
@@ -937,6 +939,7 @@ function App() {
                 <EditOrCreateWindow
                   columnNames={getWithoutId(workersColumnNames)}
                   saveNewRow={setNewRow}
+                  tableType={TableType.Workers}
                 />
               </div>
             </div>
@@ -1172,7 +1175,7 @@ function App() {
               {checksPageView === ShowOnChecksPage.showChecksTable && (
                 <div className="column-container">
                   <div style={{ width: "250px" }}>
-                    <DateInput
+                    <DateRangeInput
                       dateRange={checksDateRangeCashier}
                       setDateRange={setChecksDateRangeCashier}
                     />
