@@ -13,7 +13,7 @@ import StoreProductsService from "../services/StoreProductsService";
 import ClientsService from "../services/ClientsService";
 import ChecksService from "../services/ChecksService";
 import AlertComponent from "./AlertComponent";
-import { is } from "date-fns/locale";
+import { is, tr } from "date-fns/locale";
 import WorkersService from "../services/WorkersService";
 
 interface Props {
@@ -59,12 +59,11 @@ function RowActions({
   const buttonARef = useRef<HTMLButtonElement>(null);
   const buttonBRef = useRef<HTMLButtonElement>(null);
 
-  //const [alertOpen, setAlertOpen] = useState(true);
-  //const [alertMessage, setAlertMessage] = useState("Помилка");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("Скасовано");
 
   const handleCloseAlert = () => {
-    // Дії, які треба виконати при закритті сповіщення
-    //setAlertOpen(false);
+    setShowAlert(false);
   };
 
   const handleSelect = () => {
@@ -74,7 +73,10 @@ function RowActions({
 
   const handleCancel = () => {
     setShowActions(false);
-    //setAlertMessage("Скасовано");
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
   };
 
   const handleEdit = () => {
@@ -83,17 +85,21 @@ function RowActions({
     if (buttonARef.current) {
       buttonARef.current.click();
     }
-    //setAlertMessage("Змінено");
   };
 
   const handleDelete = () => {
     setShowActions(false);
     onDelete(rowIndex);
-    //setAlertMessage("Видалено");
   };
 
   return (
     <td>
+      {showAlert && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessage}
+        />
+      )}
       {!onlyEditButton && <button onClick={handleSelect}>Вибрати</button>}
       {showActions && (
         <div>
@@ -183,12 +189,52 @@ function TableObject({
     }
   };
 
-  const [alertOpen, setAlertOpen] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("Помилка");
+
+  const [showAlertDelete, setShowAlertDelete] = useState(false);
+  const [alertMessageDelete, setAlertMessageDelete] = useState("Помилка");
+
+  const [showAlertChange, setShowAlertChange] = useState(false);
+  const [alertMessageChange, setAlertMessageChange] = useState("Помилка");
+
+  const [showAlertCancel, setShowAlertCancel] = useState(false);
+  const [alertMessageCancel, setAlertMessageCancel] = useState("Помилка");
+
+  const showRowAlert = (alertNotification: string) => {
+    if (alertNotification === "Видалено") {
+      setAlertMessageDelete(alertNotification);
+      setShowAlertDelete(true);
+      setTimeout(() => {
+        setShowAlertDelete(false);
+      }, 3000);
+    } else if (alertNotification === "Змінено") {
+      setAlertMessageChange(alertNotification);
+      setShowAlertChange(true);
+      setTimeout(() => {
+        setShowAlertChange(false);
+      }, 3000);
+    } else if (alertNotification === "Скасовано") {
+      setAlertMessageCancel(alertNotification);
+      setShowAlertCancel(true);
+      setTimeout(() => {
+        setShowAlertCancel(false);
+      }, 3000);
+    } else {
+      setAlertMessage(alertNotification);
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false); // Приховуємо спливаюче вікно після 3 секунд
+      }, 3000);
+    }
+  };
 
   const handleCloseAlert = () => {
     // Дії, які треба виконати при закритті сповіщення
-    setAlertOpen(false);
+    setShowAlert(false);
+    setShowAlertDelete(false);
+    setShowAlertChange(false);
+    setShowAlertCancel(false);
   };
 
   const handleSelectRow = (rowIndex: number | string) => {
@@ -205,13 +251,14 @@ function TableObject({
     }
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
-    setAlertMessage("Змінено");
+    showRowAlert("Змінено");
   };
 
   const handleCancelEditing = () => {
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
-    setAlertMessage("Скасовано");
+    showRowAlert("Скасовано");
+    console.log("AAAA");
   };
 
   const handleDeleteRow = (rowIndexDb: number | string) => {
@@ -221,7 +268,7 @@ function TableObject({
     console.log(rowIndexDb + " - row index database");
 
     if (service) service.deleteRow(rowIndexDb);
-    setAlertMessage("Видалено");
+    showRowAlert("Видалено");
   };
 
   const handleDeleteAll = () => {
@@ -235,7 +282,7 @@ function TableObject({
         service.deleteRow(Number(rowId));
       });
     }
-    setAlertMessage("Усе видалено");
+    showRowAlert("Усе видалено");
   };
 
   if (rows.length > 0 && columnNames.length !== rows[0].values.length)
@@ -243,6 +290,31 @@ function TableObject({
 
   return (
     <div>
+      {/* <Table>...</Table> */}
+      {showAlert && ( // Відображаємо спливаюче вікно, якщо showAlert === true
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessage}
+        />
+      )}
+      {showAlertDelete && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessageDelete}
+        />
+      )}
+      {showAlertChange && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessageChange}
+        />
+      )}
+      {showAlertCancel && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessageCancel}
+        />
+      )}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -278,12 +350,7 @@ function TableObject({
           </tbody>
         }
       </Table>
-      {alertMessage !== "Помилка" && alertOpen && (
-        <AlertComponent
-          onClose={handleCloseAlert}
-          errorMessage={alertMessage}
-        />
-      )}
+
       {selectedRow && (
         // <Resizable>
         <EditOrCreateWindow
