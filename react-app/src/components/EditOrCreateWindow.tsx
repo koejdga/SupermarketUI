@@ -7,6 +7,7 @@ import AddStoreProductForm from "./AddStoreProductForm";
 import { TableType } from "./PrintReportButton";
 import AddWorkerForm from "./AddWorkerForm";
 import "../App.css";
+import AlertComponent from "./AlertComponent";
 
 interface Props {
   columnNames: string[];
@@ -34,6 +35,9 @@ const EditOrCreateWindow = ({
   const [editedRow, setEditedRow] = useState(selectedRow || row);
   const isEditing = selectedRow ? true : false;
 
+  const [showAlertChange, setShowAlertChange] = useState(false);
+  const [alertMessageChange, setAlertMessageChange] = useState("Помилка");
+
   const handleChanges = (columnIndex: number, value: string) => {
     if (editedRow) {
       const updatedRowValues = [...editedRow.values];
@@ -60,8 +64,18 @@ const EditOrCreateWindow = ({
     }
   };
 
+  const handleCloseAlert = () => {
+    setShowAlertChange(false);
+  };
+
   const handleSave = () => {
     if (saveNewRow) saveNewRow(editedRow);
+    setAlertMessageChange("Змінено");
+    setShowAlertChange(true);
+    setTimeout(() => {
+      setShowAlertChange(false);
+    }, 3000);
+    console.log(37);
   };
 
   return (
@@ -74,6 +88,12 @@ const EditOrCreateWindow = ({
       aria-labelledby="offcanvasScrollingLabel"
       style={{ width: "400px" }}
     >
+      {showAlertChange && ( // Відображаємо спливаюче вікно, якщо showAlert === true
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessageChange}
+        />
+      )}
       <div className="offcanvas-header" style={{ backgroundColor: "#857" }}>
         <h5 className="offcanvas-title" id="offcanvasScrollingLabel">
           {isEditing ? "Редагування" : "Додавання"}
