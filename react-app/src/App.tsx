@@ -373,9 +373,7 @@ function App() {
     } else setCurrentGet(Get.Default);
   };
 
-  const [workersData, setWorkersData] = useState<WorkerData[]>([
-    { phone_number: "+234234", street: "uuu", city: "kkk", zip_code: "oooo" },
-  ]);
+  const [workersData, setWorkersData] = useState<WorkerData[]>([]);
 
   const handleOnChangeWorkerSurname = async (value: string) => {
     WorkersService.surname = value;

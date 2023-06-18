@@ -92,7 +92,7 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
 }
 
 class WorkersService extends Service {
-  static surname = "g";
+  static surname = "";
   constructor() {
     super(
       "http://26.133.25.6:8080/api/admin/employees",
@@ -165,12 +165,12 @@ class WorkersService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       console.log(tableRowToWorker(row));
+      console.log(row.values[11], row.values[12]);
       await axios.post(
         this.postUpdateUrl,
         {
-          worker: tableRowToWorker(row),
-          user: row.values[11],
-          password: row.values[12],
+          employee: tableRowToWorker(row),
+          user: { username: row.values[11], password: row.values[12] },
         },
         Service.config
       );
