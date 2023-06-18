@@ -40,6 +40,7 @@ class CategoriesService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
+      console.log(Service.config);
       const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => categoryToTableRow(row));
     } catch (error) {

@@ -36,6 +36,7 @@ import Service from "./services/Service";
 import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
 import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
+import { User } from "./services/UserService";
 
 function App() {
   //#region Services
@@ -43,7 +44,7 @@ function App() {
   const clientsService = new ClientsService();
   const workersService = new WorkersService();
   const productsService = new ProductsService();
-  const checksService = new ChecksService();
+  let checksService: ChecksService | undefined = undefined;
   const storeProductsService = new StoreProductsService();
   const [currentService, setCurrentService] =
     useState<Service>(categoriesService);
@@ -51,11 +52,6 @@ function App() {
   //#endregion
 
   //#region Constants
-  const cashierID = "1";
-
-  const isCashier = false;
-
-  const id_employee = "em_1";
 
   const isPromotionalOptions = [
     { value: "Всі", label: "Всі" },
@@ -67,6 +63,8 @@ function App() {
     { value: "За кількістю товару", label: "За кількістю товару" },
     { value: "За назвою", label: "За назвою" },
   ];
+
+  const cashierRole = "Касирка";
 
   enum Table {
     Main = 0,
@@ -112,7 +110,7 @@ function App() {
     },
     () => {
       setTableVisible(Table.Checks);
-      setCurrentService(checksService);
+      if (checksService) setCurrentService(checksService);
     },
     () => setTableVisible(Table.Profile),
   ];
@@ -144,7 +142,7 @@ function App() {
     },
     () => {
       setTableVisible(Table.Checks);
-      setCurrentService(checksService);
+      if (checksService) setCurrentService(checksService);
     },
     () => {
       setTableVisible(Table.Workers);
@@ -219,6 +217,12 @@ function App() {
   //#endregion
 
   //#region Variables
+  const [isCashier, setIsCashier] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [idEmployee, setIdEmployee] = useState<string>();
+
   const [checksPageView, setChecksPageView] = useState(
     ShowOnChecksPage.showChecksTable
   );
@@ -239,14 +243,7 @@ function App() {
 
   const [checkRows, setCheckRows] = useState<TableRow[]>([]);
 
-  const [selectedCheck, setSelectedCheck] = useState<Check>({
-    id_employee: "23452",
-    check_number: "98989",
-    card_number: "",
-    print_date: new Date(),
-    sum_total: 800,
-    vat: 40,
-  });
+  const [selectedCheck, setSelectedCheck] = useState<Check>();
 
   const [amountOfProductInCheck, setAmountOfProductInCheck] = useState(0);
 
@@ -284,6 +281,7 @@ function App() {
   }, [newRow]);
 
   useEffect(() => {
+    if (!isLoggedIn) return;
     const fetchCategories = async () => {
       const options = await categoriesService.getCategoriesOptions();
       setCategories(options);
@@ -310,8 +308,10 @@ function App() {
     };
 
     const fetchWorkerSurnames = async () => {
-      const options = await getWorkerSurnamesOptions();
-      setWorkerSurnames(options);
+      if (!isCashier) {
+        const options = await getWorkerSurnamesOptions();
+        setWorkerSurnames(options);
+      }
     };
 
     fetchCategories();
@@ -320,7 +320,7 @@ function App() {
     fetchClientSurnames();
     fetchClientCards();
     fetchWorkerSurnames();
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (checksDateRangeCashier[0] && checksDateRangeCashier[1]) {
@@ -528,13 +528,15 @@ function App() {
     return result;
   };
 
-  const createCheck = (): Check => {
+  const createCheck = (): Check | null => {
     const sum_total = countSumTotal();
     console.log("created check and sum_total = " + sum_total);
 
+    if (!idEmployee) return null;
+
     return {
       check_number: "-1",
-      id_employee: id_employee,
+      id_employee: idEmployee,
       card_number: selectedClientCard,
       print_date: new Date(),
       sum_total: sum_total,
@@ -543,8 +545,9 @@ function App() {
   };
 
   const saveCheck = async () => {
-    const checksService = new ChecksService();
-    setCurrentCheck(createCheck());
+    const checksService = new ChecksService(isCashier, idEmployee);
+    const check = createCheck();
+    if (check) setCurrentCheck(check);
 
     let salesForDb = sales.map((sale) => saleToSaleForDb(sale));
 
@@ -577,7 +580,7 @@ function App() {
       <body>
         <h1>Супермаркет “ZLAGODA”</h1>
         <div>
-          <label>ID касир/ки: ${cashierID}</label>
+          <label>ID касир/ки: ${idEmployee}</label>
             <br />
             <label>
               Дата: ${new Date().toLocaleDateString("uk-ua")}
@@ -768,12 +771,7 @@ function App() {
                       width: "100vh",
                     }}
                   >
-                    <TovarCard
-                      tovarName="Крупа гречана 'Геркулес' 500г"
-                      price="50.00"
-                      amount="40"
-                      unitOfMeasurement="шт."
-                    />
+                    <TovarCard />
                   </div>
                 )}
               </div>
@@ -910,11 +908,13 @@ function App() {
                 }}
               />
             </div>
-            <TableObject
-              columnNames={checksColumnNames}
-              service={checksService}
-              updater={updater}
-            />
+            {checksService && (
+              <TableObject
+                columnNames={checksColumnNames}
+                service={checksService}
+                updater={updater}
+              />
+            )}
           </>
         )}
         {whatTableIsVisible === Table.Workers && (
@@ -1043,7 +1043,7 @@ function App() {
                   }}
                 >
                   <div style={{ display: "flex", gap: "100px" }}>
-                    <BasicCheckInfo cashierID={cashierID} />
+                    {idEmployee && <BasicCheckInfo cashierID={idEmployee} />}
 
                     <AutocompleteTextField
                       options={сlientCards}
@@ -1180,12 +1180,7 @@ function App() {
                       width: "100vh",
                     }}
                   >
-                    <TovarCard
-                      tovarName="Крупа гречана 'Геркулес' 500г"
-                      price="50.00"
-                      amount="40"
-                      unitOfMeasurement="шт."
-                    />
+                    <TovarCard />
                   </div>
                 )}
               </div>
@@ -1265,10 +1260,12 @@ function App() {
                   >
                     Назад до всіх чеків
                   </button>
-                  <CheckInfo
-                    check={selectedCheck}
-                    checkColumnNames={checkColumnNames}
-                  />
+                  {selectedCheck && (
+                    <CheckInfo
+                      check={selectedCheck}
+                      checkColumnNames={checkColumnNames}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -1276,7 +1273,7 @@ function App() {
         )}
         {whatTableIsVisible === Table.Profile && (
           <div style={{ width: "50%" }}>
-            <Profile id_employee={id_employee} />
+            {idEmployee && <Profile id_employee={idEmployee} />}
           </div>
         )}
       </div>
@@ -1285,9 +1282,28 @@ function App() {
 
   //#endregion
 
+  const handleLogIn = async (idEmployee: string, user: User) => {
+    setIdEmployee(idEmployee);
+    Service.user = user;
+    let profileService = new ProfileService(idEmployee);
+    const response = await profileService.getRow();
+    if (response.empl_role === cashierRole) {
+      setIsCashier(true);
+    } else setIsCashier(false);
+
+    checksService = new ChecksService(
+      isCashier,
+      isCashier ? idEmployee : undefined
+    );
+    setIsLoggedIn(true);
+  };
+
   return (
     // Cashier page
-    <div>{isCashier ? cashierPage : managerPage}</div>
+    <div>
+      {!isLoggedIn && <LoginForm handleLogIn={handleLogIn} />}
+      {isLoggedIn && <div>{isCashier ? cashierPage : managerPage}</div>}
+    </div>
   );
 }
 

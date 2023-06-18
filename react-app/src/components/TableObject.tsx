@@ -177,12 +177,12 @@ function TableObject({
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
       } else if (getFunction === Get.ChecksDateRangeCashier) {
-        let checksService = new ChecksService();
-        result = await checksService.getRows();
+        if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
         result = await workersService.getOnlyCashiers();
       }
+      console.log(result);
       if (result) setRows(result);
     } catch (error) {
       console.log(error);

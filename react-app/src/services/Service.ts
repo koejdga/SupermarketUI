@@ -1,15 +1,24 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
+import { User } from "./UserService";
 
 abstract class Service {
   protected baseUrl: string;
   protected postUpdateUrl: string;
-  static config = {
-    headers: {
-      Authorization: `Basic ${btoa("admin:password")} `,
-      "X-Requested-With": "XMLHttpRequest",
-    },
-  };
+  static user: User;
+
+  public static get config() {
+    if (!Service.user) return undefined;
+
+    return {
+      headers: {
+        Authorization: `Basic ${btoa(
+          `${Service.user.username}:${Service.user.password}`
+        )} `,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    };
+  }
 
   constructor(baseUrl: string, postUpdateUrl: string) {
     this.baseUrl = baseUrl;

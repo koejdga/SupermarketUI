@@ -4,7 +4,7 @@ import Service from "./Service";
 
 class ProfileService {
   url: string;
-  config = {};
+  config = {} || undefined;
   constructor(id_employee: string) {
     this.url = `http://26.133.25.6:8080/api/user/employees/${id_employee}`;
 

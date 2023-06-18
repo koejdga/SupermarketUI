@@ -170,7 +170,7 @@ class WorkersService extends Service {
         this.postUpdateUrl,
         {
           employee: tableRowToWorker(row),
-          user: { username: row.values[11], password: row.values[12] },
+          user: { username: row.values[11], password: btoa(row.values[12]) },
         },
         Service.config
       );

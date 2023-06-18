@@ -12,7 +12,6 @@ export interface Product {
 
 function productToTableRow(product: Product): TableRow {
   let values: string[] = [];
-  console.log(product);
   if (product.category_name) {
     values = [
       product.id_product.toString(),
@@ -21,6 +20,7 @@ function productToTableRow(product: Product): TableRow {
       product.characteristics,
     ];
   }
+  console.log(new TableRow(product.id_product, values));
 
   return new TableRow(product.id_product, values);
 }
@@ -73,6 +73,7 @@ class ProductsService extends Service {
         this.baseUrl + "/by_category/" + category,
         Service.config
       );
+      console.log(response);
       return response.data.map((row: any) => productToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -88,6 +89,7 @@ class ProductsService extends Service {
         this.baseUrl + "/with_name/" + name,
         Service.config
       );
+      console.log(response);
       return response.data.map((row: any) => productToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -110,7 +112,7 @@ class ProductsService extends Service {
       const response = await axios.get(this.baseUrl, Service.config);
 
       return response.data.map((product: Product) => ({
-        value: product.id_product,
+        value: product.product_name,
         label: product.product_name,
       }));
     } catch (error) {

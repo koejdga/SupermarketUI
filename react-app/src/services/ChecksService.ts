@@ -2,7 +2,7 @@ import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
 import { formatDate, formatDateForDb } from "../utils/Utils";
-import { Sale, SaleForDb } from "./SalesService";
+import { SaleForDb } from "./SalesService";
 
 export interface Check {
   check_number: string;
@@ -41,29 +41,58 @@ export function tableRowToCheck(tableRow: TableRow): Check {
 
 class ChecksService extends Service {
   today = new Date();
-  id_employee = "em_1";
+  isCashier: boolean;
+  idEmployee?: string;
 
   static left_date = new Date();
   static right_date = new Date();
 
-  constructor() {
+  constructor(isCashier: boolean, idEmployee?: string) {
     super(
       "http://26.133.25.6:8080/api/user/checks",
       "http://26.133.25.6:8080/api/user/checks"
     );
+    this.isCashier = isCashier;
+    this.idEmployee = idEmployee;
+
+    if (isCashier && !idEmployee)
+      throw "Provide an id employee to checks service";
   }
 
   async getRows(): Promise<TableRow[]> {
+    if (this.isCashier && this.idEmployee) {
+      return this.getRowsByEmployee(this.idEmployee);
+    }
+
     try {
       const response = await axios.get(
-        this.baseUrl +
-          `/${this.id_employee}/${formatDateForDb(
+        "http://26.133.25.6:8080/api/admin/checks" +
+          `/all/${formatDateForDb(ChecksService.left_date)}/${formatDateForDb(
+            ChecksService.right_date
+          )}`,
+        Service.config
+      );
+
+      console.log("get checks");
+      console.log(response);
+      return response.data.map((row: any) => checkToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getRowsByEmployee(idEmployee: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        "http://26.133.25.6:8080/api/user/checks" +
+          `/${idEmployee}/${formatDateForDb(
             ChecksService.left_date
           )}/${formatDateForDb(ChecksService.right_date)}`,
         Service.config
       );
 
-      console.log("get checks");
+      console.log("get checks by employee");
       console.log(response);
       return response.data.map((row: any) => checkToTableRow(row));
     } catch (error) {
