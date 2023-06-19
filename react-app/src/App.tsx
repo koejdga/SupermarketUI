@@ -246,7 +246,7 @@ function App() {
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
 
-  const [allClients, setAllClients] = useState(false);
+  const [onlyAllClients, setonlyAllClients] = useState(false);
 
   const [showAddCheckForm, setShowAddCheckForm] = useState(false);
 
@@ -499,16 +499,16 @@ function App() {
     setOnlyCashiers(!onlyCashiers);
   };
 
-  const handleOnServeAllClients = (
+  const handleOnServeOnlyAllClients = (
     _event: React.SyntheticEvent<Element, Event>,
     checked: boolean
   ) => {
     if (checked) {
-      setCurrentGet(Get.allClients);
+      setCurrentGet(Get.onlyAllClients);
     } else {
       setCurrentGet(Get.Default);
     }
-    setAllClients(!allClients);
+    setonlyAllClients(!onlyAllClients);
   };
 
   //#endregion
@@ -1364,7 +1364,7 @@ function App() {
                 <FormControlLabel
                   control={<Checkbox />}
                   label="Лише працівники, що обслуговували усіх клієнтів"
-                  onChange={handleOnServeAllClients}
+                  onChange={handleOnServeOnlyAllClients}
                 />
                 <div>
                   <button

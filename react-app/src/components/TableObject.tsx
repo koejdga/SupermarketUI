@@ -42,7 +42,7 @@ export enum Get {
   ClientSurname,
   ChecksDateRangeCashier,
   OnlyCashiers,
-  allClients,
+  onlyAllClients,
   WorkerSurname,
   ActiveClients,
   CertainCashierChecks,
@@ -197,9 +197,9 @@ function TableObject({
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
         result = await workersService.getOnlyCashiersRows();
-      } else if (getFunction === Get.allClients) {
+      } else if (getFunction === Get.onlyAllClients) {
         let workersService = new WorkersService();
-        result = await workersService.getAllClients();
+        result = await workersService.getonlyAllClients();
       } else if (getFunction === Get.ActiveClients) {
         let clientsService = new ClientsService();
         result = await clientsService.getActiveClients();

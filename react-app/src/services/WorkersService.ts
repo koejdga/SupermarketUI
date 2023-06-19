@@ -117,7 +117,7 @@ class WorkersService extends Service {
     }
   }
 
-  async getAllClients(): Promise<TableRow[]> {
+  async getonlyAllClients(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => workerToTableRow(row));
