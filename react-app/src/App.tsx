@@ -278,6 +278,9 @@ function App() {
 
   const [currentCheck, setCurrentCheck] = useState<Check>();
 
+  const [amountOfSoldProductsInCategory, setAmountOfSoldProductsInCategory] =
+    useState<number>();
+
   //#endregion
 
   //#region useEffect
@@ -418,6 +421,16 @@ function App() {
     if (value !== "") {
       setCurrentGet(Get.Category);
     } else setCurrentGet(Get.Default);
+  };
+
+  const handleOnChangeCategoryWithSoldProducts = async (value: string) => {
+    CategoriesService.categoryWithSoldProducts = value;
+    if (value !== "") {
+      const amount = await categoriesService.getAmountOfSoldProductsInCategory(
+        value
+      );
+      setAmountOfSoldProductsInCategory(amount);
+    } else setAmountOfSoldProductsInCategory(undefined);
   };
 
   const handleOnChangeProductName = (value: string) => {
@@ -809,7 +822,7 @@ function App() {
     showErrorFunction("Пароль змінено");
   };
 
-  const [test, setTest] = useState(true);
+  const [showCategoryStatistics, setShowCategoryStatistics] = useState(false);
 
   const [editing, setEditing] = useState(false);
 
@@ -1061,16 +1074,18 @@ function App() {
                 gap: "1rem",
               }}
             >
-              <Tooltip title={"jjjj"}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setTest(!test)}
-                >
-                  {test ? "Статистика за категоріями" : "Сховати статистику"}
-                </button>
-              </Tooltip>
-              {test && (
+              <button
+                type="button"
+                className="btn btn-info"
+                onClick={() =>
+                  setShowCategoryStatistics(!showCategoryStatistics)
+                }
+              >
+                {!showCategoryStatistics
+                  ? "Статистика за категоріями"
+                  : "Сховати статистику"}
+              </button>
+              {showCategoryStatistics && (
                 <TableObject
                   columnNames={[
                     "ID категорії",
@@ -1083,24 +1098,45 @@ function App() {
               )}
             </div>
             <div
-              style={{
-                height: "50px",
-              }}
+              className="column-container"
+              style={{ alignItems: "center", height: "50px" }}
             >
-              <button
-                style={{ marginRight: "15px" }}
-                type="button"
-                className="btn btn-secondary"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasScrolling"
-                aria-controls="offcanvasScrolling"
-              >
-                Додати категорію
-              </button>
-              <PrintReportButton
-                service={categoriesService}
-                tableType={TableType.Categories}
+              <div>
+                <button
+                  style={{ marginRight: "15px" }}
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasScrolling"
+                  aria-controls="offcanvasScrolling"
+                >
+                  Додати категорію
+                </button>
+                <PrintReportButton
+                  service={categoriesService}
+                  tableType={TableType.Categories}
+                />
+              </div>
+              <label className="btn btn-info" style={{ width: "12rem" }}>
+                Категорії дня
+              </label>
+              <TableObject
+                columnNames={["ID категорії", "Назва категорії", "Продано"]}
+                withButtons={false}
               />
+              <AutocompleteTextField
+                label="Категорія"
+                options={categories}
+                onChange={handleOnChangeCategoryWithSoldProducts}
+                style={{ width: "200px" }}
+              />
+              {amountOfSoldProductsInCategory && (
+                <label>
+                  Сьогодні в цій категорії продано{" "}
+                  {amountOfSoldProductsInCategory} товарів
+                </label>
+              )}
+
               <EditOrCreateWindow
                 columnNames={getWithoutId(categoriesColumnNames)}
                 saveNewRow={setNewRow}

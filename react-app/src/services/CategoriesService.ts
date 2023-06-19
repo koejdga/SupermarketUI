@@ -31,6 +31,7 @@ export function tableRowToCategory(tableRow: TableRow): Category {
 }
 
 class CategoriesService extends Service {
+  static categoryWithSoldProducts: String;
   constructor() {
     super(
       "http://26.133.25.6:8080/api/user/categories",
@@ -40,9 +41,20 @@ class CategoriesService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      console.log(Service.config);
       const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => categoryToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getAmountOfSoldProductsInCategory(category: string): Promise<number> {
+    try {
+      console.log("not implemented");
+      // const response = await axios.get(this.baseUrl, Service.config);
+      // return response.data;
+      return 300;
     } catch (error) {
       console.log(error);
       throw error;
