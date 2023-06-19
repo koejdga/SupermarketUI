@@ -44,6 +44,7 @@ export enum Get {
   ClientSurname,
   ChecksDateRangeCashier,
   OnlyCashiers,
+  onlyAllClients,
   WorkerSurname,
   ActiveClients,
   CertainCashierChecks,
@@ -199,6 +200,9 @@ function TableObject({
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
         result = await workersService.getOnlyCashiersRows();
+      } else if (getFunction === Get.onlyAllClients) {
+        let workersService = new WorkersService();
+        result = await workersService.getonlyAllClients();
       } else if (getFunction === Get.ActiveClients) {
         let clientsService = new ClientsService();
         result = await clientsService.getActiveClients();
@@ -248,7 +252,7 @@ function TableObject({
       setAlertMessage(alertNotification);
       setShowAlert(true);
       setTimeout(() => {
-        setShowAlert(false); // Приховуємо спливаюче вікно після 3 секунд
+        setShowAlert(false);
       }, 3000);
     }
   };
