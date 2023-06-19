@@ -226,6 +226,9 @@ function TableObject({
   const [showAlertCancel, setShowAlertCancel] = useState(false);
   const [alertMessageCancel, setAlertMessageCancel] = useState("Помилка");
 
+  const [showAlertNotDelete, setShowAlertNotDelete] = useState(false);
+  const [alertMessageNotDelete, setAlertMessageNotDelete] = useState("Помилка");
+
   const showRowAlert = (alertNotification: string) => {
     if (alertNotification === "Видалено") {
       setAlertMessageDelete(alertNotification);
@@ -245,6 +248,12 @@ function TableObject({
       setTimeout(() => {
         setShowAlertCancel(false);
       }, 3000);
+    } else if (alertNotification === "Не видалено") {
+      setAlertMessageNotDelete(alertNotification);
+      setShowAlertNotDelete(true);
+      setTimeout(() => {
+        setShowAlertNotDelete(false);
+      }, 3000);
     } else {
       setAlertMessage(alertNotification);
       setShowAlert(true);
@@ -260,6 +269,7 @@ function TableObject({
     setShowAlertDelete(false);
     setShowAlertChange(false);
     setShowAlertCancel(false);
+    setShowAlertNotDelete(false);
   };
 
   const handleSelectRow = (rowIndex: number | string) => {
@@ -335,6 +345,12 @@ function TableObject({
         <AlertComponent
           onClose={handleCloseAlert}
           errorMessage={alertMessageChange}
+        />
+      )}
+      {showAlertNotDelete && (
+        <AlertComponent
+          onClose={handleCloseAlert}
+          errorMessage={alertMessageNotDelete}
         />
       )}
       {showAlertCancel && (
