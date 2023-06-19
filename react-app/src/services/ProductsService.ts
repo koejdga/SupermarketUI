@@ -112,7 +112,7 @@ class ProductsService extends Service {
       const response = await axios.get(this.baseUrl, Service.config);
 
       return response.data.map((product: Product) => ({
-        value: product.product_name,
+        value: product.id_product,
         label: product.product_name,
       }));
     } catch (error) {

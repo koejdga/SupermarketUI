@@ -5,7 +5,8 @@ import Service from "./Service";
 export interface StoreProduct {
   upc: string;
   upc_prom: string;
-  product_name: number;
+  product_name: string;
+  id_product?: number;
   selling_price: number;
   products_number: number;
   promotional_product: boolean;
@@ -37,7 +38,7 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
   const product: StoreProduct = {
     upc: tableRow.values[0],
     upc_prom: tableRow.values[1],
-    product_name: Number(tableRow.values[2]),
+    product_name: tableRow.values[2],
     selling_price: Number(tableRow.values[3]),
     products_number: Number(tableRow.values[4]),
     promotional_product: tableRow.values[5] === "так" ? true : false,
@@ -46,9 +47,9 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
   return product;
 }
 
-export function tableRowToStoreProductToPost(
+export async function tableRowToStoreProductToPost(
   tableRow: TableRow
-): StoreProductToPost {
+): Promise<StoreProductToPost> {
   const product: StoreProductToPost = {
     upc: tableRow.values[0],
     upc_prom: tableRow.values[1],
@@ -148,9 +149,11 @@ class StoreProductsService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
+      let storeProduct = await tableRowToStoreProductToPost(data);
+      console.log(storeProduct);
       await axios.put(
         `${this.postUpdateUrl}/${id}`,
-        tableRowToStoreProductToPost(data),
+        storeProduct,
         Service.config
       );
     } catch (error) {
@@ -161,12 +164,8 @@ class StoreProductsService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      console.log(tableRowToStoreProductToPost(row));
-      await axios.post(
-        this.postUpdateUrl,
-        tableRowToStoreProductToPost(row),
-        Service.config
-      );
+      let storeProduct = await tableRowToStoreProductToPost(row);
+      await axios.post(this.postUpdateUrl, storeProduct, Service.config);
     } catch (error) {
       console.log(error);
       throw error;

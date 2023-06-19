@@ -1029,6 +1029,9 @@ function App() {
                     columnNames={storeProductsColumnNames}
                     service={storeProductsService}
                     updater={updater}
+                    setEditing={setEditing}
+                    saveNewRow={setNewRow}
+                    tableType={TableType.StoreProducts}
                   />
                 )}
                 {currentGet === Get.UPC && (
@@ -1064,6 +1067,8 @@ function App() {
                 columnNames={categoriesColumnNames}
                 service={categoriesService}
                 updater={updater}
+                setEditing={setEditing}
+                saveNewRow={setNewRow}
               />
             </div>
             <div
@@ -1202,6 +1207,8 @@ function App() {
               columnNames={clientsColumnNames}
               service={clientsService}
               updater={updater}
+              setEditing={setEditing}
+              saveNewRow={setNewRow}
             />
             <EditOrCreateWindow
               columnNames={clientsColumnNames}
@@ -1338,7 +1345,6 @@ function App() {
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
                   gap: "10px",
                 }}
               >
@@ -1347,7 +1353,7 @@ function App() {
                   label="Лише касир/ки"
                   onChange={handleOnChangeOnlyCashiers}
                 />
-                <div>
+                <div style={{ marginLeft: "38rem" }}>
                   <button
                     style={{ marginRight: "15px" }}
                     type="button"
@@ -1373,6 +1379,7 @@ function App() {
                   getFunction={currentGet}
                   setEditing={setEditing}
                   saveNewRow={setNewRow}
+                  tableType={TableType.Workers}
                 />
 
                 <EditOrCreateWindow
