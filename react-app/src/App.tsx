@@ -283,6 +283,16 @@ function App() {
   const [amountOfSoldProductsInCategory, setAmountOfSoldProductsInCategory] =
     useState<number>();
 
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [showCategoryStatistics, setShowCategoryStatistics] = useState(false);
+
+  const [editing, setEditing] = useState(false);
+
   //#endregion
 
   //#region useEffect
@@ -636,6 +646,44 @@ function App() {
     setIsLoggedIn(false);
   };
 
+  const changePassword = async () => {
+    const user = { username: Service.user.username, password: oldPassword };
+    const userService = new UserService(user);
+
+    try {
+      await userService.logIn();
+    } catch (error) {
+      if ((error as AxiosError).message === "Network Error") {
+        console.log("Network Error");
+        showErrorFunction("Сервер не підключений");
+        return;
+      } else {
+        showErrorFunction("Неправильний нікнейм або пароль");
+        return;
+      }
+    }
+
+    user.password = newPassword;
+    try {
+      await userService.changePassword(user, oldPassword);
+      localStorage.setItem("password", btoa(user.password));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    showErrorFunction("Пароль змінено");
+  };
+
+  const showErrorFunction = (errorMessage?: string) => {
+    if (errorMessage) {
+      setErrorMessage(errorMessage);
+    }
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+    }, 3000);
+  };
+
   const addCheckRowToUITable = (newRow: TableRow) => {
     if (checkRows.length === 0) {
       setCheckRows([newRow]);
@@ -791,54 +839,6 @@ function App() {
   //#endregion
 
   //#region Parts of return
-
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const showErrorFunction = (errorMessage?: string) => {
-    if (errorMessage) {
-      setErrorMessage(errorMessage);
-    }
-    setShowError(true);
-    setTimeout(() => {
-      setShowError(false);
-    }, 3000);
-  };
-
-  const changePassword = async () => {
-    const user = { username: Service.user.username, password: oldPassword };
-    const userService = new UserService(user);
-
-    try {
-      await userService.logIn();
-    } catch (error) {
-      if ((error as AxiosError).message === "Network Error") {
-        console.log("Network Error");
-        showErrorFunction("Сервер не підключений");
-        return;
-      } else {
-        showErrorFunction("Неправильний нікнейм або пароль");
-        return;
-      }
-    }
-
-    user.password = newPassword;
-    try {
-      await userService.changePassword(user, oldPassword);
-      localStorage.setItem("password", btoa(user.password));
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-    showErrorFunction("Пароль змінено");
-  };
-
-  const [showCategoryStatistics, setShowCategoryStatistics] = useState(false);
-
-  const [editing, setEditing] = useState(false);
 
   const logOutAndChangePasswordButtons = (
     <div style={{ display: "flex", gap: "1rem" }}>
@@ -1372,7 +1372,7 @@ function App() {
                   label="Лише працівники, що обслуговували усіх клієнтів"
                   onChange={handleOnServeOnlyAllClients}
                 />
-                <div>
+                <div style={{ marginLeft: "10%" }}>
                   <button
                     style={{ marginRight: "15px" }}
                     type="button"
