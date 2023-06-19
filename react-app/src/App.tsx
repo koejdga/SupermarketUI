@@ -65,6 +65,12 @@ function App() {
     { value: "Не акційні", label: "Не акційні" },
   ];
 
+  const clientsPercents = [
+    { value: "10", label: "10" },
+    { value: "20", label: "20" },
+    { value: "25", label: "25" },
+  ];
+
   const sortingStoreProductsOptions = [
     { value: "За кількістю товару", label: "За кількістю товару" },
     { value: "За назвою", label: "За назвою" },
@@ -419,8 +425,8 @@ function App() {
 
   const handleOnChangeIsPromotional = (value: string) => {
     if (value === "Акційні") setCurrentGet(Get.Promo);
-    else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
-    else setCurrentGet(Get.Default);
+    // else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
+    // else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeSortingStoreProducts = (value: string) => {
@@ -607,12 +613,6 @@ function App() {
       return [];
     }
   };
-
-  const clientsPercents = [
-    { value: "10", label: "10" },
-    { value: "20", label: "20" },
-    { value: "25", label: "25" },
-  ];
 
   //#endregion
 
@@ -967,6 +967,8 @@ function App() {
                 columnNames={productsColumnNames}
                 service={productsService}
                 updater={updater}
+                setEditing={setEditing}
+                saveNewRow={setNewRow}
               />
 
               <EditOrCreateWindow

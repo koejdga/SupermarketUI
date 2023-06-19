@@ -168,10 +168,6 @@ function TableObject({
     getRows();
   }, [updater, getFunction, initialRows]);
 
-  useEffect(() => {
-    console.log(rows);
-  }, [rows]);
-
   const getRows = async () => {
     try {
       let result;
@@ -210,7 +206,7 @@ function TableObject({
         let checksService = new ChecksService(false);
         result = await checksService.getRowsByEmployee(WorkersService.ID);
       }
-      console.log(result);
+      // console.log(result);
       if (result) setRows(result);
     } catch (error) {
       console.log(error);
