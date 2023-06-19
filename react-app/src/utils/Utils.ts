@@ -6,6 +6,10 @@ export function formatDate(date: Date): string {
   });
 }
 
+export function formatDateToTime(date: Date): string {
+  return new Date(date).toLocaleTimeString("uk-UA");
+}
+
 export function convertStringToDate(dateString: string): Date {
   const [day, month, year] = dateString.split(" ");
 

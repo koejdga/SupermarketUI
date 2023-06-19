@@ -1,7 +1,11 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
-import { formatDate, formatDateForDb } from "../utils/Utils";
+import {
+  convertStringToDate,
+  formatDate,
+  formatDateForDb,
+} from "../utils/Utils";
 import { SaleForDb } from "./SalesService";
 
 export interface Check {
@@ -23,7 +27,7 @@ function checkToTableRow(check: Check): TableRow {
     check.vat.toString(),
   ];
 
-  return new TableRow(check.card_number, values);
+  return new TableRow(check.check_number, values);
 }
 
 export function tableRowToCheck(tableRow: TableRow): Check {
@@ -31,7 +35,7 @@ export function tableRowToCheck(tableRow: TableRow): Check {
     check_number: tableRow.values[0],
     id_employee: tableRow.values[1],
     card_number: tableRow.values[2],
-    print_date: new Date(tableRow.values[3]),
+    print_date: convertStringToDate(tableRow.values[3]),
     sum_total: Number(tableRow.values[4]),
     vat: Number(tableRow.values[5]),
   };
@@ -96,6 +100,20 @@ class ChecksService extends Service {
       console.log("get checks by employee");
       console.log(response);
       return response.data.map((row: any) => checkToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getCheckByNumber(checkNumber: string | number): Promise<Check> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + `/${checkNumber}`,
+        Service.config
+      );
+
+      return response.data;
     } catch (error) {
       console.log(error);
       throw error;

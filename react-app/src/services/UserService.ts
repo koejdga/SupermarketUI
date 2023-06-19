@@ -18,8 +18,21 @@ class UserService {
   async logIn(): Promise<string> {
     try {
       const response = await axios.get(this.baseUrl);
-      console.log(response);
       return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async changePassword(user: User, oldPassword: string): Promise<void> {
+    try {
+      await axios.put(
+        `http://26.133.25.6:8080/api/public/users/${user.username}/${btoa(
+          oldPassword
+        )}/${btoa(user.password)}`,
+        Service.config
+      );
     } catch (error) {
       console.log(error);
       throw error;

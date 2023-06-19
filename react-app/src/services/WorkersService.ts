@@ -86,6 +86,7 @@ export function tableRowToWorker(tableRow: TableRow): Worker {
 
 class WorkersService extends Service {
   static surname = "";
+  static ID = "";
   constructor() {
     super(
       "http://26.133.25.6:8080/api/admin/employees",
@@ -103,7 +104,7 @@ class WorkersService extends Service {
     }
   }
 
-  async getOnlyCashiers(): Promise<TableRow[]> {
+  async getOnlyCashiersRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(
         this.baseUrl + "/cashiers",
@@ -123,6 +124,19 @@ class WorkersService extends Service {
         Service.config
       );
       console.log(response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getCashiersObjects(): Promise<Worker[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + "/cashiers",
+        Service.config
+      );
       return response.data;
     } catch (error) {
       console.log(error);

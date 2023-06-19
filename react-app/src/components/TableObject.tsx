@@ -27,6 +27,7 @@ interface Props {
   getFunction?: number;
   setEditing?: (editing: boolean) => void;
   selectRow?: (row: TableRow) => void;
+  saveNewRow?: (row: TableRow) => void;
 }
 
 export enum Get {
@@ -43,6 +44,7 @@ export enum Get {
   OnlyCashiers,
   WorkerSurname,
   ActiveClients,
+  CertainCashierChecks,
 }
 
 interface RowActionsProps {
@@ -152,6 +154,7 @@ function TableObject({
   getFunction = 0,
   setEditing,
   selectRow,
+  saveNewRow,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | string>(-1);
@@ -160,6 +163,10 @@ function TableObject({
   useEffect(() => {
     getRows();
   }, [updater, getFunction, initialRows]);
+
+  useEffect(() => {
+    console.log(rows);
+  }, [rows]);
 
   const getRows = async () => {
     try {
@@ -188,10 +195,13 @@ function TableObject({
         if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
-        result = await workersService.getOnlyCashiers();
+        result = await workersService.getOnlyCashiersRows();
       } else if (getFunction === Get.ActiveClients) {
         let clientsService = new ClientsService();
         result = await clientsService.getActiveClients();
+      } else if (getFunction === Get.CertainCashierChecks) {
+        let checksService = new ChecksService(false);
+        result = await checksService.getRowsByEmployee(WorkersService.ID);
       }
       console.log(result);
       if (result) setRows(result);
@@ -250,6 +260,7 @@ function TableObject({
 
   const handleSelectRow = (rowIndex: number | string) => {
     console.log("Select row:", rowIndex);
+    console.log(rows.filter((row) => row.id === rowIndex)[0]);
     setSelectedRowIndex(rowIndex);
     setSelectedRow(rows.filter((row) => row.id === rowIndex)[0]);
   };
@@ -357,10 +368,15 @@ function TableObject({
                     onDoubleClick={() => {
                       handleSelectRow(rows[rowIndex].id);
                       if (onDoubleClickRow) {
-                        onDoubleClickRow();
                         console.log(selectRow);
                         console.log(selectedRow);
-                        if (selectRow && selectedRow) selectRow(selectedRow);
+                        if (selectRow)
+                          selectRow(
+                            rows.filter(
+                              (row) => row.id === rows[rowIndex].id
+                            )[0]
+                          );
+                        onDoubleClickRow();
                       }
                     }}
                   >
@@ -374,13 +390,12 @@ function TableObject({
       </Table>
 
       {selectedRow && (
-        // <Resizable>
         <EditOrCreateWindow
           columnNames={columnNames}
           selectedRow={selectedRow}
+          saveNewRow={saveNewRow}
           onCancel={handleCancelEditing}
         />
-        // </Resizable>
       )}
     </div>
   );

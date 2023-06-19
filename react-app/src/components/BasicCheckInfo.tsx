@@ -1,3 +1,5 @@
+import { formatDate, formatDateToTime } from "../utils/Utils";
+
 interface Props {
   cashierID: string;
   date?: Date;
@@ -8,18 +10,10 @@ const BasicCheckInfo = ({ cashierID, date }: Props) => {
     <div>
       <label>ID касир/ки: {cashierID}</label>
       <br />
-      <label>
-        Дата:{" "}
-        {date
-          ? date.toLocaleDateString("uk-ua")
-          : new Date().toLocaleDateString("uk-ua")}
-      </label>
+      <label>Дата: {date ? formatDate(date) : formatDate(new Date())}</label>
       <br />
       <label>
-        Час:{" "}
-        {date
-          ? date.toLocaleTimeString("uk-ua")
-          : new Date().toLocaleTimeString("uk-ua")}
+        Час: {date ? formatDateToTime(date) : formatDateToTime(new Date())}
       </label>
     </div>
   );

@@ -42,6 +42,7 @@ import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
 import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 import UserService, { User } from "./services/UserService";
+import { AxiosError } from "axios";
 
 function App() {
   //#region Services
@@ -80,6 +81,7 @@ function App() {
     Checks,
     Workers,
     Profile,
+    ChangePassword,
   }
 
   const buttonNamesCashier = [
@@ -250,7 +252,9 @@ function App() {
 
   const [selectedCheckRow, setSelectedCheckRow] = useState<TableRow>();
 
-  const [selectedCheck, setSelectedCheck] = useState<Check>();
+  const [selectedCheckNumber, setSelectedCheckNumber] = useState<
+    string | number
+  >();
 
   const [amountOfProductInCheck, setAmountOfProductInCheck] = useState(0);
 
@@ -279,7 +283,8 @@ function App() {
   //#region useEffect
 
   useEffect(() => {
-    if (selectedCheckRow) setSelectedCheck(tableRowToCheck(selectedCheckRow));
+    if (selectedCheckRow) console.log(tableRowToCheck(selectedCheckRow));
+    if (selectedCheckRow) setSelectedCheckNumber(selectedCheckRow.id);
   }, [selectedCheckRow]);
 
   const [updater, setUpdater] = useState(true);
@@ -333,12 +338,18 @@ function App() {
       }
     };
 
+    const fetchCashierIds = async () => {
+      const options = await getCashierIDsOptions();
+      setCashierIDs(options);
+    };
+
     fetchCategories();
     fetchProductNames();
     fetchUPCs();
     fetchClientSurnames();
     fetchClientCards();
     fetchWorkerSurnames();
+    fetchCashierIds();
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -372,7 +383,9 @@ function App() {
   useEffect(() => {
     if (idEmployee) {
       const username = localStorage.getItem("username");
-      const password = localStorage.getItem("password");
+      const encryptedPassword = localStorage.getItem("password");
+      let password;
+      if (encryptedPassword !== null) password = atob(encryptedPassword);
       if (username && password) {
         const user = {
           username: username,
@@ -446,8 +459,15 @@ function App() {
     setSelectedClientCard(value);
   };
 
+  const handleOnChangeCashierID = (value: string) => {
+    WorkersService.ID = value;
+    if (value !== "") {
+      setCurrentGet(Get.CertainCashierChecks);
+    } else setCurrentGet(Get.Default);
+  };
+
   const handleOnChangePercent = (value: string) => {
-    setSelectedPercent(value);
+    console.log("not implemented");
   };
 
   const handleOnChangeOnlyCashiers = (
@@ -523,12 +543,31 @@ function App() {
         label: clientCard,
       }));
     } catch (error) {
-      console.error("Failed to fetch surnames options:", error);
+      console.error("Failed to fetch client cards:", error);
       return [];
     }
   };
 
   const [сlientCards, setClientCards] = useState<Option[]>([]);
+
+  const [cashierIDs, setCashierIDs] = useState<Option[]>([]);
+  const getCashierIDsOptions = async () => {
+    try {
+      let result = await workersService.getCashiersObjects();
+      return result.map((cashier) => ({
+        value: cashier.id_employee,
+        label:
+          cashier.id_employee +
+          " " +
+          cashier.empl_surname +
+          " " +
+          cashier.empl_name,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch cashier IDs:", error);
+      return [];
+    }
+  };
 
   const clientsPercents = [
     { value: "10", label: "10" },
@@ -559,7 +598,7 @@ function App() {
 
   const saveUserData = (user: User) => {
     localStorage.setItem("username", user.username);
-    localStorage.setItem("password", user.password);
+    localStorage.setItem("password", btoa(user.password));
   };
 
   const handleLogOut = () => {
@@ -602,9 +641,9 @@ function App() {
     }
 
     for (let i = 0; i < sales.length; i++) {
-      if (sales[i].UPC === result.upc) {
+      if (sales[i].upc === result.upc) {
         const newSales = [...sales];
-        newSales[i].product_number += amount;
+        newSales[i].products_number += amount;
         newSales[i].total += amount * sales[i].selling_price;
         setSales(newSales);
         updateCheckRowInUITable(saleToTableRow(newSales[i]), i);
@@ -613,9 +652,9 @@ function App() {
     }
 
     const newSale = {
-      UPC: upc,
+      upc: upc,
       product_name: result.product_name.toString(),
-      product_number: amount,
+      products_number: amount,
       selling_price: result.selling_price,
       total: amount * result.selling_price,
     };
@@ -700,7 +739,7 @@ function App() {
             (sale) => `
             <label>${sale.product_name}</label>
               <div class="sale-info">
-                <label>${sale.selling_price} х ${sale.product_number}</label>
+                <label>${sale.selling_price} х ${sale.products_number}</label>
                 <label>${sale.total}</label>
               </div>
             <hr>
@@ -724,20 +763,125 @@ function App() {
 
   //#region Parts of return
 
-  const [test, setTest] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showErrorFunction = (errorMessage?: string) => {
+    if (errorMessage) {
+      setErrorMessage(errorMessage);
+    }
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+    }, 3000);
+  };
+
+  const changePassword = async () => {
+    const user = { username: Service.user.username, password: oldPassword };
+    const userService = new UserService(user);
+
+    try {
+      await userService.logIn();
+    } catch (error) {
+      if ((error as AxiosError).message === "Network Error") {
+        console.log("Network Error");
+        showErrorFunction("Сервер не підключений");
+        return;
+      } else {
+        showErrorFunction("Неправильний нікнейм або пароль");
+        return;
+      }
+    }
+
+    user.password = newPassword;
+    try {
+      await userService.changePassword(user, oldPassword);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    showErrorFunction("Пароль змінено");
+  };
+
+  const [test, setTest] = useState(true);
 
   const [editing, setEditing] = useState(false);
+
+  const logOutAndChangePasswordButtons = (
+    <div style={{ display: "flex", gap: "1rem" }}>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        onClick={() => setTableVisible(Table.ChangePassword)}
+      >
+        Змінити пароль
+      </button>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        onClick={handleLogOut}
+      >
+        Вийти
+      </button>
+    </div>
+  );
+
+  const changePasswordPage = (
+    <div className="column-container" style={{ width: "20%" }}>
+      {Service.user && (
+        <label style={{ fontSize: 18 }}>Нікнейм: {Service.user.username}</label>
+      )}
+      <TextField
+        type="password"
+        className="text-field"
+        key={"old_password"}
+        label={"Старий пароль"}
+        onChange={(event) => setOldPassword(event.target.value)}
+        variant="outlined"
+      />
+      <TextField
+        type="password"
+        className="text-field"
+        key={"new_password"}
+        label={"Новий пароль"}
+        onChange={(event) => setNewPassword(event.target.value)}
+        variant="outlined"
+      />
+      <button
+        type="button"
+        className="btn btn-success"
+        onClick={changePassword}
+      >
+        Змінити пароль
+      </button>
+    </div>
+  );
 
   const managerPage = (
     <div>
       <div className="button-panel">
-        <ButtonPanel
-          buttonNames={buttonNamesManager}
-          onClickFunctions={onClickFunctionsManager}
-          defaultValue={0}
-        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginRight: "3rem",
+          }}
+        >
+          <ButtonPanel
+            buttonNames={buttonNamesManager}
+            onClickFunctions={onClickFunctionsManager}
+            defaultValue={0}
+          />
+          {logOutAndChangePasswordButtons}
+        </div>
       </div>
       <div className="full-page">
+        {whatTableIsVisible === Table.ChangePassword && (
+          <div>{changePasswordPage} </div>
+        )}
         {whatTableIsVisible === Table.Main && (
           <div>
             <ButtonGrid
@@ -923,15 +1067,17 @@ function App() {
                   {test ? "Статистика за категоріями" : "Сховати статистику"}
                 </button>
               </Tooltip>
-              <TableObject
-                columnNames={[
-                  "ID категорії",
-                  "Назва категорії",
-                  "Група товарів",
-                  "Продано",
-                ]}
-                withButtons={false}
-              />
+              {test && (
+                <TableObject
+                  columnNames={[
+                    "ID категорії",
+                    "Назва категорії",
+                    "Група товарів",
+                    "Продано",
+                  ]}
+                  withButtons={false}
+                />
+              )}
             </div>
             <div
               style={{
@@ -1045,9 +1191,9 @@ function App() {
 
                   <div style={{ width: "15%" }}>
                     <AutocompleteTextField
-                      options={clientsPercents}
-                      onChange={handleOnChangePercent}
-                      label="Cashier ID"
+                      options={cashierIDs}
+                      onChange={handleOnChangeCashierID}
+                      label="Касир/ка"
                     />
                   </div>
 
@@ -1092,9 +1238,9 @@ function App() {
                 >
                   Назад до всіх чеків
                 </button>
-                {selectedCheck && (
+                {selectedCheckNumber && (
                   <CheckInfo
-                    check={selectedCheck}
+                    checkNumber={selectedCheckNumber}
                     checkColumnNames={checkColumnNames}
                   />
                 )}
@@ -1187,6 +1333,7 @@ function App() {
                   updater={updater}
                   getFunction={currentGet}
                   setEditing={setEditing}
+                  saveNewRow={setNewRow}
                 />
 
                 <EditOrCreateWindow
@@ -1200,6 +1347,7 @@ function App() {
             </div>
           </div>
         )}
+        {showError && <AlertComponent errorMessage={errorMessage} />}
       </div>
     </div>
   );
@@ -1207,13 +1355,25 @@ function App() {
   const cashierPage = (
     <div>
       <div className="button-panel">
-        <ButtonPanel
-          buttonNames={buttonNamesCashier}
-          onClickFunctions={onClickFunctionsCashier}
-          defaultValue={0}
-        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginRight: "3rem",
+          }}
+        >
+          <ButtonPanel
+            buttonNames={buttonNamesCashier}
+            onClickFunctions={onClickFunctionsCashier}
+            defaultValue={0}
+          />
+          {logOutAndChangePasswordButtons}
+        </div>
       </div>
       <div className="full-page">
+        {whatTableIsVisible === Table.ChangePassword && (
+          <div>{changePasswordPage} </div>
+        )}
         {whatTableIsVisible === Table.Main && (
           <div>
             {!showAddCheckForm && (
@@ -1449,9 +1609,9 @@ function App() {
                   >
                     Назад до всіх чеків
                   </button>
-                  {selectedCheck && (
+                  {selectedCheckNumber && (
                     <CheckInfo
-                      check={selectedCheck}
+                      checkNumber={selectedCheckNumber}
                       checkColumnNames={checkColumnNames}
                     />
                   )}

@@ -3,9 +3,9 @@ import TableRow from "../classes/TableRow";
 import Service from "./Service";
 
 export interface Sale {
-  UPC: string;
+  upc: string;
   product_name: string;
-  product_number: number;
+  products_number: number;
   selling_price: number;
   total: number;
 }
@@ -16,19 +16,19 @@ export interface SaleForDb {
 }
 
 export function saleToSaleForDb(sale: Sale): SaleForDb {
-  return { first: sale.UPC, second: sale.product_number };
+  return { first: sale.upc, second: sale.products_number };
 }
 
 export function saleToTableRow(sale: Sale): TableRow {
   const values: string[] = [
-    sale.UPC,
+    sale.upc,
     sale.product_name,
-    sale.product_number.toString(),
+    sale.products_number.toString(),
     sale.selling_price.toString(),
     sale.total.toString(),
   ];
 
-  return new TableRow(sale.UPC, values);
+  return new TableRow(sale.upc, values);
 }
 
 class SalesService {
@@ -41,7 +41,7 @@ class SalesService {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.url);
+      const response = await axios.get(this.url, this.config);
       console.log("sales");
       console.log(response);
       return response.data.map((row: any) => saleToTableRow(row));
