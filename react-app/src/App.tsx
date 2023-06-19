@@ -369,7 +369,9 @@ function App() {
     };
 
     const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
+    const encryptedPassword = localStorage.getItem("password");
+    let password;
+    if (encryptedPassword !== null) password = atob(encryptedPassword);
     if (username && password) {
       const user = {
         username: username,
@@ -799,6 +801,7 @@ function App() {
     user.password = newPassword;
     try {
       await userService.changePassword(user, oldPassword);
+      localStorage.setItem("password", btoa(user.password));
     } catch (error) {
       console.log(error);
       throw error;
