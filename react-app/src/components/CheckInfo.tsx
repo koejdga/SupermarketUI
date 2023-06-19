@@ -23,7 +23,7 @@ const CheckInfo = ({ check, checkColumnNames }: Props) => {
     };
 
     fetchCheckRows();
-  }, []);
+  }, [check]);
 
   return (
     <>

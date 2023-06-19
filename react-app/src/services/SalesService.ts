@@ -33,7 +33,7 @@ export function saleToTableRow(sale: Sale): TableRow {
 
 class SalesService {
   url: string;
-  config = {};
+  config = {} || undefined;
   constructor(check_number: string) {
     this.url = `http://26.133.25.6:8080/api/user/sales/${check_number}`;
     this.config = Service.config;

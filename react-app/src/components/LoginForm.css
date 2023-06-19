@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-.login-form button {
+.login-form .submit-button {
   padding: 10px 20px;
   border-radius: 5px;
   border: none;

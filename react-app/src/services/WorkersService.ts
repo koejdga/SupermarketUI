@@ -18,13 +18,6 @@ export interface Worker {
   zip_code: string;
 }
 
-export interface WorkerData {
-  phone_number: string;
-  city: string;
-  street: string;
-  zip_code: string;
-}
-
 function workerToTableRow(worker: Worker): TableRow {
   const values: string[] = [
     worker.id_employee,
@@ -123,7 +116,7 @@ class WorkersService extends Service {
     }
   }
 
-  async getRowsBySurname(surname: string): Promise<WorkerData[]> {
+  async getRowsBySurname(surname: string): Promise<Worker[]> {
     try {
       const response = await axios.get(
         this.baseUrl + `/with_surname/${surname}`,
@@ -149,7 +142,7 @@ class WorkersService extends Service {
     }
   }
 
-  async updateRow(id: number, data: TableRow): Promise<void> {
+  async updateRow(id: number | string, data: TableRow): Promise<void> {
     try {
       await axios.put(
         `${this.postUpdateUrl}/${id}`,

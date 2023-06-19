@@ -11,6 +11,13 @@ abstract class Service {
     if (!Service.user) return undefined;
 
     // Service.user = { username: "admin", password: "password" };
+
+    // return {
+    //   headers: {
+    //     Authorization: `Basic ${btoa(`admin:password`)} `,
+    //     "X-Requested-With": "XMLHttpRequest",
+    //   },
+    // };
     return {
       headers: {
         Authorization: `Basic ${btoa(
@@ -29,7 +36,7 @@ abstract class Service {
   abstract getRows(): Promise<TableRow[]>;
 
   // abstract updateRow(id: number, data: T): Promise<void>;
-  abstract updateRow(id: number, data: TableRow): Promise<void>;
+  abstract updateRow(id: number | string, data: TableRow): Promise<void>;
 
   // abstract createRow(data: T): Promise<void>;
   abstract createRow(row: TableRow): Promise<void>;

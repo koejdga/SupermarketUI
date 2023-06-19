@@ -25,6 +25,8 @@ interface Props {
   onlyEditButton?: boolean;
   onDoubleClickRow?: () => void;
   getFunction?: number;
+  setEditing?: (editing: boolean) => void;
+  selectRow?: (row: TableRow) => void;
 }
 
 export enum Get {
@@ -48,6 +50,7 @@ interface RowActionsProps {
   onDelete: (rowIndex: number | string) => void;
   onSelect: (rowIndex: number | string) => void;
   onlyEditButton?: boolean;
+  setEditing?: (editing: boolean) => void;
 }
 
 function RowActions({
@@ -55,6 +58,7 @@ function RowActions({
   onDelete,
   onSelect,
   onlyEditButton = false,
+  setEditing,
 }: RowActionsProps) {
   const [showActions, setShowActions] = useState(false);
   const buttonARef = useRef<HTMLButtonElement>(null);
@@ -78,10 +82,16 @@ function RowActions({
     setTimeout(() => {
       setShowAlert(false);
     }, 3000);
+
+    if (setEditing) setEditing(false);
   };
 
   const handleEdit = () => {
     setShowActions(false);
+    if (setEditing) {
+      setEditing(true);
+      console.log("set editing true");
+    }
 
     if (buttonARef.current) {
       buttonARef.current.click();
@@ -140,6 +150,8 @@ function TableObject({
   onlyEditButton = false,
   onDoubleClickRow,
   getFunction = 0,
+  setEditing,
+  selectRow,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | string>(-1);
@@ -257,17 +269,19 @@ function TableObject({
     setSelectedRow(undefined);
     setSelectedRowIndex(-1);
     showRowAlert("Скасовано");
-    console.log("AAAA");
   };
 
   const handleDeleteRow = (rowIndexDb: number | string) => {
-    // let rowIndexDb = rows[rowIndex].id;
-    const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
-    setRows(updatedRows);
-    console.log(rowIndexDb + " - row index database");
+    if (service) {
+      service.deleteRow(rowIndexDb);
+      const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
+      setRows(updatedRows);
+      console.log(rowIndexDb + " - row index database");
 
-    if (service) service.deleteRow(rowIndexDb);
-    showRowAlert("Видалено");
+      showRowAlert("Видалено");
+    } else {
+      showRowAlert("Не видалено");
+    }
   };
 
   const handleDeleteAll = () => {
@@ -333,13 +347,22 @@ function TableObject({
                     onDelete={handleDeleteRow}
                     onSelect={handleSelectRow}
                     onlyEditButton={onlyEditButton}
+                    setEditing={setEditing}
                   />
                 )}
 
                 {row.values.map((rowData, index) => (
                   <td
                     key={`${rowIndex}-${index}`}
-                    onDoubleClick={onDoubleClickRow}
+                    onDoubleClick={() => {
+                      handleSelectRow(rows[rowIndex].id);
+                      if (onDoubleClickRow) {
+                        onDoubleClickRow();
+                        console.log(selectRow);
+                        console.log(selectedRow);
+                        if (selectRow && selectedRow) selectRow(selectedRow);
+                      }
+                    }}
                   >
                     {rowData}
                   </td>

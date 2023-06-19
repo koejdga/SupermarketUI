@@ -1,6 +1,8 @@
+import { AxiosError } from "axios";
 import UserService, { User } from "../services/UserService";
 import "./LoginForm.css";
 import { useState } from "react";
+import AlertComponent from "./AlertComponent";
 
 interface Props {
   handleLogIn: (idEmployee: string, user: User) => void;
@@ -10,11 +12,14 @@ const LoginForm = ({ handleLogIn }: Props) => {
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
 
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const logIn = async () => {
     if (!username) {
-      // alert empty username
+      showErrorFunction("Нікнейм не може бути пустим");
     } else if (!password) {
-      // alert empty password
+      showErrorFunction("Пароль не може бути пустим");
     } else {
       console.log(username);
       console.log(password);
@@ -26,10 +31,24 @@ const LoginForm = ({ handleLogIn }: Props) => {
         console.log(response);
         handleLogIn(response, user);
       } catch (error) {
-        console.log("alerttt");
-        // alert wrong username or password
+        if ((error as AxiosError).message === "Network Error") {
+          console.log("Network Error");
+          showErrorFunction("Сервер не підключений");
+        } else {
+          showErrorFunction("Неправильний нікнейм або пароль");
+        }
       }
     }
+  };
+
+  const showErrorFunction = (errorMessage?: string) => {
+    if (errorMessage) {
+      setErrorMessage(errorMessage);
+    }
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+    }, 3000);
   };
 
   return (
@@ -56,10 +75,11 @@ const LoginForm = ({ handleLogIn }: Props) => {
           }}
         />
         <br />
-        <button type="button" onClick={logIn}>
+        <button type="button" className="submit-button" onClick={logIn}>
           Увійти
         </button>
       </form>
+      {showError && <AlertComponent errorMessage={errorMessage} />}
     </div>
   );
 };

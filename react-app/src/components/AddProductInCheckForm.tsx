@@ -48,7 +48,6 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
 
   const showErrorFunction = (errorMessage?: string) => {
     if (errorMessage) {
-      console.log("settt");
       setErrorMessage(errorMessage);
     }
     setShowError(true);

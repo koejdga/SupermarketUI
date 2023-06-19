@@ -14,7 +14,9 @@ interface Props {
   selectedRow?: TableRow;
   onCancel?: () => void;
   saveNewRow?: (row: TableRow) => void;
+  editRow?: (row: TableRow) => void;
   tableType?: TableType;
+  editing?: boolean;
 }
 
 const EditOrCreateWindow = ({
@@ -23,6 +25,7 @@ const EditOrCreateWindow = ({
   onCancel,
   saveNewRow,
   tableType,
+  editRow,
 }: Props) => {
   var buttonStyle = {
     color: "#fff",
@@ -34,6 +37,7 @@ const EditOrCreateWindow = ({
   const row: TableRow = new TableRow(-1, Array(columnNames.length).fill(""));
   const [editedRow, setEditedRow] = useState(selectedRow || row);
   const isEditing = selectedRow ? true : false;
+  const ed = editRow;
 
   const [showAlertChange, setShowAlertChange] = useState(false);
   const [alertMessageChange, setAlertMessageChange] = useState("Помилка");
@@ -60,7 +64,6 @@ const EditOrCreateWindow = ({
 
       const updatedRow = new TableRow(editedRow.id, updatedRowValues);
       setEditedRow(updatedRow);
-      console.log(updatedRow);
     }
   };
 
@@ -69,13 +72,16 @@ const EditOrCreateWindow = ({
   };
 
   const handleSave = () => {
-    if (saveNewRow) saveNewRow(editedRow);
-    setAlertMessageChange("Змінено");
+    console.log(saveNewRow);
+    if (saveNewRow) {
+      saveNewRow(editedRow);
+      setAlertMessageChange("Додано");
+    }
+
     setShowAlertChange(true);
     setTimeout(() => {
       setShowAlertChange(false);
     }, 3000);
-    console.log(37);
   };
 
   return (

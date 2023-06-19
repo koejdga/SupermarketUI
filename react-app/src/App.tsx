@@ -25,14 +25,14 @@ import EditOrCreateWindow from "./components/EditOrCreateWindow";
 import { Link, Upc } from "react-bootstrap-icons";
 import CategoriesService from "./services/CategoriesService";
 import ClientsService from "./services/ClientsService";
-import WorkersService, {
-  WorkerData,
-  tableRowToWorker,
-} from "./services/WorkersService";
+import WorkersService, { tableRowToWorker } from "./services/WorkersService";
 import ButtonGrid from "./components/ButtonGrid";
 import "./App.css";
 import ProductsService from "./services/ProductsService";
-import ChecksService, { Check } from "./services/ChecksService";
+import ChecksService, {
+  Check,
+  tableRowToCheck,
+} from "./services/ChecksService";
 import StoreProductsService from "./services/StoreProductsService";
 import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
@@ -41,7 +41,7 @@ import Service from "./services/Service";
 import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
 import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
-import { User } from "./services/UserService";
+import UserService, { User } from "./services/UserService";
 
 function App() {
   //#region Services
@@ -222,7 +222,7 @@ function App() {
   //#endregion
 
   //#region Variables
-  const [isCashier, setIsCashier] = useState(false);
+  const [isCashier, setIsCashier] = useState(true);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -247,6 +247,8 @@ function App() {
   const [showAddCheckForm, setShowAddCheckForm] = useState(false);
 
   const [checkRows, setCheckRows] = useState<TableRow[]>([]);
+
+  const [selectedCheckRow, setSelectedCheckRow] = useState<TableRow>();
 
   const [selectedCheck, setSelectedCheck] = useState<Check>();
 
@@ -276,12 +278,24 @@ function App() {
 
   //#region useEffect
 
+  useEffect(() => {
+    if (selectedCheckRow) setSelectedCheck(tableRowToCheck(selectedCheckRow));
+  }, [selectedCheckRow]);
+
   const [updater, setUpdater] = useState(true);
   useEffect(() => {
     if (newRow) {
-      currentService.createRow(newRow).then(() => {
-        setUpdater(!updater);
-      });
+      if (!editing) {
+        console.log("creating");
+        currentService.createRow(newRow).then(() => {
+          setUpdater(!updater);
+        });
+      } else {
+        console.log("updating row, row id = " + newRow.id);
+        currentService.updateRow(newRow.id, newRow).then(() => {
+          setUpdater(!updater);
+        });
+      }
     }
   }, [newRow]);
 
@@ -336,6 +350,39 @@ function App() {
     }
   }, [checksDateRangeCashier]);
 
+  useEffect(() => {
+    const fetchIdEmployee = async (user: User) => {
+      const userService = new UserService(user);
+      const response = await userService.logIn();
+      setIdEmployee(response);
+    };
+
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    if (username && password) {
+      const user = {
+        username: username,
+        password: password,
+      };
+
+      fetchIdEmployee(user);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (idEmployee) {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+      if (username && password) {
+        const user = {
+          username: username,
+          password: password,
+        };
+        handleLogIn(idEmployee, user);
+      }
+    }
+  }, [idEmployee]);
+
   //#endregion
 
   //#region HandleOnChange functions
@@ -379,7 +426,7 @@ function App() {
     } else setCurrentGet(Get.Default);
   };
 
-  const [workersData, setWorkersData] = useState<WorkerData[]>([]);
+  const [workersData, setWorkersData] = useState<Worker[]>([]);
 
   const handleOnChangeWorkerSurname = async (value: string) => {
     WorkersService.surname = value;
@@ -388,6 +435,8 @@ function App() {
         WorkersService.surname
       );
       setWorkersData(result);
+    } else {
+      setWorkersData([]);
     }
   };
 
@@ -492,6 +541,7 @@ function App() {
   //#region Functions
 
   const handleLogIn = async (idEmployee: string, user: User) => {
+    saveUserData(user);
     setIdEmployee(idEmployee);
     Service.user = user;
     let profileService = new ProfileService(idEmployee);
@@ -505,6 +555,17 @@ function App() {
     }
 
     setIsLoggedIn(true);
+  };
+
+  const saveUserData = (user: User) => {
+    localStorage.setItem("username", user.username);
+    localStorage.setItem("password", user.password);
+  };
+
+  const handleLogOut = () => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("password");
+    setIsLoggedIn(false);
   };
 
   const addCheckRowToUITable = (newRow: TableRow) => {
@@ -664,6 +725,8 @@ function App() {
   //#region Parts of return
 
   const [test, setTest] = useState(false);
+
+  const [editing, setEditing] = useState(false);
 
   const managerPage = (
     <div>
@@ -963,52 +1026,79 @@ function App() {
         )}
         {whatTableIsVisible === Table.Checks && (
           <>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "start",
-                gap: "25px",
-                marginBottom: "15px",
-              }}
-            >
-              <div style={{ width: "250px" }}>
-                <DateRangeInput
-                  dateRange={checksDateRangeManager}
-                  setDateRange={setChecksDateRangeManager}
-                />
-              </div>
+            {checksPageView === ShowOnChecksPage.showChecksTable && (
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "start",
+                    gap: "25px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <div style={{ width: "250px" }}>
+                    <DateRangeInput
+                      dateRange={checksDateRangeManager}
+                      setDateRange={setChecksDateRangeManager}
+                    />
+                  </div>
 
-              <div style={{ width: "15%" }}>
-                <AutocompleteTextField
-                  options={clientsPercents}
-                  onChange={handleOnChangePercent}
-                  label="Cashier ID"
-                />
-              </div>
+                  <div style={{ width: "15%" }}>
+                    <AutocompleteTextField
+                      options={clientsPercents}
+                      onChange={handleOnChangePercent}
+                      label="Cashier ID"
+                    />
+                  </div>
 
-              <button
-                className="btn btn-secondary"
-                style={{
-                  height: "40px",
-                  marginTop: "12px",
-                  marginLeft: "40%",
-                }}
-              >
-                Загальна сума
-              </button>
-              <PrintReportButton
-                buttonStyle={{
-                  height: "40px",
-                  marginTop: "12px",
-                }}
-              />
-            </div>
-            {checksService && (
-              <TableObject
-                columnNames={checksColumnNames}
-                service={checksService}
-                updater={updater}
-              />
+                  <button
+                    className="btn btn-secondary"
+                    style={{
+                      height: "40px",
+                      marginTop: "12px",
+                      marginLeft: "40%",
+                    }}
+                  >
+                    Загальна сума
+                  </button>
+                  <PrintReportButton
+                    buttonStyle={{
+                      height: "40px",
+                      marginTop: "12px",
+                    }}
+                  />
+                </div>
+                {checksService && (
+                  <TableObject
+                    columnNames={checksColumnNames}
+                    service={checksService}
+                    updater={updater}
+                    withButtons={false}
+                    onDoubleClickRow={showCheckInfo}
+                    selectRow={setSelectedCheckRow}
+                  />
+                )}
+              </div>
+            )}
+
+            {checksPageView === ShowOnChecksPage.showCheckInfo && (
+              <>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: "200px" }}
+                  onClick={() =>
+                    setChecksPageView(ShowOnChecksPage.showChecksTable)
+                  }
+                >
+                  Назад до всіх чеків
+                </button>
+                {selectedCheck && (
+                  <CheckInfo
+                    check={selectedCheck}
+                    checkColumnNames={checkColumnNames}
+                  />
+                )}
+              </>
             )}
           </>
         )}
@@ -1032,7 +1122,7 @@ function App() {
                   <br />
                   {workersData &&
                     workersData.map((data) => (
-                      <div>
+                      <div key={data.id_employee}>
                         <div
                           style={{
                             borderRadius: "10px",
@@ -1041,6 +1131,9 @@ function App() {
                             backgroundColor: "InfoBackground",
                           }}
                         >
+                          <div>ID: {data.id_employee}</div>
+                          <div>Прізвище: {data.empl_surname}</div>
+                          <div>Ім'я: {data.empl_name}</div>
                           <div>Номер телефону: {data.phone_number}</div>
                           <div>
                             Адреса: вул. {data.street}, м. {data.city}{" "}
@@ -1065,7 +1158,7 @@ function App() {
                 }}
               >
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={<Checkbox />}
                   label="Лише касир/ки"
                   onChange={handleOnChangeOnlyCashiers}
                 />
@@ -1093,12 +1186,15 @@ function App() {
                   service={workersService}
                   updater={updater}
                   getFunction={currentGet}
+                  setEditing={setEditing}
                 />
 
                 <EditOrCreateWindow
                   columnNames={getWithoutId(workersColumnNames)}
                   saveNewRow={setNewRow}
+                  selectedRow={newRow}
                   tableType={TableType.Workers}
+                  onCancel={() => setEditing(false)}
                 />
               </div>
             </div>
