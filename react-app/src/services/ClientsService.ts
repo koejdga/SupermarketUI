@@ -93,7 +93,18 @@ class ClientsService extends Service {
     }
   }
 
-  // TODO переглянути чи норм передається пароль(тут дані паролю просто для тесту)
+  async getActiveClients(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(this.baseUrl, Service.config);
+      console.log("not imlemented (now returns getRows)");
+      console.log(response);
+      return response.data.map((row: any) => clientToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getClientCards(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);

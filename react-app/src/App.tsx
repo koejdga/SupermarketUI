@@ -6,7 +6,12 @@ import { useState, ChangeEvent, useEffect } from "react";
 import DateRangeInput from "./components/DateRangeInput";
 import TovarCard from "./components/TovarCard";
 import AutocompleteTextField from "./components/AutocompleteTextField";
-import { Checkbox, FormControlLabel, SelectChangeEvent } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  SelectChangeEvent,
+  Tooltip,
+} from "@mui/material";
 import PrintReportButton, {
   TableType,
   printReport,
@@ -219,7 +224,7 @@ function App() {
   //#region Variables
   const [isCashier, setIsCashier] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [idEmployee, setIdEmployee] = useState<string>();
 
@@ -486,6 +491,22 @@ function App() {
 
   //#region Functions
 
+  const handleLogIn = async (idEmployee: string, user: User) => {
+    setIdEmployee(idEmployee);
+    Service.user = user;
+    let profileService = new ProfileService(idEmployee);
+    const response = await profileService.getRow();
+    if (response.empl_role === cashierRole) {
+      setIsCashier(true);
+      setChecksService(new ChecksService(true, idEmployee));
+    } else {
+      setIsCashier(false);
+      setChecksService(new ChecksService(false));
+    }
+
+    setIsLoggedIn(true);
+  };
+
   const addCheckRowToUITable = (newRow: TableRow) => {
     if (checkRows.length === 0) {
       setCheckRows([newRow]);
@@ -641,6 +662,8 @@ function App() {
   //#endregion
 
   //#region Parts of return
+
+  const [test, setTest] = useState(false);
 
   const managerPage = (
     <div>
@@ -822,6 +845,33 @@ function App() {
             </div>
             <div
               style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "1rem",
+              }}
+            >
+              <Tooltip title={"jjjj"}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setTest(!test)}
+                >
+                  {test ? "Статистика за категоріями" : "Сховати статистику"}
+                </button>
+              </Tooltip>
+              <TableObject
+                columnNames={[
+                  "ID категорії",
+                  "Назва категорії",
+                  "Група товарів",
+                  "Продано",
+                ]}
+                withButtons={false}
+              />
+            </div>
+            <div
+              style={{
                 height: "50px",
               }}
             >
@@ -855,12 +905,35 @@ function App() {
                 marginBottom: "1.5rem",
               }}
             >
-              <div style={{ width: "15%" }}>
+              <div
+                style={{
+                  flexGrow: 1,
+                  display: "flex",
+                  gap: "2rem",
+                  width: "550px",
+                }}
+              >
                 <AutocompleteTextField
                   options={clientsPercents}
                   onChange={handleOnChangePercent}
                   label="Відсоток знижки"
+                  style={{ width: "180px" }}
                 />
+                <Tooltip title="Клієнт/ки, що купували хоч раз товари з кожної категорії у магазині">
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="Активні"
+                    key={"prom"}
+                    onChange={(event) => {
+                      console.log(event);
+                      if (currentGet === Get.Default) {
+                        setCurrentGet(Get.ActiveClients);
+                      } else if (currentGet === Get.ActiveClients) {
+                        setCurrentGet(Get.Default);
+                      }
+                    }}
+                  />
+                </Tooltip>
               </div>
               <div style={{ marginRight: "25px" }}>
                 <button
@@ -1301,22 +1374,6 @@ function App() {
   );
 
   //#endregion
-
-  const handleLogIn = async (idEmployee: string, user: User) => {
-    setIdEmployee(idEmployee);
-    Service.user = user;
-    let profileService = new ProfileService(idEmployee);
-    const response = await profileService.getRow();
-    if (response.empl_role === cashierRole) {
-      setIsCashier(true);
-      setChecksService(new ChecksService(true, idEmployee));
-    } else {
-      setIsCashier(false);
-      setChecksService(new ChecksService(false));
-    }
-
-    setIsLoggedIn(true);
-  };
 
   return (
     // Cashier page

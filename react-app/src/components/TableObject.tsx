@@ -40,6 +40,7 @@ export enum Get {
   ChecksDateRangeCashier,
   OnlyCashiers,
   WorkerSurname,
+  ActiveClients,
 }
 
 interface RowActionsProps {
@@ -176,6 +177,9 @@ function TableObject({
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
         result = await workersService.getOnlyCashiers();
+      } else if (getFunction === Get.ActiveClients) {
+        let clientsService = new ClientsService();
+        result = await clientsService.getActiveClients();
       }
       console.log(result);
       if (result) setRows(result);
