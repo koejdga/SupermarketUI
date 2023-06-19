@@ -3,7 +3,7 @@ import { Alert } from "@mui/material";
 import { Snackbar } from "@mui/material";
 
 interface Props {
-  onClose: () => void;
+  onClose?: () => void;
   errorMessage?: string;
 }
 
@@ -13,7 +13,12 @@ const AlertComponent = ({ onClose, errorMessage }: Props) => {
       return;
     }
 
-    onClose();
+    if (onClose) onClose();
+    close();
+  };
+
+  const close = () => {
+    errorMessage = undefined;
   };
 
   return (
@@ -22,7 +27,7 @@ const AlertComponent = ({ onClose, errorMessage }: Props) => {
       open={errorMessage ? true : false} // Змінено значення open
       autoHideDuration={3000} // Змінено значення autoHideDuration
     >
-      <Alert onClose={handleClose} severity="success">
+      <Alert onClose={handleClose} severity="error">
         {errorMessage ? errorMessage : "Неправильно введені дані"}
       </Alert>
     </Snackbar>

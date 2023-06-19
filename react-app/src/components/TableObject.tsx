@@ -165,18 +165,13 @@ function TableObject({
         result = await productsService.getRowsByName(
           ProductsService.productName
         );
-      } else if (getFunction === Get.UPC) {
-        console.log("це взагалі треба видалити");
-        // let storeProductsService = new StoreProductsService();
-        // result = await storeProductsService.getRowByUPC(
-        //   StoreProductsService.UPC
-        // );
       } else if (getFunction === Get.Promo) {
         console.log("Not implemented");
       } else if (getFunction === Get.ClientSurname) {
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
       } else if (getFunction === Get.ChecksDateRangeCashier) {
+        console.log(service);
         if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();

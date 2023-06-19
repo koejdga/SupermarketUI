@@ -61,6 +61,7 @@ class ChecksService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     if (this.isCashier && this.idEmployee) {
+      console.log("cashier get checks");
       return this.getRowsByEmployee(this.idEmployee);
     }
 

@@ -44,7 +44,7 @@ function App() {
   const clientsService = new ClientsService();
   const workersService = new WorkersService();
   const productsService = new ProductsService();
-  let checksService: ChecksService | undefined = undefined;
+  const [checksService, setChecksService] = useState<ChecksService>();
   const storeProductsService = new StoreProductsService();
   const [currentService, setCurrentService] =
     useState<Service>(categoriesService);
@@ -219,7 +219,7 @@ function App() {
   //#region Variables
   const [isCashier, setIsCashier] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const [idEmployee, setIdEmployee] = useState<string>();
 
@@ -324,6 +324,7 @@ function App() {
 
   useEffect(() => {
     if (checksDateRangeCashier[0] && checksDateRangeCashier[1]) {
+      console.log(checksDateRangeCashier[0]);
       ChecksService.left_date = checksDateRangeCashier[0];
       ChecksService.right_date = checksDateRangeCashier[1];
       setCurrentGet(Get.ChecksDateRangeCashier);
@@ -493,6 +494,12 @@ function App() {
     }
   };
 
+  const updateCheckRowInUITable = (newRow: TableRow, i: number) => {
+    const rows = [...checkRows];
+    rows[i] = newRow;
+    setCheckRows(rows);
+  };
+
   const addSaleToSales = (sale: Sale) => {
     if (sales.length === 0) {
       setSales([sale]);
@@ -507,6 +514,21 @@ function App() {
   ): Promise<void> {
     const storeProductService = new StoreProductsService();
     const result = await storeProductService.getRowByUPC(upc);
+
+    if (amount > result.products_number) {
+      throw new Error("Кількість товару більша, ніж є в наявності");
+    }
+
+    for (let i = 0; i < sales.length; i++) {
+      if (sales[i].UPC === result.upc) {
+        const newSales = [...sales];
+        newSales[i].product_number += amount;
+        newSales[i].total += amount * sales[i].selling_price;
+        setSales(newSales);
+        updateCheckRowInUITable(saleToTableRow(newSales[i]), i);
+        return;
+      }
+    }
 
     const newSale = {
       UPC: upc,
@@ -1141,6 +1163,10 @@ function App() {
                 options={UPCs}
                 onChange={handleOnChangeUPC}
                 label="UPC"
+                defaultValue={{
+                  label: StoreProductsService.UPC,
+                  value: StoreProductsService.UPC,
+                }}
               />
             </div>
 
@@ -1173,13 +1199,7 @@ function App() {
                   />
                 )}
                 {currentGet === Get.UPC && (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "55px",
-                      width: "100vh",
-                    }}
-                  >
+                  <div style={{ width: "50%" }}>
                     <TovarCard />
                   </div>
                 )}
@@ -1289,12 +1309,12 @@ function App() {
     const response = await profileService.getRow();
     if (response.empl_role === cashierRole) {
       setIsCashier(true);
-    } else setIsCashier(false);
+      setChecksService(new ChecksService(true, idEmployee));
+    } else {
+      setIsCashier(false);
+      setChecksService(new ChecksService(false));
+    }
 
-    checksService = new ChecksService(
-      isCashier,
-      isCashier ? idEmployee : undefined
-    );
     setIsLoggedIn(true);
   };
 

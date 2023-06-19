@@ -32,23 +32,23 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
     }
   };
 
-  let alertMessage = "Помилка";
-
-  const handleAddProduct = () => {
-    alertMessage = "Test";
+  const handleAddProduct = async () => {
     if (upc === "") {
       showErrorFunction("Неправильно введено UPC");
     } else if (amount === errorValue) {
       showErrorFunction("Неправильно введено кількість товару");
     } else {
-      console.log("Added");
-      onAdd(upc, amount);
-      alertMessage = "Успішно додано";
+      try {
+        await onAdd(upc, amount);
+      } catch (error) {
+        showErrorFunction((error as Error).message);
+      }
     }
   };
 
   const showErrorFunction = (errorMessage?: string) => {
     if (errorMessage) {
+      console.log("settt");
       setErrorMessage(errorMessage);
     }
     setShowError(true);
@@ -57,20 +57,9 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
     }, 3000);
   };
 
-  const [alertOpen, setAlertOpen] = useState(true);
-  const handleCloseAlert = () => {
-    // Дії, які треба виконати при закритті сповіщення
-    setAlertOpen(false);
-  };
-
   return (
     <div className="add-product-in-check-form">
-      {alertOpen && alertMessage !== "Помилка" && (
-        <AlertComponent
-          onClose={handleCloseAlert}
-          errorMessage={alertMessage}
-        />
-      )}
+      {showError && <AlertComponent errorMessage={errorMessage} />}
       <h3>Додати продукт</h3>
       <AutocompleteTextField
         className="autocomplete-field"
