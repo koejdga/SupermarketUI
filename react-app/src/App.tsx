@@ -246,6 +246,8 @@ function App() {
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
 
+  const [allClients, setAllClients] = useState(false);
+
   const [showAddCheckForm, setShowAddCheckForm] = useState(false);
 
   const [checkRows, setCheckRows] = useState<TableRow[]>([]);
@@ -482,6 +484,18 @@ function App() {
       setCurrentGet(Get.Default);
     }
     setOnlyCashiers(!onlyCashiers);
+  };
+
+  const handleOnServeAllClients = (
+    _event: React.SyntheticEvent<Element, Event>,
+    checked: boolean
+  ) => {
+    if (checked) {
+      setCurrentGet(Get.allClients);
+    } else {
+      setCurrentGet(Get.Default);
+    }
+    setAllClients(!allClients);
   };
 
   //#endregion
@@ -1310,6 +1324,11 @@ function App() {
                   control={<Checkbox />}
                   label="Лише касир/ки"
                   onChange={handleOnChangeOnlyCashiers}
+                />
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Лише працівники, що обслуговували усіх клієнтів"
+                  onChange={handleOnServeAllClients}
                 />
                 <div>
                   <button
