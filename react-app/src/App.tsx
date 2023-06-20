@@ -785,6 +785,7 @@ function App() {
   };
 
   const showErrorFunction = (errorMessage?: string) => {
+    console.log(errorMessage);
     if (errorMessage) {
       setErrorMessage(errorMessage);
     }
@@ -1021,6 +1022,31 @@ function App() {
       </button>
     </div>
   );
+
+  const [showSumOfSoldProducts, setShowSumOfSoldProducts] = useState(false);
+
+  const [minSum, setMinSum] = useState("0");
+
+  const [sumOfSoldProductsRows, setSumOfSoldProductsRows] =
+    useState<TableRow[]>();
+
+  const getSumsForWorkers = async () => {
+    let sum;
+    try {
+      sum = Number(minSum);
+    } catch (error) {
+      showErrorFunction("Введіть число");
+      return;
+    }
+
+    try {
+      const response = await workersService.getSoldSumsOfWorkers(sum);
+      setSumOfSoldProductsRows(response);
+    } catch (error) {
+      console.log(error);
+      showErrorFunction("Помилка");
+    }
+  };
 
   const managerPage = (
     <div>
@@ -1521,108 +1547,176 @@ function App() {
           </>
         )}
         {whatTableIsVisible === Table.Workers && (
-          <div
-            style={{
-              display: "flex",
-              width: "90%",
-              minHeight: "100vh",
-              gap: "15px",
-            }}
-          >
-            <div style={{ minWidth: "200px" }}>
-              <AutocompleteTextField
-                options={workerSurnames}
-                onChange={handleOnChangeWorkerSurname}
-                label="Прізвище"
-              />
-              {WorkersService.surname !== "" && (
-                <div>
-                  <br />
-                  {workersData &&
-                    workersData.map((data) => (
-                      <div key={data.id_employee}>
-                        <div
-                          style={{
-                            borderRadius: "10px",
-                            padding: "10px",
-                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
-                            backgroundColor: "InfoBackground",
-                          }}
-                        >
-                          <div>ID: {data.id_employee}</div>
-                          <div>Прізвище: {data.empl_surname}</div>
-                          <div>Ім'я: {data.empl_name}</div>
-                          <div>Номер телефону: {data.phone_number}</div>
-                          <div>
-                            Адреса: вул. {data.street}, м. {data.city}{" "}
-                            {data.zip_code}
-                          </div>
-                        </div>
-                        <br />
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{ width: "1px", backgroundColor: "grey" }} />
-
-            <div className="column-container" style={{ flexGrow: 1 }}>
+          <>
+            {!showSumOfSoldProducts && (
               <div
                 style={{
                   display: "flex",
-                  gap: "10px",
+                  width: "90%",
+                  minHeight: "100vh",
+                  gap: "15px",
                 }}
               >
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Лише касир/ки"
-                  onChange={handleOnChangeOnlyCashiers}
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Лише працівники, що обслуговували усіх клієнтів"
-                  onChange={handleOnServeOnlyAllClients}
-                />
-                <div style={{ marginLeft: "10%" }}>
-                  <button
-                    style={{ marginRight: "15px" }}
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasScrolling"
-                    aria-controls="offcanvasScrolling"
-                  >
-                    Додати робітника/цю
-                  </button>
+                <div style={{ minWidth: "200px" }}>
+                  <AutocompleteTextField
+                    options={workerSurnames}
+                    onChange={handleOnChangeWorkerSurname}
+                    label="Прізвище"
+                  />
+                  {WorkersService.surname !== "" && (
+                    <div>
+                      <br />
+                      {workersData &&
+                        workersData.map((data) => (
+                          <div key={data.id_employee}>
+                            <div
+                              style={{
+                                borderRadius: "10px",
+                                padding: "10px",
+                                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
+                                backgroundColor: "InfoBackground",
+                              }}
+                            >
+                              <div>ID: {data.id_employee}</div>
+                              <div>Прізвище: {data.empl_surname}</div>
+                              <div>Ім'я: {data.empl_name}</div>
+                              <div>Номер телефону: {data.phone_number}</div>
+                              <div>
+                                Адреса: вул. {data.street}, м. {data.city}{" "}
+                                {data.zip_code}
+                              </div>
+                            </div>
+                            <br />
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
 
-                  <PrintReportButton
-                    service={workersService}
-                    tableType={TableType.Workers}
+                <div style={{ width: "1px", backgroundColor: "grey" }} />
+
+                <div className="column-container" style={{ flexGrow: 1 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                    }}
+                  >
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label="Лише касир/ки"
+                      onChange={handleOnChangeOnlyCashiers}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label="Обслуговували усіх клієнт/ок"
+                      onChange={handleOnServeOnlyAllClients}
+                    />
+                    <div style={{ marginLeft: "10%" }}>
+                      <button
+                        style={{ marginRight: "15px" }}
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          setShowSumOfSoldProducts(true);
+                          getSumsForWorkers();
+                        }}
+                      >
+                        Сума проданих товарів
+                      </button>
+
+                      <button
+                        style={{ marginRight: "15px" }}
+                        type="button"
+                        className="btn btn-secondary"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasScrolling"
+                        aria-controls="offcanvasScrolling"
+                      >
+                        Додати робітника/цю
+                      </button>
+
+                      <PrintReportButton
+                        service={workersService}
+                        tableType={TableType.Workers}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <TableObject
+                      columnNames={workersColumnNames}
+                      service={workersService}
+                      updater={updater}
+                      getFunction={currentGet}
+                      setEditing={setEditing}
+                      saveNewRow={setNewRow}
+                      tableType={TableType.Workers}
+                    />
+
+                    <EditOrCreateWindow
+                      columnNames={getWithoutId(workersColumnNames)}
+                      saveNewRow={setNewRow}
+                      selectedRow={newRow}
+                      tableType={TableType.Workers}
+                      onCancel={() => setEditing(false)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            {showSumOfSoldProducts && (
+              <div className="column-container">
+                <button
+                  style={{ width: "15rem" }}
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setShowSumOfSoldProducts(false)}
+                >
+                  Назад до всіх працівни/ць
+                </button>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "2rem",
+                    padding: "2rem 0 0 0",
+                  }}
+                >
+                  <TextField
+                    className="text-field"
+                    key={"min_sum"}
+                    label={"Мінімальна сума"}
+                    onChange={(event) => {
+                      setMinSum(event.target.value);
+                    }}
+                    variant="outlined"
+                    defaultValue={0}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ height: "40px", marginTop: "8px" }}
+                    onClick={getSumsForWorkers}
+                  >
+                    Шукати
+                  </button>
+                </div>
+                <div style={{ width: "70%" }}>
+                  <TableObject
+                    columnNames={[
+                      "ID",
+                      "Прізвище",
+                      "Ім'я",
+                      "Посада",
+                      "Кількість проданих продуктів",
+                      "Сума",
+                    ]}
+                    rows={sumOfSoldProductsRows}
+                    withButtons={false}
                   />
                 </div>
               </div>
-              <div>
-                <TableObject
-                  columnNames={workersColumnNames}
-                  service={workersService}
-                  updater={updater}
-                  getFunction={currentGet}
-                  setEditing={setEditing}
-                  saveNewRow={setNewRow}
-                  tableType={TableType.Workers}
-                />
-
-                <EditOrCreateWindow
-                  columnNames={getWithoutId(workersColumnNames)}
-                  saveNewRow={setNewRow}
-                  selectedRow={newRow}
-                  tableType={TableType.Workers}
-                  onCancel={() => setEditing(false)}
-                />
-              </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
         {showError && <AlertComponent errorMessage={errorMessage} />}
       </div>
@@ -1910,6 +2004,7 @@ function App() {
             {idEmployee && <Profile id_employee={idEmployee} />}
           </div>
         )}
+        {showError && <AlertComponent errorMessage={errorMessage} />}
       </div>
     </div>
   );

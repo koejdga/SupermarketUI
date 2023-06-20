@@ -117,6 +117,30 @@ class WorkersService extends Service {
     }
   }
 
+  async getSoldSumsOfWorkers(minSum: number): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + `/get_sold_products/${minSum}`,
+        Service.config
+      );
+
+      return response.data.map(
+        (row: any) =>
+          new TableRow(row.id_employee, [
+            row.id_employee,
+            row.empl_surname,
+            row.empl_name,
+            row.empl_role,
+            row.sold_products_amount,
+            row.sell_sum,
+          ])
+      );
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getonlyAllClients(): Promise<TableRow[]> {
     try {
       const response = await axios.get(
