@@ -65,12 +65,6 @@ function App() {
     { value: "Не акційні", label: "Не акційні" },
   ];
 
-  const clientsPercents = [
-    { value: "10", label: "10" },
-    { value: "20", label: "20" },
-    { value: "25", label: "25" },
-  ];
-
   const sortingStoreProductsOptions = [
     { value: "За кількістю товару", label: "За кількістю товару" },
     { value: "За назвою", label: "За назвою" },
@@ -244,10 +238,6 @@ function App() {
 
   const [selectedUPC, setSelectedUPC] = useState<string>("");
 
-  const [selectedSurname, setSelectedSurname] = useState("");
-
-  const [selectedPercent, setSelectedPercent] = useState("");
-
   const [soldProductsAmount, setSoldProductsAmount] = useState(300);
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
@@ -295,9 +285,9 @@ function App() {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [showCategoryStatistics, setShowCategoryStatistics] = useState(false);
-
   const [editing, setEditing] = useState(false);
+
+  const [statisticsRows, setStatisticsRows] = useState<TableRow[]>();
 
   //#endregion
 
@@ -364,6 +354,17 @@ function App() {
       setCashierIDs(options);
     };
 
+    const fetchPercents = async () => {
+      const options = await getPercentOptions();
+      setClientsPercents(options);
+    };
+
+    const fetchCategoriesStatistics = async () => {
+      const rows = await categoriesService.getStatistics();
+      setStatisticsRows(rows);
+      // setClientsPercents(options);
+    };
+
     fetchCategories();
     fetchProductNames();
     fetchUPCs();
@@ -371,6 +372,8 @@ function App() {
     fetchClientCards();
     fetchWorkerSurnames();
     fetchCashierIds();
+    fetchPercents();
+    fetchCategoriesStatistics();
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -500,7 +503,10 @@ function App() {
   };
 
   const handleOnChangePercent = (value: string) => {
-    console.log("not implemented");
+    ClientsService.percent = value;
+    if (value !== "") {
+      setCurrentGet(Get.ClientsWithPercent);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeOnlyCashiers = (
@@ -610,6 +616,20 @@ function App() {
       }));
     } catch (error) {
       console.error("Failed to fetch cashier IDs:", error);
+      return [];
+    }
+  };
+
+  const [clientsPercents, setClientsPercents] = useState<Option[]>([]);
+  const getPercentOptions = async () => {
+    try {
+      let result = await clientsService.getPercentOptions();
+      return result.map((percent) => ({
+        value: percent,
+        label: percent,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch percent options:", error);
       return [];
     }
   };
@@ -969,6 +989,8 @@ function App() {
                 updater={updater}
                 setEditing={setEditing}
                 saveNewRow={setNewRow}
+                tableType={TableType.Products}
+                getFunction={currentGet}
               />
 
               <EditOrCreateWindow
@@ -1095,28 +1117,17 @@ function App() {
                 gap: "1rem",
               }}
             >
-              <button
-                type="button"
-                className="btn btn-info"
-                onClick={() =>
-                  setShowCategoryStatistics(!showCategoryStatistics)
-                }
-              >
-                {!showCategoryStatistics
-                  ? "Статистика за категоріями"
-                  : "Сховати статистику"}
-              </button>
-              {showCategoryStatistics && (
-                <TableObject
-                  columnNames={[
-                    "ID категорії",
-                    "Назва категорії",
-                    "Група товарів",
-                    "Продано",
-                  ]}
-                  withButtons={false}
-                />
-              )}
+              <label className="btn btn-info">Статистика за категоріями</label>
+              <TableObject
+                columnNames={[
+                  "ID категорії",
+                  "Назва категорії",
+                  "Група товарів",
+                  "Продано",
+                ]}
+                withButtons={false}
+                rows={statisticsRows}
+              />
             </div>
             <div
               className="column-container"
@@ -1193,16 +1204,29 @@ function App() {
                     control={<Checkbox />}
                     label="Активні"
                     key={"prom"}
-                    onChange={(event) => {
-                      console.log(event);
+                    onChange={() => {
                       if (currentGet === Get.Default) {
-                        setCurrentGet(Get.ActiveClients);
+                        if (ClientsService.city === "") {
+                          showErrorFunction("Введіть місто");
+                        } else {
+                          setCurrentGet(Get.ActiveClients);
+                        }
                       } else if (currentGet === Get.ActiveClients) {
                         setCurrentGet(Get.Default);
                       }
                     }}
                   />
                 </Tooltip>
+                <TextField
+                  className="text-field"
+                  key={"product_name"}
+                  label={"Місто"}
+                  onChange={(event) =>
+                    (ClientsService.city = event.target.value)
+                  }
+                  variant="outlined"
+                  // value={editedRow?.values[1] || ""}
+                />
               </div>
               <div style={{ marginRight: "25px" }}>
                 <button
@@ -1225,6 +1249,7 @@ function App() {
               updater={updater}
               setEditing={setEditing}
               saveNewRow={setNewRow}
+              getFunction={currentGet}
             />
             <EditOrCreateWindow
               columnNames={clientsColumnNames}

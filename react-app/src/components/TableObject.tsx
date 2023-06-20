@@ -48,6 +48,7 @@ export enum Get {
   WorkerSurname,
   ActiveClients,
   CertainCashierChecks,
+  ClientsWithPercent,
 }
 
 interface RowActionsProps {
@@ -180,6 +181,7 @@ function TableObject({
         result = await productsService.getRowsByCategory(
           ProductsService.category
         );
+        console.log("category");
       } else if (getFunction === Get.ProductName) {
         let productsService = new ProductsService();
         result = await productsService.getRowsByName(
@@ -201,12 +203,15 @@ function TableObject({
         result = await workersService.getonlyAllClients();
       } else if (getFunction === Get.ActiveClients) {
         let clientsService = new ClientsService();
-        result = await clientsService.getActiveClients();
+        result = await clientsService.getActiveClients(ClientsService.city);
       } else if (getFunction === Get.CertainCashierChecks) {
         let checksService = new ChecksService(false);
         result = await checksService.getRowsByEmployee(WorkersService.ID);
+      } else if (getFunction === Get.ClientsWithPercent) {
+        let clientsService = new ClientsService();
+        result = await clientsService.getRowsByPercent(ClientsService.percent);
       }
-      // console.log(result);
+      console.log(result);
       if (result) setRows(result);
     } catch (error) {
       console.log(error);

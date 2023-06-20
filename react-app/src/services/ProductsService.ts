@@ -22,7 +22,7 @@ function productToTableRow(product: Product): TableRow {
       product.characteristics,
     ];
   }
-  console.log(new TableRow(product.id_product, values));
+  // console.log(new TableRow(product.id_product, values));
 
   return new TableRow(product.id_product, values);
 }
@@ -30,26 +30,39 @@ function productToTableRow(product: Product): TableRow {
 export async function tableRowToProduct(tableRow: TableRow): Promise<Product> {
   let product: Product;
 
-  const categoriesService = new CategoriesService();
-  const categories = await categoriesService.getCategoriesOptions();
+  // const categoriesService = new CategoriesService();
+  // let categories;
+  // try {
+  //   categories = await categoriesService.getCategoriesOptions();
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
-  const element = tableRow.values.length === 4 ? 1 : 0;
-  const categoryNumber = categories.filter(
-    (category: Option) => category.label === tableRow.values[element]
-  )[0].value;
-  console.log(categoryNumber);
+  // const element = tableRow.values.length === 4 ? 1 : 0;
+  // let categoryNumber;
+  // try {
+  //   console.log(tableRow.values[element]);
+  //   const category = categories.filter(
+  //     (category: Option) => category.label === tableRow.values[element]
+  //   )[0];
+  //   console.log(category);
+  //   categoryNumber = category;
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // console.log(categoryNumber);
 
   if (tableRow.values.length === 4) {
     product = {
       id_product: Number(tableRow.values[0]),
-      category_number: categoryNumber,
+      category_number: Number(tableRow.values[1]),
       product_name: tableRow.values[2],
       characteristics: tableRow.values[3],
     };
   } else {
     product = {
       id_product: -1,
-      category_number: categoryNumber,
+      category_number: Number(tableRow.values[0]),
       product_name: tableRow.values[1],
       characteristics: tableRow.values[2],
     };
@@ -148,6 +161,7 @@ class ProductsService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       const product = await tableRowToProduct(row);
+      console.log(product);
       await axios.post(this.postUpdateUrl, product, Service.config);
     } catch (error) {
       console.log(error);

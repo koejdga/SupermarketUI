@@ -63,6 +63,8 @@ export function tableRowToClient(tableRow: TableRow): Client {
 
 class ClientsService extends Service {
   static surname = "";
+  static city = "";
+  static percent = "";
   constructor() {
     super(
       "http://26.133.25.6:8080/api/user/customer_cards",
@@ -96,6 +98,20 @@ class ClientsService extends Service {
     }
   }
 
+  async getRowsByPercent(percent: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        `http://26.133.25.6:8080/api/admin/customer_cards/${percent}`,
+        Service.config
+      );
+      console.log(response);
+      return response.data.map((row: any) => clientToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getSurnames(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
@@ -108,10 +124,26 @@ class ClientsService extends Service {
     }
   }
 
-  async getActiveClients(): Promise<TableRow[]> {
+  async getPercentOptions(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
-      console.log("not imlemented (now returns getRows)");
+      let result = response.data.map((client: Client) =>
+        client.percent.toString()
+      );
+      result = [...new Set(result)];
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getActiveClients(city: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        `http://26.133.25.6:8080/api/admin/customer_cards/tried_everything/${city}`,
+        Service.config
+      );
       console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
     } catch (error) {
