@@ -71,7 +71,7 @@ function App() {
     { value: "За назвою", label: "За назвою" },
   ];
 
-  const cashierRole = "Касир/ка";
+  const cashierRole = "Касирка";
 
   enum Table {
     Main = 0,
@@ -1402,7 +1402,7 @@ function App() {
                       <AutocompleteTextField
                         options={cashierIDs}
                         onChange={handleOnChangeCashierID}
-                        label="Касир/ка"
+                        label="Касирка"
                       />
                     </div>
                   </div>
