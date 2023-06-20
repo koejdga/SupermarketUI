@@ -65,7 +65,6 @@ class ChecksService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     if (this.isCashier && this.idEmployee) {
-      console.log("cashier get checks");
       return this.getRowsByEmployee(this.idEmployee);
     }
 
@@ -78,8 +77,6 @@ class ChecksService extends Service {
         Service.config
       );
 
-      console.log("get checks");
-      console.log(response);
       return response.data.map((row: any) => checkToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -154,11 +151,11 @@ class ChecksService extends Service {
   };
 
   async updateRow(id: number, data: TableRow): Promise<void> {
-    // TODO delete this method (leave mock method for interface)
+    // mock method for interface
   }
 
   createRow = async (row: TableRow): Promise<void> => {
-    // TODO delete this method (leave mock method for interface)
+    // mock method for interface
   };
 }
 

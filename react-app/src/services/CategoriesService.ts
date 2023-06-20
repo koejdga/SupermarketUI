@@ -67,11 +67,23 @@ class CategoriesService extends Service {
         "http://26.133.25.6:8080/api/admin/store_products/strange_statistic",
         Service.config
       );
-      console.log(response);
-      // return response.data.map((response) => (new TableRow(response.data)));
+      return response.data.map(
+        (row: {
+          category_number: number;
+          category_name: string;
+          price_range: string;
+          total_sold: string;
+        }) =>
+          new TableRow(row.category_number, [
+            row.category_number?.toString(),
+            row.category_name,
+            row.price_range,
+            row.total_sold,
+          ])
+      );
       return [];
     } catch (error) {
-      console.error("Failed to fetch category options:", error);
+      console.error("Failed to fetch categories statistics:", error);
       return [];
     }
   }

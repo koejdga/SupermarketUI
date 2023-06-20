@@ -42,7 +42,7 @@ export enum Get {
   SortByName,
   SortByAmount,
   ClientSurname,
-  ChecksDateRangeCashier,
+  ChecksDateRange,
   OnlyCashiers,
   onlyAllClients,
   WorkerSurname,
@@ -175,6 +175,7 @@ function TableObject({
       if (initialRows) {
         setRows(initialRows);
       } else if (service && getFunction === Get.Default) {
+        console.log("default");
         result = await service.getRows();
       } else if (getFunction === Get.Category) {
         let productsService = new ProductsService();
@@ -192,8 +193,8 @@ function TableObject({
       } else if (getFunction === Get.ClientSurname) {
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
-      } else if (getFunction === Get.ChecksDateRangeCashier) {
-        console.log(service);
+      } else if (getFunction === Get.ChecksDateRange) {
+        console.log("getting checks");
         if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();

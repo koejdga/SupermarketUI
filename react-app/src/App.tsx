@@ -377,13 +377,31 @@ function App() {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    if (checksDateRangeCashier[0] && checksDateRangeCashier[1]) {
+    if (
+      checksDateRangeCashier[0] !== null &&
+      checksDateRangeCashier[1] !== null
+    ) {
       console.log(checksDateRangeCashier[0]);
       ChecksService.left_date = checksDateRangeCashier[0];
       ChecksService.right_date = checksDateRangeCashier[1];
-      setCurrentGet(Get.ChecksDateRangeCashier);
+      setCurrentGet(Get.ChecksDateRange);
     }
   }, [checksDateRangeCashier]);
+
+  useEffect(() => {
+    if (
+      checksDateRangeManager[0] !== null &&
+      checksDateRangeManager[1] !== null
+    ) {
+      ChecksService.left_date = checksDateRangeManager[0];
+      ChecksService.right_date = checksDateRangeManager[1];
+      setCurrentGet(Get.ChecksDateRange);
+    } else {
+      ChecksService.left_date = new Date();
+      ChecksService.right_date = new Date();
+      setCurrentGet(Get.Default);
+    }
+  }, [checksDateRangeManager]);
 
   useEffect(() => {
     const fetchIdEmployee = async (user: User) => {
@@ -395,7 +413,6 @@ function App() {
     const username = localStorage.getItem("username");
     const encryptedPassword = localStorage.getItem("password");
     let password;
-    console.log(encryptedPassword);
     try {
       if (encryptedPassword !== null) password = atob(encryptedPassword);
     } catch (error) {
@@ -1322,6 +1339,7 @@ function App() {
                     Загальна сума
                   </button>
                   <PrintReportButton
+                    service={checksService}
                     tableType={TableType.Checks}
                     buttonStyle={{
                       height: "40px",
@@ -1337,6 +1355,7 @@ function App() {
                     withButtons={false}
                     onDoubleClickRow={showCheckInfo}
                     selectRow={setSelectedCheckRow}
+                    getFunction={currentGet}
                   />
                 )}
               </div>

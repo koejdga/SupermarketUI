@@ -21,14 +21,11 @@ const LoginForm = ({ handleLogIn }: Props) => {
     } else if (!password) {
       showErrorFunction("Пароль не може бути пустим");
     } else {
-      console.log(username);
-      console.log(password);
       let user = { username: username, password: password };
       const userService = new UserService(user);
 
       try {
         const response = await userService.logIn();
-        console.log(response);
         handleLogIn(response, user);
       } catch (error) {
         if ((error as AxiosError).message === "Network Error") {
