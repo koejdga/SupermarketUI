@@ -43,6 +43,7 @@ import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 import UserService, { User } from "./services/UserService";
 import { AxiosError } from "axios";
+import { formatDate } from "./utils/Utils";
 
 function App() {
   //#region Services
@@ -288,6 +289,8 @@ function App() {
   const [editing, setEditing] = useState(false);
 
   const [statisticsRows, setStatisticsRows] = useState<TableRow[]>();
+
+  const [totalSum, setTotalSum] = useState<number>();
 
   //#endregion
 
@@ -894,6 +897,28 @@ function App() {
     return array.slice(1);
   };
 
+  const setTotalSumLabel = () => {
+    if (checksDateRangeManager[0] === checksDateRangeManager[1]) {
+      return `${
+        checksDateRangeManager[0] !== null
+          ? formatDate(checksDateRangeManager[0])
+          : formatDate(new Date())
+      } продано товарів на ${totalSum} гривень`;
+    } else
+      return `З ${
+        checksDateRangeManager[0] !== null
+          ? formatDate(checksDateRangeManager[0])
+          : formatDate(new Date())
+      }
+    до
+    ${
+      checksDateRangeManager[1] !== null
+        ? formatDate(checksDateRangeManager[1])
+        : formatDate(new Date())
+    }
+    продано товарів на ${totalSum} гривень`;
+  };
+
   //#endregion
 
   //#region Parts of return
@@ -1308,44 +1333,82 @@ function App() {
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "start",
+                    justifyContent: "space-between",
                     gap: "25px",
                     marginBottom: "15px",
+                    marginRight: "2rem",
                   }}
                 >
-                  <div style={{ width: "250px" }}>
-                    <DateRangeInput
-                      dateRange={checksDateRangeManager}
-                      setDateRange={setChecksDateRangeManager}
-                    />
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <div style={{ width: "250px" }}>
+                      <DateRangeInput
+                        dateRange={checksDateRangeManager}
+                        setDateRange={setChecksDateRangeManager}
+                      />
+                    </div>
+
+                    <div style={{ width: "10rem" }}>
+                      <AutocompleteTextField
+                        options={cashierIDs}
+                        onChange={handleOnChangeCashierID}
+                        label="Касир/ка"
+                      />
+                    </div>
                   </div>
 
-                  <div style={{ width: "15%" }}>
-                    <AutocompleteTextField
-                      options={cashierIDs}
-                      onChange={handleOnChangeCashierID}
-                      label="Касир/ка"
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    {totalSum && (
+                      <div style={{ display: "flex", gap: "1rem" }}>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          style={{
+                            height: "40px",
+                            marginTop: "12px",
+                          }}
+                          onClick={() => {
+                            setTotalSum(undefined);
+                          }}
+                        >
+                          Сховати
+                        </button>
+                        <div
+                          style={{
+                            borderRadius: "10px",
+                            padding: "5px",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                            backgroundColor: "InfoBackground",
+                            width: "18rem",
+                          }}
+                        >
+                          {setTotalSumLabel()}
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      className="btn btn-secondary"
+                      style={{
+                        height: "40px",
+                        marginTop: "12px",
+                      }}
+                      onClick={async () => {
+                        console.log("get total price");
+                        const response = await checksService?.getTotalSum();
+                        setTotalSum(response);
+                        // make upper div visible
+                      }}
+                    >
+                      Загальна сума
+                    </button>
+                    <PrintReportButton
+                      service={checksService}
+                      tableType={TableType.Checks}
+                      buttonStyle={{
+                        height: "40px",
+                        marginTop: "12px",
+                      }}
                     />
                   </div>
-
-                  <button
-                    className="btn btn-secondary"
-                    style={{
-                      height: "40px",
-                      marginTop: "12px",
-                      marginLeft: "40%",
-                    }}
-                  >
-                    Загальна сума
-                  </button>
-                  <PrintReportButton
-                    service={checksService}
-                    tableType={TableType.Checks}
-                    buttonStyle={{
-                      height: "40px",
-                      marginTop: "12px",
-                    }}
-                  />
                 </div>
                 {checksService && (
                   <TableObject

@@ -10,14 +10,6 @@ abstract class Service {
   public static get config() {
     if (!Service.user) return undefined;
 
-    // Service.user = { username: "admin", password: "password" };
-
-    // return {
-    //   headers: {
-    //     Authorization: `Basic ${btoa(`admin:password`)} `,
-    //     "X-Requested-With": "XMLHttpRequest",
-    //   },
-    // };
     return {
       headers: {
         Authorization: `Basic ${btoa(

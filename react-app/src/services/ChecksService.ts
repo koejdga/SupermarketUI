@@ -7,6 +7,7 @@ import {
   formatDateForDb,
 } from "../utils/Utils";
 import { SaleForDb } from "./SalesService";
+import WorkersService from "./WorkersService";
 
 export interface Check {
   check_number: string;
@@ -92,6 +93,24 @@ class ChecksService extends Service {
       );
 
       return response.data.map((row: any) => checkToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getTotalSum(): Promise<number> {
+    try {
+      const workerIdOrAll =
+        WorkersService.ID !== "" ? WorkersService.ID : "all";
+      const response = await axios.get(
+        `http://26.133.25.6:8080/api/admin/checks/price/${workerIdOrAll}/${formatDateForDb(
+          ChecksService.left_date
+        )}/${formatDateForDb(ChecksService.right_date)}`,
+        Service.config
+      );
+
+      return response.data;
     } catch (error) {
       console.log(error);
       throw error;
