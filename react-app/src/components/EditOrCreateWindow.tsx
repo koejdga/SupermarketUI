@@ -82,6 +82,7 @@ const EditOrCreateWindow = ({
     setTimeout(() => {
       setShowAlertChange(false);
     }, 3000);
+    setEditedRow(row);
   };
 
   useEffect(() => {}, []);

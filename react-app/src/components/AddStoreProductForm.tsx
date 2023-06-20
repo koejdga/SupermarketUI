@@ -19,7 +19,6 @@ const AddStoreProductForm = ({
   columnNames,
 }: Props) => {
   const [productNames, setProductNames] = useState<Option[]>();
-  const [productName, setProductName] = useState<Option>();
 
   useEffect(() => {
     const fetchProductNames = async () => {
@@ -42,16 +41,7 @@ const AddStoreProductForm = ({
         value={editedRow?.values[0] || ""}
         fullWidth
       />
-      <TextField
-        className="text-field"
-        key={"product_name"}
-        label={columnNames[2]}
-        onChange={(event) => handleChanges(2, event.target.value)}
-        variant="outlined"
-        value={editedRow?.values[2] || ""}
-        fullWidth
-      />
-      {/* {productNames ? (
+      {productNames && (
         <AutocompleteTextField
           label={columnNames[2]}
           key={"product_name"}
@@ -59,20 +49,8 @@ const AddStoreProductForm = ({
           onChange={(value) => {
             handleChanges(2, value);
           }}
-          // defaultValue={productName}
         />
-      ) : (
-        <TextField
-          className="text-field"
-          key={"product_name"}
-          label={columnNames[2]}
-          onChange={(event) => handleChanges(2, event.target.value)}
-          variant="outlined"
-          value={editedRow?.values[2] || ""}
-          fullWidth
-        />
-      )} */}
-
+      )}
       <TextField
         className="text-field"
         key={"price"}

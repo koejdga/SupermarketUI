@@ -170,6 +170,7 @@ class StoreProductsService extends Service {
       console.log(error);
       throw error;
     }
+    console.log("added");
   };
 }
 
