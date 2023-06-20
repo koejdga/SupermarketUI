@@ -33,7 +33,9 @@ import ChecksService, {
   Check,
   tableRowToCheck,
 } from "./services/ChecksService";
-import StoreProductsService from "./services/StoreProductsService";
+import StoreProductsService, {
+  PromoNotPromo,
+} from "./services/StoreProductsService";
 import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
@@ -102,7 +104,7 @@ function App() {
     "Чеки",
     "Працівники",
   ];
-  const onClickFunctionsCashierNotFull = [
+  const onClickFunctionsCashier = [
     () => setTableVisible(Table.Main),
     () => {
       setTableVisible(Table.Products);
@@ -123,13 +125,6 @@ function App() {
     () => setTableVisible(Table.Profile),
   ];
 
-  const onClickFunctionsCashier = onClickFunctionsCashierNotFull.map((func) => {
-    const newFunc = () => {
-      func();
-      setSelectedUPC("");
-    };
-    return newFunc;
-  });
   const onClickFunctionsManager = [
     () => setTableVisible(Table.Main),
     () => {
@@ -137,6 +132,8 @@ function App() {
       setCurrentService(productsService);
     },
     () => {
+      StoreProductsService.promo = StoreProductsService.defaultPromo;
+      StoreProductsService.sortByName = StoreProductsService.defaultSortByName;
       setTableVisible(Table.StoreProducts);
       setCurrentService(storeProductsService);
     },
@@ -238,8 +235,6 @@ function App() {
 
   const [whatTableIsVisible, setTableVisible] = useState(-1);
 
-  const [selectedUPC, setSelectedUPC] = useState<string>("");
-
   const [soldProductsAmount, setSoldProductsAmount] = useState(300);
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
@@ -255,8 +250,6 @@ function App() {
   const [selectedCheckNumber, setSelectedCheckNumber] = useState<
     string | number
   >();
-
-  const [amountOfProductInCheck, setAmountOfProductInCheck] = useState(0);
 
   const [checksDateRangeCashier, setChecksDateRangeCashier] = useState<
     [Date | null, Date | null]
@@ -500,14 +493,33 @@ function App() {
   };
 
   const handleOnChangeIsPromotional = (value: string) => {
-    if (value === "Акційні") setCurrentGet(Get.Promo);
-    // else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
-    // else setCurrentGet(Get.Default);
+    if (value === "Акційні") {
+      StoreProductsService.promo = PromoNotPromo.Promo;
+      // setUpdater(!updater);
+      // setCurrentGet(Get.Promo);
+    } else if (value === "Не акційні") {
+      StoreProductsService.promo = PromoNotPromo.NotPromo;
+      // setUpdater(!updater);
+      // setCurrentGet(Get.NotPromo);
+    } else {
+      StoreProductsService.promo = PromoNotPromo.All;
+      // setUpdater(!updater);
+      // setCurrentGet(Get.Default);
+    }
+    setUpdater(!updater);
   };
 
   const handleOnChangeSortingStoreProducts = (value: string) => {
-    if (value === "За кількістю товару") setCurrentGet(Get.SortByAmount);
-    else if (value === "За назвою") setCurrentGet(Get.SortByName);
+    if (value === "За кількістю товару") {
+      StoreProductsService.sortByName = false;
+      // setUpdater(!updater);
+      // setCurrentGet(Get.SortByAmount);
+    } else if (value === "За назвою") {
+      StoreProductsService.sortByName = true;
+      // setUpdater(!updater);
+      // setCurrentGet(Get.SortByName);
+    }
+    setUpdater(!updater);
   };
 
   const handleOnChangeCategory = (value: string) => {

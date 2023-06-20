@@ -63,8 +63,20 @@ export async function tableRowToStoreProductToPost(
   return product;
 }
 
+export enum PromoNotPromo {
+  All,
+  Promo,
+  NotPromo,
+}
+
 class StoreProductsService extends Service {
   static UPC = "";
+
+  static defaultPromo = PromoNotPromo.All;
+  static defaultSortByName = false;
+
+  static promo = this.defaultPromo;
+  static sortByName = this.defaultSortByName;
 
   constructor() {
     super(
@@ -75,7 +87,22 @@ class StoreProductsService extends Service {
 
   async getRows(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl, Service.config);
+      const sortString = StoreProductsService.sortByName
+        ? "/by_product_name"
+        : "/by_products_number";
+      let url;
+      if (StoreProductsService.promo === PromoNotPromo.All) {
+        url = this.baseUrl + sortString;
+      } else {
+        const promoNotPromoString =
+          StoreProductsService.promo === PromoNotPromo.Promo
+            ? "/promo"
+            : "/not_promo";
+        url = this.baseUrl + promoNotPromoString + sortString;
+      }
+
+      console.log(url);
+      const response = await axios.get(url, Service.config);
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {
       console.log(error);
