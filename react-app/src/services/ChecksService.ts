@@ -87,6 +87,20 @@ class ChecksService extends Service {
     }
   }
 
+  async getAllRows(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        "http://26.133.25.6:8080/api/admin/checks",
+        Service.config
+      );
+
+      return response.data.map((row: any) => checkToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getRowsByEmployee(idEmployee: string): Promise<TableRow[]> {
     try {
       const response = await axios.get(
@@ -120,20 +134,6 @@ class ChecksService extends Service {
     }
   }
 
-  async updateRow(id: number, data: TableRow): Promise<void> {
-    // TODO delete this method (leave mock method for interface)
-    try {
-      await axios.put(
-        `${this.baseUrl}/${id}`,
-        tableRowToCheck(data),
-        Service.config
-      );
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-
   createCheck = async (check: Check, sales: SaleForDb[]): Promise<void> => {
     try {
       console.log("creating check in db");
@@ -153,15 +153,12 @@ class ChecksService extends Service {
     }
   };
 
+  async updateRow(id: number, data: TableRow): Promise<void> {
+    // TODO delete this method (leave mock method for interface)
+  }
+
   createRow = async (row: TableRow): Promise<void> => {
     // TODO delete this method (leave mock method for interface)
-    try {
-      console.log(tableRowToCheck(row));
-      await axios.post(this.baseUrl, tableRowToCheck(row), Service.config);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
   };
 }
 

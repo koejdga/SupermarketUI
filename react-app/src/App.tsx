@@ -1322,6 +1322,7 @@ function App() {
                     Загальна сума
                   </button>
                   <PrintReportButton
+                    tableType={TableType.Checks}
                     buttonStyle={{
                       height: "40px",
                       marginTop: "12px",

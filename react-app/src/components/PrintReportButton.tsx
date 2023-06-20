@@ -9,6 +9,7 @@ import Service from "../services/Service";
 import { Category, tableRowToCategory } from "../services/CategoriesService";
 import { Product, tableRowToProduct } from "../services/ProductsService";
 import { convertStringToDate, formatDate } from "../utils/Utils";
+import ChecksService from "../services/ChecksService";
 
 interface Props {
   service?: Service;
@@ -22,6 +23,7 @@ export enum TableType {
   StoreProducts,
   Workers,
   Clients,
+  Checks,
 }
 
 export const printReport = (report: string) => {
@@ -184,11 +186,6 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
         return productsReport;
       }
       case TableType.StoreProducts: {
-        // let products: Product[] = [];
-        // for (let i = 0; i < rows.length; i++) {
-        //   products.push(tableRowToProduct(rows[i]));
-        // }
-
         const storeProductsReport = `<!DOCTYPE html>
         <html>
           <head>
@@ -227,6 +224,72 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
                   <td>${row.values[0]}</td>
                   <td>${row.values[1] !== null ? row.values[1] : ""}</td>
                   <td>${row.values[2]}</td>
+                  <td>${row.values[3]}</td>
+                  <td>${row.values[4]}</td>
+                  <td>${row.values[5]}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </table>
+            <p>Дата: <span id="date"></span></p>
+          
+            <script>
+              const dateElement = document.getElementById("date");
+              const today = new Date();
+              const options = { year: 'numeric', month: 'long', day: 'numeric' };
+              dateElement.textContent = today.toLocaleDateString(undefined, options);
+            </script>
+          </body>
+        </html>`;
+
+        return storeProductsReport;
+      }
+      case TableType.Checks: {
+        const checksService = new ChecksService(false);
+        const rows = await checksService.getAllRows().catch((error) => {
+          console.log(error);
+        });
+        if (!rows) return "";
+
+        const storeProductsReport = `<!DOCTYPE html>
+        <html>
+          <head>
+            <title>Products Report</title>
+            <style>
+              h1 {
+                text-align: center;
+              }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>Супермаркет “ZLAGODA”</h1>
+            <h2>Чеки</h2>
+            <table>
+              <tr>
+                <th>Номер чека</th>
+                <th>ID працівника/ці</th>
+                <th>Номер карти клієнт/ки</th>
+                <th>Дата</th>
+                <th>Сума</th>
+                <th>ПДВ</th>
+              </tr>
+              ${rows
+                .map(
+                  (row) => `
+                <tr>
+                  <td>${row.values[0]}</td>
+                  <td>${row.values[1]}</td>
+                  <td>${row.values[2] !== null ? row.values[2] : ""}</td>
                   <td>${row.values[3]}</td>
                   <td>${row.values[4]}</td>
                   <td>${row.values[5]}</td>
