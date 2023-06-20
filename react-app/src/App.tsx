@@ -395,7 +395,13 @@ function App() {
     const username = localStorage.getItem("username");
     const encryptedPassword = localStorage.getItem("password");
     let password;
-    if (encryptedPassword !== null) password = atob(encryptedPassword);
+    console.log(encryptedPassword);
+    try {
+      if (encryptedPassword !== null) password = atob(encryptedPassword);
+    } catch (error) {
+      console.log("atob error");
+      throw new Error();
+    }
     if (username && password) {
       const user = {
         username: username,
@@ -411,7 +417,12 @@ function App() {
       const username = localStorage.getItem("username");
       const encryptedPassword = localStorage.getItem("password");
       let password;
-      if (encryptedPassword !== null) password = atob(encryptedPassword);
+      try {
+        if (encryptedPassword !== null) password = atob(encryptedPassword);
+      } catch (error) {
+        console.log("atob error");
+        throw new Error();
+      }
       if (username && password) {
         const user = {
           username: username,
@@ -657,7 +668,12 @@ function App() {
 
   const saveUserData = (user: User) => {
     localStorage.setItem("username", user.username);
-    localStorage.setItem("password", btoa(user.password));
+    try {
+      localStorage.setItem("password", btoa(user.password));
+    } catch (error) {
+      console.log("btoa error");
+      throw new Error();
+    }
   };
 
   const handleLogOut = () => {
@@ -686,7 +702,12 @@ function App() {
     user.password = newPassword;
     try {
       await userService.changePassword(user, oldPassword);
-      localStorage.setItem("password", btoa(user.password));
+      try {
+        localStorage.setItem("password", btoa(user.password));
+      } catch (error) {
+        console.log("btoa error");
+        throw new Error();
+      }
     } catch (error) {
       console.log(error);
       throw error;
