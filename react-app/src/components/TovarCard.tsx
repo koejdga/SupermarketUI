@@ -3,6 +3,7 @@ import "./TovarCard.css";
 import StoreProductsService, {
   StoreProduct,
 } from "../services/StoreProductsService";
+import ProductsService from "../services/ProductsService";
 
 const TovarCard = () => {
   const [storeProduct, setStoreProduct] = useState<StoreProduct>();
@@ -13,6 +14,7 @@ const TovarCard = () => {
         StoreProductsService.UPC
       );
       setStoreProduct(response);
+      if (response.id_product) ProductsService.id = response.id_product;
     };
 
     fetchStoreProduct();
@@ -28,6 +30,9 @@ const TovarCard = () => {
           </p>
           <p className="tovar-card amount">
             Кількість наявних одиниць товару: {storeProduct.products_number}
+          </p>
+          <p className="tovar-card amount">
+            Характеристики: {storeProduct.characteristics}
           </p>
         </div>
       )}

@@ -10,6 +10,7 @@ export interface StoreProduct {
   selling_price: number;
   products_number: number;
   promotional_product: boolean;
+  characteristics?: string;
 }
 
 export interface StoreProductToPost {
@@ -64,6 +65,7 @@ export async function tableRowToStoreProductToPost(
 
 class StoreProductsService extends Service {
   static UPC = "";
+
   constructor() {
     super(
       "http://26.133.25.6:8080/api/user/store_products",
@@ -74,8 +76,6 @@ class StoreProductsService extends Service {
   async getRows(): Promise<TableRow[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
-      console.log("get store products");
-      console.log(response);
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {
       console.log(error);
@@ -98,8 +98,6 @@ class StoreProductsService extends Service {
 
   async getRowByUPC(UPC: string): Promise<StoreProduct> {
     try {
-      console.log(UPC);
-      console.log(this.baseUrl + "/" + UPC);
       const response = await axios.get(
         this.baseUrl + "/" + UPC,
         Service.config
@@ -114,7 +112,6 @@ class StoreProductsService extends Service {
 
   async getRowsOnlyPromo(): Promise<TableRow[]> {
     try {
-      console.log(this.baseUrl + "/promo");
       const response = await axios.get(this.baseUrl + "/promo", Service.config);
       return response.data.map((row: any) => storeProductToTableRow(row));
     } catch (error) {

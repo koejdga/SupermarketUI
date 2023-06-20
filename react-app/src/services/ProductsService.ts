@@ -3,6 +3,7 @@ import TableRow from "../classes/TableRow";
 import Service from "./Service";
 import CategoriesService from "./CategoriesService";
 import { Option } from "../components/AutocompleteTextField";
+import { formatDate } from "../utils/Utils";
 
 export interface Product {
   id_product: number;
@@ -74,6 +75,10 @@ export function tableRowToProduct(tableRow: TableRow): Product {
 class ProductsService extends Service {
   static category = "";
   static productName = "";
+  static id: number;
+
+  static left_date = new Date();
+  static right_date = new Date();
 
   constructor() {
     super(
@@ -116,6 +121,23 @@ class ProductsService extends Service {
       );
       console.log(response);
       return response.data.map((row: any) => productToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getAmountOfSoldProduct(): Promise<number> {
+    try {
+      if (!ProductsService.id) return -1;
+      const url =
+        this.baseUrl +
+        `/count/${ProductsService.id}/${formatDate(
+          ProductsService.left_date
+        )}/${formatDate(ProductsService.right_date)}`;
+      const response = await axios.get(url, Service.config);
+      console.log(response);
+      return response.data;
     } catch (error) {
       console.log(error);
       throw error;

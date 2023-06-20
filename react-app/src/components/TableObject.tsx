@@ -175,7 +175,6 @@ function TableObject({
       if (initialRows) {
         setRows(initialRows);
       } else if (service && getFunction === Get.Default) {
-        console.log("default");
         result = await service.getRows();
       } else if (getFunction === Get.Category) {
         let productsService = new ProductsService();

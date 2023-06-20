@@ -381,10 +381,13 @@ function App() {
     fetchClientSurnames();
     fetchClientCards();
     fetchWorkerSurnames();
-    fetchCashierIds();
     fetchPercents();
-    fetchCategoriesStatistics();
     fetchTheMostPopularCategories();
+
+    if (!isCashier) {
+      fetchCashierIds();
+      fetchCategoriesStatistics();
+    }
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -396,6 +399,10 @@ function App() {
       ChecksService.left_date = checksDateRangeCashier[0];
       ChecksService.right_date = checksDateRangeCashier[1];
       setCurrentGet(Get.ChecksDateRange);
+    } else {
+      ChecksService.left_date = new Date();
+      ChecksService.right_date = new Date();
+      setCurrentGet(Get.Default);
     }
   }, [checksDateRangeCashier]);
 
@@ -413,6 +420,23 @@ function App() {
       setCurrentGet(Get.Default);
     }
   }, [checksDateRangeManager]);
+
+  useEffect(() => {
+    console.log("tovar date is changed");
+    const fetchAmountOfSoldProduct = async () => {
+      const response = await productsService.getAmountOfSoldProduct();
+      setSoldProductsAmount(response);
+    };
+
+    if (tovarDateRange[0] !== null && tovarDateRange[1] !== null) {
+      ProductsService.left_date = tovarDateRange[0];
+      ProductsService.right_date = tovarDateRange[1];
+    } else {
+      ProductsService.left_date = new Date();
+      ProductsService.right_date = new Date();
+    }
+    fetchAmountOfSoldProduct();
+  }, [tovarDateRange]);
 
   useEffect(() => {
     const fetchIdEmployee = async (user: User) => {
@@ -1155,6 +1179,24 @@ function App() {
                     }}
                   >
                     <TovarCard />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        width: "700px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <label>
+                        Кількість проданих одиниць товару: {soldProductsAmount}
+                      </label>
+
+                      <DateRangeInput
+                        dateRange={tovarDateRange}
+                        setDateRange={setTovarDateRange}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -1852,24 +1894,3 @@ function App() {
 }
 
 export default App;
-
-{
-  /* <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                        width: "700px",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <label>
-                        Кількість проданих одиниць товару: {soldProductsAmount}
-                      </label>
-
-                      <DateInput
-                        dateRange={tovarDateRange}
-                        setDateRange={setTovarDateRange}
-                      />
-                    </div> */
-}
