@@ -37,10 +37,6 @@ export enum Get {
   Category,
   ProductName,
   UPC,
-  Promo,
-  NotPromo,
-  SortByName,
-  SortByAmount,
   ClientSurname,
   ChecksDateRange,
   OnlyCashiers,
@@ -187,8 +183,6 @@ function TableObject({
         result = await productsService.getRowsByName(
           ProductsService.productName
         );
-      } else if (getFunction === Get.Promo) {
-        console.log("Not implemented");
       } else if (getFunction === Get.ClientSurname) {
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
