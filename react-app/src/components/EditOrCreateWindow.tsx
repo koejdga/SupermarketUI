@@ -8,6 +8,7 @@ import { TableType } from "./PrintReportButton";
 import AddWorkerForm from "./AddWorkerForm";
 import "../App.css";
 import AlertComponent from "./AlertComponent";
+import EditWorkerForm from "./EditWorkerForm";
 
 interface Props {
   columnNames: string[];
@@ -25,7 +26,6 @@ const EditOrCreateWindow = ({
   onCancel,
   saveNewRow,
   tableType,
-  editRow,
 }: Props) => {
   var buttonStyle = {
     color: "#fff",
@@ -37,7 +37,6 @@ const EditOrCreateWindow = ({
   const row: TableRow = new TableRow(-1, Array(columnNames.length).fill(""));
   const [editedRow, setEditedRow] = useState(selectedRow || row);
   const isEditing = selectedRow ? true : false;
-  const ed = editRow;
 
   const [showAlertChange, setShowAlertChange] = useState(false);
   const [alertMessageChange, setAlertMessageChange] = useState("Помилка");
@@ -74,6 +73,7 @@ const EditOrCreateWindow = ({
   const handleSave = () => {
     console.log(saveNewRow);
     if (saveNewRow) {
+      console.log(editedRow);
       saveNewRow(editedRow);
       setAlertMessageChange("Додано");
     }
@@ -82,7 +82,10 @@ const EditOrCreateWindow = ({
     setTimeout(() => {
       setShowAlertChange(false);
     }, 3000);
+    setEditedRow(row);
   };
+
+  useEffect(() => {}, []);
 
   return (
     <div
@@ -149,8 +152,16 @@ const EditOrCreateWindow = ({
             />
           )}
 
-          {tableType && tableType === TableType.Workers && (
+          {tableType && tableType === TableType.Workers && !selectedRow && (
             <AddWorkerForm
+              columnNames={columnNames}
+              editedRow={editedRow}
+              handleChanges={handleChanges}
+            />
+          )}
+
+          {tableType && tableType === TableType.Workers && selectedRow && (
+            <EditWorkerForm
               columnNames={columnNames}
               editedRow={editedRow}
               handleChanges={handleChanges}

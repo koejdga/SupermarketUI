@@ -31,23 +31,40 @@ function clientToTableRow(client: Client): TableRow {
 }
 
 export function tableRowToClient(tableRow: TableRow): Client {
-  const client: Client = {
-    card_number: tableRow.values[0],
-    cust_surname: tableRow.values[1],
-    cust_name: tableRow.values[2],
-    cust_patronymic: tableRow.values[3],
-    phone_number: tableRow.values[4],
-    city: tableRow.values[5],
-    street: tableRow.values[6],
-    zip_code: tableRow.values[7],
-    percent: Number(tableRow.values[8]),
-  };
+  let client: Client;
+  if (tableRow.values.length === 9) {
+    client = {
+      card_number: tableRow.values[0],
+      cust_surname: tableRow.values[1],
+      cust_name: tableRow.values[2],
+      cust_patronymic: tableRow.values[3],
+      phone_number: tableRow.values[4],
+      city: tableRow.values[5],
+      street: tableRow.values[6],
+      zip_code: tableRow.values[7],
+      percent: Number(tableRow.values[8]),
+    };
+  } else {
+    client = {
+      card_number: tableRow.id.toString(),
+      cust_surname: tableRow.values[0],
+      cust_name: tableRow.values[1],
+      cust_patronymic: tableRow.values[2],
+      phone_number: tableRow.values[3],
+      city: tableRow.values[4],
+      street: tableRow.values[5],
+      zip_code: tableRow.values[6],
+      percent: Number(tableRow.values[7]),
+    };
+  }
 
   return client;
 }
 
 class ClientsService extends Service {
   static surname = "";
+  static city = "";
+  static percent = "";
   constructor() {
     super(
       "http://26.133.25.6:8080/api/user/customer_cards",
@@ -81,6 +98,20 @@ class ClientsService extends Service {
     }
   }
 
+  async getRowsByPercent(percent: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        `http://26.133.25.6:8080/api/admin/customer_cards/${percent}`,
+        Service.config
+      );
+      console.log(response);
+      return response.data.map((row: any) => clientToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getSurnames(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
@@ -93,10 +124,26 @@ class ClientsService extends Service {
     }
   }
 
-  async getActiveClients(): Promise<TableRow[]> {
+  async getPercentOptions(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
-      console.log("not imlemented (now returns getRows)");
+      let result = response.data.map((client: Client) =>
+        client.percent.toString()
+      );
+      result = [...new Set(result)];
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getActiveClients(city: string): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        `http://26.133.25.6:8080/api/admin/customer_cards/tried_everything/${city}`,
+        Service.config
+      );
       console.log(response);
       return response.data.map((row: any) => clientToTableRow(row));
     } catch (error) {

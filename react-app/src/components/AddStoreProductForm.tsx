@@ -5,6 +5,7 @@ import AutocompleteTextField from "./AutocompleteTextField";
 import type { Option } from "./AutocompleteTextField";
 import ProductsService from "../services/ProductsService";
 import { Checkbox, FormControlLabel } from "@mui/material";
+import StoreProductsService from "../services/StoreProductsService";
 
 interface Props {
   handleChanges: (columnIndex: number, value: string) => void;
@@ -18,6 +19,7 @@ const AddStoreProductForm = ({
   columnNames,
 }: Props) => {
   const [productNames, setProductNames] = useState<Option[]>();
+
   useEffect(() => {
     const fetchProductNames = async () => {
       const productsService = new ProductsService();
@@ -26,7 +28,7 @@ const AddStoreProductForm = ({
     };
 
     fetchProductNames();
-  }, []);
+  }, [editedRow]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -39,25 +41,16 @@ const AddStoreProductForm = ({
         value={editedRow?.values[0] || ""}
         fullWidth
       />
-      {productNames ? (
+      {productNames && (
         <AutocompleteTextField
           label={columnNames[2]}
           key={"product_name"}
           options={productNames}
-          onChange={(value) => handleChanges(2, value)}
-        />
-      ) : (
-        <TextField
-          className="text-field"
-          key={"product_name"}
-          label={columnNames[2]}
-          onChange={(event) => handleChanges(2, event.target.value)}
-          variant="outlined"
-          value={editedRow?.values[2] || ""}
-          fullWidth
+          onChange={(value) => {
+            handleChanges(2, value);
+          }}
         />
       )}
-
       <TextField
         className="text-field"
         key={"price"}

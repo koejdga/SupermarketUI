@@ -61,18 +61,20 @@ class CategoriesService extends Service {
     }
   }
 
-  // deprecated
-  // async getCategoriesIds(): Promise<string[]> {
-  //   try {
-  //     const response = await axios.get(this.baseUrl);
-  //     return response.data.map((category: any) =>
-  //       category.category_number.toString()
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // }
+  async getStatistics(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        "http://26.133.25.6:8080/api/admin/store_products/strange_statistic",
+        Service.config
+      );
+      console.log(response);
+      // return response.data.map((response) => (new TableRow(response.data)));
+      return [];
+    } catch (error) {
+      console.error("Failed to fetch category options:", error);
+      return [];
+    }
+  }
 
   getCategoriesOptions = async () => {
     try {

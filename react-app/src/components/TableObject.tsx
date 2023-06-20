@@ -15,6 +15,7 @@ import ChecksService from "../services/ChecksService";
 import AlertComponent from "./AlertComponent";
 import { is, tr } from "date-fns/locale";
 import WorkersService from "../services/WorkersService";
+import { TableType } from "./PrintReportButton";
 
 interface Props {
   columnNames: string[];
@@ -28,6 +29,7 @@ interface Props {
   setEditing?: (editing: boolean) => void;
   selectRow?: (row: TableRow) => void;
   saveNewRow?: (row: TableRow) => void;
+  tableType?: TableType;
 }
 
 export enum Get {
@@ -46,6 +48,7 @@ export enum Get {
   WorkerSurname,
   ActiveClients,
   CertainCashierChecks,
+  ClientsWithPercent,
 }
 
 interface RowActionsProps {
@@ -156,6 +159,7 @@ function TableObject({
   setEditing,
   selectRow,
   saveNewRow,
+  tableType,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | string>(-1);
@@ -164,10 +168,6 @@ function TableObject({
   useEffect(() => {
     getRows();
   }, [updater, getFunction, initialRows]);
-
-  useEffect(() => {
-    console.log(rows);
-  }, [rows]);
 
   const getRows = async () => {
     try {
@@ -181,6 +181,7 @@ function TableObject({
         result = await productsService.getRowsByCategory(
           ProductsService.category
         );
+        console.log("category");
       } else if (getFunction === Get.ProductName) {
         let productsService = new ProductsService();
         result = await productsService.getRowsByName(
@@ -202,10 +203,13 @@ function TableObject({
         result = await workersService.getonlyAllClients();
       } else if (getFunction === Get.ActiveClients) {
         let clientsService = new ClientsService();
-        result = await clientsService.getActiveClients();
+        result = await clientsService.getActiveClients(ClientsService.city);
       } else if (getFunction === Get.CertainCashierChecks) {
         let checksService = new ChecksService(false);
         result = await checksService.getRowsByEmployee(WorkersService.ID);
+      } else if (getFunction === Get.ClientsWithPercent) {
+        let clientsService = new ClientsService();
+        result = await clientsService.getRowsByPercent(ClientsService.percent);
       }
       console.log(result);
       if (result) setRows(result);
@@ -298,12 +302,16 @@ function TableObject({
 
   const handleDeleteRow = (rowIndexDb: number | string) => {
     if (service) {
-      service.deleteRow(rowIndexDb);
-      const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
-      setRows(updatedRows);
-      console.log(rowIndexDb + " - row index database");
+      try {
+        service.deleteRow(rowIndexDb);
+        const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
+        setRows(updatedRows);
+        console.log(rowIndexDb + " - row index database");
 
-      showRowAlert("Видалено");
+        showRowAlert("Видалено");
+      } catch (error) {
+        showRowAlert("Не видалено");
+      }
     } else {
       showRowAlert("Не видалено");
     }
@@ -411,10 +419,19 @@ function TableObject({
 
       {selectedRow && (
         <EditOrCreateWindow
-          columnNames={columnNames}
-          selectedRow={selectedRow}
+          columnNames={
+            tableType === TableType.StoreProducts
+              ? columnNames
+              : columnNames.slice(1)
+          }
+          selectedRow={
+            tableType === TableType.StoreProducts
+              ? selectedRow
+              : new TableRow(selectedRow.id, selectedRow.values.slice(1))
+          }
           saveNewRow={saveNewRow}
           onCancel={handleCancelEditing}
+          tableType={tableType}
         />
       )}
     </div>

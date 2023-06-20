@@ -1,6 +1,8 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
+import CategoriesService from "./CategoriesService";
+import { Option } from "../components/AutocompleteTextField";
 
 export interface Product {
   id_product: number;
@@ -20,13 +22,36 @@ function productToTableRow(product: Product): TableRow {
       product.characteristics,
     ];
   }
-  console.log(new TableRow(product.id_product, values));
+  // console.log(new TableRow(product.id_product, values));
 
   return new TableRow(product.id_product, values);
 }
 
-export function tableRowToProduct(tableRow: TableRow): Product {
+export async function tableRowToProduct(tableRow: TableRow): Promise<Product> {
   let product: Product;
+
+  // const categoriesService = new CategoriesService();
+  // let categories;
+  // try {
+  //   categories = await categoriesService.getCategoriesOptions();
+  // } catch (error) {
+  //   console.log(error);
+  // }
+
+  // const element = tableRow.values.length === 4 ? 1 : 0;
+  // let categoryNumber;
+  // try {
+  //   console.log(tableRow.values[element]);
+  //   const category = categories.filter(
+  //     (category: Option) => category.label === tableRow.values[element]
+  //   )[0];
+  //   console.log(category);
+  //   categoryNumber = category;
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // console.log(categoryNumber);
+
   if (tableRow.values.length === 4) {
     product = {
       id_product: Number(tableRow.values[0]),
@@ -112,7 +137,7 @@ class ProductsService extends Service {
       const response = await axios.get(this.baseUrl, Service.config);
 
       return response.data.map((product: Product) => ({
-        value: product.product_name,
+        value: product.id_product,
         label: product.product_name,
       }));
     } catch (error) {
@@ -123,11 +148,10 @@ class ProductsService extends Service {
 
   async updateRow(id: number, data: TableRow): Promise<void> {
     try {
-      await axios.put(
-        `${this.postUpdateUrl}/${id}`,
-        tableRowToProduct(data),
-        Service.config
-      );
+      const product = await tableRowToProduct(data);
+      console.log(data);
+      console.log(product);
+      await axios.put(`${this.postUpdateUrl}/${id}`, product, Service.config);
     } catch (error) {
       console.log(error);
       throw error;
@@ -136,12 +160,9 @@ class ProductsService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      console.log(tableRowToProduct(row));
-      await axios.post(
-        this.postUpdateUrl,
-        tableRowToProduct(row),
-        Service.config
-      );
+      const product = await tableRowToProduct(row);
+      console.log(product);
+      await axios.post(this.postUpdateUrl, product, Service.config);
     } catch (error) {
       console.log(error);
       throw error;

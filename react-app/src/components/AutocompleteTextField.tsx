@@ -38,7 +38,7 @@ const AutocompleteTextField = ({
       style={style}
       className={className}
       options={options}
-      getOptionLabel={(option: { label: any }) => option.label}
+      getOptionLabel={(option: { label: string }) => option.label}
       onChange={handleOnChange}
       renderInput={(params: AutocompleteRenderInputParams) => (
         <TextField {...params} label={label} variant="outlined" fullWidth />

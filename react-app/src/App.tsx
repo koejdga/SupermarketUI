@@ -238,10 +238,6 @@ function App() {
 
   const [selectedUPC, setSelectedUPC] = useState<string>("");
 
-  const [selectedSurname, setSelectedSurname] = useState("");
-
-  const [selectedPercent, setSelectedPercent] = useState("");
-
   const [soldProductsAmount, setSoldProductsAmount] = useState(300);
 
   const [onlyCashiers, setOnlyCashiers] = useState(false);
@@ -282,6 +278,16 @@ function App() {
 
   const [amountOfSoldProductsInCategory, setAmountOfSoldProductsInCategory] =
     useState<number>();
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [editing, setEditing] = useState(false);
+
+  const [statisticsRows, setStatisticsRows] = useState<TableRow[]>();
 
   //#endregion
 
@@ -348,6 +354,17 @@ function App() {
       setCashierIDs(options);
     };
 
+    const fetchPercents = async () => {
+      const options = await getPercentOptions();
+      setClientsPercents(options);
+    };
+
+    const fetchCategoriesStatistics = async () => {
+      const rows = await categoriesService.getStatistics();
+      setStatisticsRows(rows);
+      // setClientsPercents(options);
+    };
+
     fetchCategories();
     fetchProductNames();
     fetchUPCs();
@@ -355,6 +372,8 @@ function App() {
     fetchClientCards();
     fetchWorkerSurnames();
     fetchCashierIds();
+    fetchPercents();
+    fetchCategoriesStatistics();
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -409,8 +428,8 @@ function App() {
 
   const handleOnChangeIsPromotional = (value: string) => {
     if (value === "Акційні") setCurrentGet(Get.Promo);
-    else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
-    else setCurrentGet(Get.Default);
+    // else if (value === "Не акційні") setCurrentGet(Get.NotPromo);
+    // else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeSortingStoreProducts = (value: string) => {
@@ -484,7 +503,10 @@ function App() {
   };
 
   const handleOnChangePercent = (value: string) => {
-    console.log("not implemented");
+    ClientsService.percent = value;
+    if (value !== "") {
+      setCurrentGet(Get.ClientsWithPercent);
+    } else setCurrentGet(Get.Default);
   };
 
   const handleOnChangeOnlyCashiers = (
@@ -598,11 +620,19 @@ function App() {
     }
   };
 
-  const clientsPercents = [
-    { value: "10", label: "10" },
-    { value: "20", label: "20" },
-    { value: "25", label: "25" },
-  ];
+  const [clientsPercents, setClientsPercents] = useState<Option[]>([]);
+  const getPercentOptions = async () => {
+    try {
+      let result = await clientsService.getPercentOptions();
+      return result.map((percent) => ({
+        value: percent,
+        label: percent,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch percent options:", error);
+      return [];
+    }
+  };
 
   //#endregion
 
@@ -634,6 +664,44 @@ function App() {
     localStorage.removeItem("username");
     localStorage.removeItem("password");
     setIsLoggedIn(false);
+  };
+
+  const changePassword = async () => {
+    const user = { username: Service.user.username, password: oldPassword };
+    const userService = new UserService(user);
+
+    try {
+      await userService.logIn();
+    } catch (error) {
+      if ((error as AxiosError).message === "Network Error") {
+        console.log("Network Error");
+        showErrorFunction("Сервер не підключений");
+        return;
+      } else {
+        showErrorFunction("Неправильний нікнейм або пароль");
+        return;
+      }
+    }
+
+    user.password = newPassword;
+    try {
+      await userService.changePassword(user, oldPassword);
+      localStorage.setItem("password", btoa(user.password));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    showErrorFunction("Пароль змінено");
+  };
+
+  const showErrorFunction = (errorMessage?: string) => {
+    if (errorMessage) {
+      setErrorMessage(errorMessage);
+    }
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+    }, 3000);
   };
 
   const addCheckRowToUITable = (newRow: TableRow) => {
@@ -792,54 +860,6 @@ function App() {
 
   //#region Parts of return
 
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const showErrorFunction = (errorMessage?: string) => {
-    if (errorMessage) {
-      setErrorMessage(errorMessage);
-    }
-    setShowError(true);
-    setTimeout(() => {
-      setShowError(false);
-    }, 3000);
-  };
-
-  const changePassword = async () => {
-    const user = { username: Service.user.username, password: oldPassword };
-    const userService = new UserService(user);
-
-    try {
-      await userService.logIn();
-    } catch (error) {
-      if ((error as AxiosError).message === "Network Error") {
-        console.log("Network Error");
-        showErrorFunction("Сервер не підключений");
-        return;
-      } else {
-        showErrorFunction("Неправильний нікнейм або пароль");
-        return;
-      }
-    }
-
-    user.password = newPassword;
-    try {
-      await userService.changePassword(user, oldPassword);
-      localStorage.setItem("password", btoa(user.password));
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-    showErrorFunction("Пароль змінено");
-  };
-
-  const [showCategoryStatistics, setShowCategoryStatistics] = useState(false);
-
-  const [editing, setEditing] = useState(false);
-
   const logOutAndChangePasswordButtons = (
     <div style={{ display: "flex", gap: "1rem" }}>
       <button
@@ -967,6 +987,10 @@ function App() {
                 columnNames={productsColumnNames}
                 service={productsService}
                 updater={updater}
+                setEditing={setEditing}
+                saveNewRow={setNewRow}
+                tableType={TableType.Products}
+                getFunction={currentGet}
               />
 
               <EditOrCreateWindow
@@ -1043,6 +1067,9 @@ function App() {
                     columnNames={storeProductsColumnNames}
                     service={storeProductsService}
                     updater={updater}
+                    setEditing={setEditing}
+                    saveNewRow={setNewRow}
+                    tableType={TableType.StoreProducts}
                   />
                 )}
                 {currentGet === Get.UPC && (
@@ -1078,6 +1105,8 @@ function App() {
                 columnNames={categoriesColumnNames}
                 service={categoriesService}
                 updater={updater}
+                setEditing={setEditing}
+                saveNewRow={setNewRow}
               />
             </div>
             <div
@@ -1088,28 +1117,17 @@ function App() {
                 gap: "1rem",
               }}
             >
-              <button
-                type="button"
-                className="btn btn-info"
-                onClick={() =>
-                  setShowCategoryStatistics(!showCategoryStatistics)
-                }
-              >
-                {!showCategoryStatistics
-                  ? "Статистика за категоріями"
-                  : "Сховати статистику"}
-              </button>
-              {showCategoryStatistics && (
-                <TableObject
-                  columnNames={[
-                    "ID категорії",
-                    "Назва категорії",
-                    "Група товарів",
-                    "Продано",
-                  ]}
-                  withButtons={false}
-                />
-              )}
+              <label className="btn btn-info">Статистика за категоріями</label>
+              <TableObject
+                columnNames={[
+                  "ID категорії",
+                  "Назва категорії",
+                  "Група товарів",
+                  "Продано",
+                ]}
+                withButtons={false}
+                rows={statisticsRows}
+              />
             </div>
             <div
               className="column-container"
@@ -1186,16 +1204,29 @@ function App() {
                     control={<Checkbox />}
                     label="Активні"
                     key={"prom"}
-                    onChange={(event) => {
-                      console.log(event);
+                    onChange={() => {
                       if (currentGet === Get.Default) {
-                        setCurrentGet(Get.ActiveClients);
+                        if (ClientsService.city === "") {
+                          showErrorFunction("Введіть місто");
+                        } else {
+                          setCurrentGet(Get.ActiveClients);
+                        }
                       } else if (currentGet === Get.ActiveClients) {
                         setCurrentGet(Get.Default);
                       }
                     }}
                   />
                 </Tooltip>
+                <TextField
+                  className="text-field"
+                  key={"product_name"}
+                  label={"Місто"}
+                  onChange={(event) =>
+                    (ClientsService.city = event.target.value)
+                  }
+                  variant="outlined"
+                  // value={editedRow?.values[1] || ""}
+                />
               </div>
               <div style={{ marginRight: "25px" }}>
                 <button
@@ -1216,6 +1247,9 @@ function App() {
               columnNames={clientsColumnNames}
               service={clientsService}
               updater={updater}
+              setEditing={setEditing}
+              saveNewRow={setNewRow}
+              getFunction={currentGet}
             />
             <EditOrCreateWindow
               columnNames={clientsColumnNames}
@@ -1352,7 +1386,6 @@ function App() {
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
                   gap: "10px",
                 }}
               >
@@ -1366,7 +1399,7 @@ function App() {
                   label="Лише працівники, що обслуговували усіх клієнтів"
                   onChange={handleOnServeOnlyAllClients}
                 />
-                <div>
+                <div style={{ marginLeft: "10%" }}>
                   <button
                     style={{ marginRight: "15px" }}
                     type="button"
@@ -1392,6 +1425,7 @@ function App() {
                   getFunction={currentGet}
                   setEditing={setEditing}
                   saveNewRow={setNewRow}
+                  tableType={TableType.Workers}
                 />
 
                 <EditOrCreateWindow
