@@ -1,6 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
+import { WeekNumberFormatter } from "react-day-picker";
 
 export interface Category {
   category_number: string;
@@ -49,12 +50,41 @@ class CategoriesService extends Service {
     }
   }
 
-  async getAmountOfSoldProductsInCategory(category: string): Promise<number> {
+  async getAmountOfSoldProductsInCategory(
+    categoryNumber: string
+  ): Promise<number> {
     try {
-      console.log("not implemented");
-      // const response = await axios.get(this.baseUrl, Service.config);
-      // return response.data;
-      return 300;
+      const response = await axios.get(
+        this.baseUrl + `/get_sold_today/${categoryNumber}`,
+        Service.config
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getTheMostPopularCategories(): Promise<TableRow[]> {
+    try {
+      const response = await axios.get(
+        this.baseUrl + "/best_sellers",
+        Service.config
+      );
+      console.log("popular categories");
+      console.log(response);
+      return response.data.map(
+        (category: {
+          category_number: number;
+          category_name: string;
+          total_sold: number;
+        }) =>
+          new TableRow(category.category_number, [
+            category.category_number.toString(),
+            category.category_name,
+            category.total_sold.toString(),
+          ])
+      );
     } catch (error) {
       console.log(error);
       throw error;

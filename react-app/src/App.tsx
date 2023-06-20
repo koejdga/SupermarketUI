@@ -290,6 +290,9 @@ function App() {
 
   const [statisticsRows, setStatisticsRows] = useState<TableRow[]>();
 
+  const [theMostPopularCategories, setTheMostPopularCategories] =
+    useState<TableRow[]>();
+
   const [totalSum, setTotalSum] = useState<number>();
 
   //#endregion
@@ -365,7 +368,11 @@ function App() {
     const fetchCategoriesStatistics = async () => {
       const rows = await categoriesService.getStatistics();
       setStatisticsRows(rows);
-      // setClientsPercents(options);
+    };
+
+    const fetchTheMostPopularCategories = async () => {
+      const rows = await categoriesService.getTheMostPopularCategories();
+      setTheMostPopularCategories(rows);
     };
 
     fetchCategories();
@@ -377,6 +384,7 @@ function App() {
     fetchCashierIds();
     fetchPercents();
     fetchCategoriesStatistics();
+    fetchTheMostPopularCategories();
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -1221,8 +1229,9 @@ function App() {
               <TableObject
                 columnNames={["ID категорії", "Назва категорії", "Продано"]}
                 withButtons={false}
+                rows={theMostPopularCategories}
               />
-              <AutocompleteTextField
+              {/* <AutocompleteTextField
                 label="Категорія"
                 options={categories}
                 onChange={handleOnChangeCategoryWithSoldProducts}
@@ -1233,7 +1242,7 @@ function App() {
                   Сьогодні в цій категорії продано{" "}
                   {amountOfSoldProductsInCategory} товарів
                 </label>
-              )}
+              )} */}
 
               <EditOrCreateWindow
                 columnNames={getWithoutId(categoriesColumnNames)}
