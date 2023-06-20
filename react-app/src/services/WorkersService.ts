@@ -119,7 +119,10 @@ class WorkersService extends Service {
 
   async getonlyAllClients(): Promise<TableRow[]> {
     try {
-      const response = await axios.get(this.baseUrl, Service.config);
+      const response = await axios.get(
+        this.baseUrl + "/served_all_customers",
+        Service.config
+      );
       return response.data.map((row: any) => workerToTableRow(row));
     } catch (error) {
       console.log(error);
