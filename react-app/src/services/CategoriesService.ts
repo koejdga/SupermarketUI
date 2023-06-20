@@ -50,12 +50,10 @@ class CategoriesService extends Service {
     }
   }
 
-  async getAmountOfSoldProductsInCategory(
-    categoryNumber: string
-  ): Promise<number> {
+  async getCategoryIsEmpty(categoryNumber: string): Promise<boolean> {
     try {
       const response = await axios.get(
-        this.baseUrl + `/get_sold_today/${categoryNumber}`,
+        this.baseUrl + `/is_empty/${categoryNumber}`,
         Service.config
       );
       return response.data;

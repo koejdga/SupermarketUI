@@ -270,8 +270,7 @@ function App() {
 
   const [currentCheck, setCurrentCheck] = useState<Check>();
 
-  const [amountOfSoldProductsInCategory, setAmountOfSoldProductsInCategory] =
-    useState<number>();
+  const [categoryIsEmpty, setCategoryIsEmpty] = useState<boolean>();
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -487,16 +486,10 @@ function App() {
   const handleOnChangeIsPromotional = (value: string) => {
     if (value === "Акційні") {
       StoreProductsService.promo = PromoNotPromo.Promo;
-      // setUpdater(!updater);
-      // setCurrentGet(Get.Promo);
     } else if (value === "Не акційні") {
       StoreProductsService.promo = PromoNotPromo.NotPromo;
-      // setUpdater(!updater);
-      // setCurrentGet(Get.NotPromo);
     } else {
       StoreProductsService.promo = PromoNotPromo.All;
-      // setUpdater(!updater);
-      // setCurrentGet(Get.Default);
     }
     setUpdater(!updater);
   };
@@ -504,12 +497,8 @@ function App() {
   const handleOnChangeSortingStoreProducts = (value: string) => {
     if (value === "За кількістю товару") {
       StoreProductsService.sortByName = false;
-      // setUpdater(!updater);
-      // setCurrentGet(Get.SortByAmount);
     } else if (value === "За назвою") {
       StoreProductsService.sortByName = true;
-      // setUpdater(!updater);
-      // setCurrentGet(Get.SortByName);
     }
     setUpdater(!updater);
   };
@@ -521,14 +510,14 @@ function App() {
     } else setCurrentGet(Get.Default);
   };
 
-  const handleOnChangeCategoryWithSoldProducts = async (value: string) => {
-    CategoriesService.categoryWithSoldProducts = value;
+  const handleOnChangeIsEmptyCategory = async (value: string) => {
+    // CategoriesService.categoryWithSoldProducts = value;
     if (value !== "") {
-      const amount = await categoriesService.getAmountOfSoldProductsInCategory(
-        value
-      );
-      setAmountOfSoldProductsInCategory(amount);
-    } else setAmountOfSoldProductsInCategory(undefined);
+      console.log("hello");
+      const response = await categoriesService.getCategoryIsEmpty(value);
+      console.log(response);
+      setCategoryIsEmpty(response);
+    } else setCategoryIsEmpty(undefined);
   };
 
   const handleOnChangeProductName = (value: string) => {
@@ -1264,6 +1253,15 @@ function App() {
                 withButtons={false}
                 rows={statisticsRows}
               />
+              <label>
+                Знайти, скільки товарів куплено в різних групах в кожній
+                категорії. Якщо товарів певної групи не продається в магазині,
+                не відображати цю групу Групи товарів: • перша (товари з ціною
+                більшою, ніж 75% від найдорожчого товару в цій категорії) •
+                друга (товари з ціною більшою, ніж 25%, та меншою, ніж 75% від
+                найдорожчого товару в цій категорії) • третя (товари з ціною
+                меншою, ніж 25% від найдорожчого товару в цій категорії)
+              </label>
             </div>
             <div
               className="column-container"
@@ -1293,18 +1291,16 @@ function App() {
                 withButtons={false}
                 rows={theMostPopularCategories}
               />
-              {/* <AutocompleteTextField
+              <label className="btn btn-info">Чи пуста категорія?</label>
+              <AutocompleteTextField
                 label="Категорія"
                 options={categories}
-                onChange={handleOnChangeCategoryWithSoldProducts}
+                onChange={handleOnChangeIsEmptyCategory}
                 style={{ width: "200px" }}
               />
-              {amountOfSoldProductsInCategory && (
-                <label>
-                  Сьогодні в цій категорії продано{" "}
-                  {amountOfSoldProductsInCategory} товарів
-                </label>
-              )} */}
+              {categoryIsEmpty !== undefined && (
+                <label>Ця категорія{categoryIsEmpty ? "" : " не"} пуста</label>
+              )}
 
               <EditOrCreateWindow
                 columnNames={getWithoutId(categoriesColumnNames)}
@@ -1905,7 +1901,6 @@ function App() {
   //#endregion
 
   return (
-    // Cashier page
     <div>
       {!isLoggedIn && <LoginForm handleLogIn={handleLogIn} />}
       {isLoggedIn && <div>{isCashier ? cashierPage : managerPage}</div>}
