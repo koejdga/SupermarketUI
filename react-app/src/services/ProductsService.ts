@@ -27,7 +27,7 @@ function productToTableRow(product: Product): TableRow {
   return new TableRow(product.id_product, values);
 }
 
-export async function tableRowToProduct(tableRow: TableRow): Promise<Product> {
+export function tableRowToProduct(tableRow: TableRow): Product {
   let product: Product;
 
   // const categoriesService = new CategoriesService();

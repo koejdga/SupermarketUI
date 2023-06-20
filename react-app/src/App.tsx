@@ -1058,7 +1058,10 @@ function App() {
                   >
                     Додати товар у магазині
                   </button>
-                  <PrintReportButton />
+                  <PrintReportButton
+                    service={storeProductsService}
+                    tableType={TableType.StoreProducts}
+                  />
                 </div>
               </div>
               <div>
@@ -1239,7 +1242,10 @@ function App() {
                 >
                   Додати клієнт/ку
                 </button>
-                <PrintReportButton />
+                <PrintReportButton
+                  service={clientsService}
+                  tableType={TableType.Clients}
+                />
               </div>
             </div>
 

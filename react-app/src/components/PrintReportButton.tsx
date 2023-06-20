@@ -21,6 +21,7 @@ export enum TableType {
   Products,
   StoreProducts,
   Workers,
+  Clients,
 }
 
 export const printReport = (report: string) => {
@@ -62,86 +63,6 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
       console.log(error);
     });
     if (!rows) return "";
-    const workers = [
-      new TableRow(1, [
-        "1",
-        "Jack",
-        "Smith",
-        "",
-        "Cashier",
-        "10000",
-        "10.07.1997",
-        "10.07.1997",
-        "+12984927",
-        "London",
-        "Main str",
-        "86752",
-      ]),
-      new TableRow(1, [
-        "1",
-        "Dariia",
-        "Smith",
-        "",
-        "Manager",
-        "30000",
-        "10.07.1997",
-        "10.07.1997",
-        "+12984927",
-        "London",
-        "Main str",
-        "12345",
-      ]),
-      new TableRow(1, [
-        "1",
-        "Andrew",
-        "Smith",
-        "",
-        "Cashier",
-        "20000",
-        "10.07.1997",
-        "10.07.1997",
-        "+12984927",
-        "London",
-        "Main str",
-        "86752",
-      ]),
-    ];
-
-    const clients = [
-      new TableRow(1, [
-        "1535326",
-        "Jack",
-        "Smith",
-        "",
-        "+380957642809",
-        "London",
-        "Main str",
-        "86752",
-        "10",
-      ]),
-      new TableRow(1, [
-        "1535326",
-        "Dariia",
-        "Smith",
-        "",
-        "+380957642809",
-        "London",
-        "Main str",
-        "12345",
-        "40",
-      ]),
-      new TableRow(1, [
-        "1535326",
-        "Andrew",
-        "Smith",
-        "",
-        "+380957642809",
-        "London",
-        "Main str",
-        "86752",
-        "25",
-      ]),
-    ];
 
     switch (tableType) {
       case TableType.Categories: {
@@ -262,6 +183,71 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
         return productsReport;
       }
+      case TableType.StoreProducts: {
+        // let products: Product[] = [];
+        // for (let i = 0; i < rows.length; i++) {
+        //   products.push(tableRowToProduct(rows[i]));
+        // }
+
+        const storeProductsReport = `<!DOCTYPE html>
+        <html>
+          <head>
+            <title>Products Report</title>
+            <style>
+              h1 {
+                text-align: center;
+              }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>Супермаркет “ZLAGODA”</h1>
+            <h2>Товари</h2>
+            <table>
+              <tr>
+                <th>UPC</th>
+                <th>Акційне UPC</th>
+                <th>Назва товару</th>
+                <th>Ціна</th>
+                <th>Кількість</th>
+                <th>Акційний</th>
+              </tr>
+              ${rows
+                .map(
+                  (row) => `
+                <tr>
+                  <td>${row.values[0]}</td>
+                  <td>${row.values[1] !== null ? row.values[1] : ""}</td>
+                  <td>${row.values[2]}</td>
+                  <td>${row.values[3]}</td>
+                  <td>${row.values[4]}</td>
+                  <td>${row.values[5]}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </table>
+            <p>Дата: <span id="date"></span></p>
+          
+            <script>
+              const dateElement = document.getElementById("date");
+              const today = new Date();
+              const options = { year: 'numeric', month: 'long', day: 'numeric' };
+              dateElement.textContent = today.toLocaleDateString(undefined, options);
+            </script>
+          </body>
+        </html>`;
+
+        return storeProductsReport;
+      }
       case TableType.Workers: {
         let workers: Worker[] = [];
         for (let i = 0; i < rows.length; i++) {
@@ -324,19 +310,13 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
 
         return workersReport;
       }
-    }
+      case TableType.Clients: {
+        let clients: Client[] = [];
+        for (let i = 0; i < rows.length; i++) {
+          clients.push(tableRowToClient(rows[i]));
+        }
 
-    let workerss: Worker[] = [];
-    for (let i = 0; i < workers.length; i++) {
-      workerss.push(tableRowToWorker(workers[i]));
-    }
-
-    let clientss: Client[] = [];
-    for (let i = 0; i < clients.length; i++) {
-      clientss.push(tableRowToClient(clients[i]));
-    }
-
-    const clientsReport = `<!DOCTYPE html>
+        const clientsReport = `<!DOCTYPE html>
     <html>
       <head>
         <title>Clients Report</title>
@@ -352,7 +332,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
       <body>
         <h1>Супермаркет “ZLAGODA”</h1>
         <h2>Звіт про клієнток</h2>
-        ${clientss
+        ${clients
           .map(
             (client) => `
           <p>Номер картки: ${client.card_number}</p>
@@ -374,67 +354,10 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
           dateElement.textContent = today.toLocaleDateString(undefined, options);
         </script>
       </body>
-    </html>`;
-    const workersReport = `<!DOCTYPE html>
-    <html>
-      <head>
-        <title>Workers Report</title>
-        <style>
-          h1 {
-            text-align: center;
-          }
-          p {
-            margin-bottom: 10px;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>Супермаркет “ZLAGODA”</h1>
-        <h2>Звіт про працівників</h2>
-        ${workerss
-          .map(
-            (worker) => `
-          <p>ID: ${worker.id_employee}</p>
-          <p>П.І.Б.: ${worker.empl_surname} ${worker.empl_name} ${
-              worker.empl_patronymic
-            }</p>
-          <p>Посада: ${worker.empl_role}</p>
-          <p>Зарплата: ${worker.salary} грн.</p>
-          <p>Дата народження: ${worker.date_of_birth.toLocaleDateString(
-            "uk-UA",
-            {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            }
-          )}</p>
-          <p>Дата початку роботи: ${worker.date_of_start.toLocaleDateString(
-            "uk-UA",
-            {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            }
-          )}</p>
-          <p>Номер телефону: ${worker.phone_number}</p>
-          <p>Адреса: вул. ${worker.street}, м. ${worker.city} ${
-              worker.zip_code
-            }</p>
-          <hr>
-        `
-          )
-          .join("")}
-      
-        <p>Дата: <span id="date"></span></p>
-      
-        <script>
-          const dateElement = document.getElementById("date");
-          const today = new Date();
-          const options = { year: 'numeric', month: 'long', day: 'numeric' };
-          dateElement.textContent = today.toLocaleDateString(undefined, options);
-        </script>
-      </body>
-    </html>`;
+        </html>`;
+        return clientsReport;
+      }
+    }
 
     return "";
   };
