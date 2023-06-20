@@ -16,7 +16,7 @@ interface Props {
 
 const AddWorkerForm = ({ handleChanges, editedRow, columnNames }: Props) => {
   const [roles] = useState([
-    { value: "Касирка", label: "Касирка" },
+    { value: "Касир/ка", label: "Касир/ка" },
     { value: "Менеджерка", label: "Менеджерка" },
   ]);
 

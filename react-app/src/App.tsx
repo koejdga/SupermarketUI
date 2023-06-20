@@ -71,7 +71,7 @@ function App() {
     { value: "За назвою", label: "За назвою" },
   ];
 
-  const cashierRole = "Касирка";
+  const cashierRole = "Касир/ка";
 
   enum Table {
     Main = 0,
