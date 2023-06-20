@@ -1410,7 +1410,7 @@ function App() {
                       <AutocompleteTextField
                         options={cashierIDs}
                         onChange={handleOnChangeCashierID}
-                        label="Касир/ка"
+                        label="Касирка"
                       />
                     </div>
                   </div>
