@@ -222,6 +222,7 @@ function App() {
   //#endregion
 
   //#region Variables
+
   const [isCashier, setIsCashier] = useState(true);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -286,6 +287,8 @@ function App() {
     useState<TableRow[]>();
 
   const [totalSum, setTotalSum] = useState<number>();
+
+  const [valueForMinCost, setValueForMinCost] = useState("");
 
   //#endregion
 
@@ -482,6 +485,11 @@ function App() {
   //#endregion
 
   //#region HandleOnChange functions
+
+  const handleOnChangeForMinCost = (event: ChangeEvent<HTMLInputElement>) => {
+    setValueForMinCost(event.target.value);
+    console.log(valueForMinCost);
+  };
 
   const handleOnChangeIsPromotional = (value: string) => {
     if (value === "Акційні") {
@@ -1851,13 +1859,20 @@ function App() {
             <div className="column-container" style={{ width: "90%" }}>
               {checksPageView === ShowOnChecksPage.showChecksTable && (
                 <div className="column-container">
-                  <div style={{ width: "250px" }}>
-                    <DateRangeInput
-                      dateRange={checksDateRangeCashier}
-                      setDateRange={setChecksDateRangeCashier}
-                    />
+                  <div style={{ display: "flex", width: "1000px" }}>
+                    <div style={{ width: "250px" }}>
+                      <DateRangeInput
+                        dateRange={checksDateRangeCashier}
+                        setDateRange={setChecksDateRangeCashier}
+                      />
+                    </div>
+                    <div style={{ width: "200px", marginLeft: "500px" }}>
+                      <TextField
+                        label={"Мінімальна ціна"}
+                        onChange={handleOnChangeForMinCost}
+                      />
+                    </div>
                   </div>
-
                   <TableObject
                     columnNames={checksColumnNames}
                     service={checksService}
@@ -1889,6 +1904,7 @@ function App() {
             </div>
           </>
         )}
+
         {whatTableIsVisible === Table.Profile && (
           <div style={{ width: "50%" }}>
             {idEmployee && <Profile id_employee={idEmployee} />}
