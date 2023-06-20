@@ -71,7 +71,7 @@ function App() {
     { value: "За назвою", label: "За назвою" },
   ];
 
-  const cashierRole = "Касир/ка";
+  const cashierRole = "Касирка";
 
   enum Table {
     Main = 0,
@@ -421,12 +421,14 @@ function App() {
     }
   }, [checksDateRangeManager]);
 
+  const fetchAmountOfSoldProduct = async () => {
+    const response = await productsService.getAmountOfSoldProduct();
+    console.log(response);
+    setSoldProductsAmount(response);
+  };
+
   useEffect(() => {
     console.log("tovar date is changed");
-    const fetchAmountOfSoldProduct = async () => {
-      const response = await productsService.getAmountOfSoldProduct();
-      setSoldProductsAmount(response);
-    };
 
     if (tovarDateRange[0] !== null && tovarDateRange[1] !== null) {
       ProductsService.left_date = tovarDateRange[0];
@@ -524,11 +526,17 @@ function App() {
     } else setCurrentGet(Get.Default);
   };
 
-  const handleOnChangeUPC = (value: string) => {
+  const handleOnChangeUPC = async (value: string) => {
     StoreProductsService.UPC = value;
+
     if (value !== "") {
+      const response = await storeProductsService.getRowByUPC(
+        StoreProductsService.UPC
+      );
+      if (response.id_product) ProductsService.id = response.id_product;
       setCurrentGet(Get.UPC);
     } else setCurrentGet(Get.Default);
+    await fetchAmountOfSoldProduct();
   };
 
   const handleOnChangeClientSurname = (value: string) => {
@@ -686,7 +694,7 @@ function App() {
   const [clientsPercents, setClientsPercents] = useState<Option[]>([]);
   const getPercentOptions = async () => {
     try {
-      let result = await clientsService.getPercentOptions();
+      let result = await clientsService.getPercents();
       return result.map((percent) => ({
         value: percent,
         label: percent,
@@ -1372,7 +1380,7 @@ function App() {
               getFunction={currentGet}
             />
             <EditOrCreateWindow
-              columnNames={clientsColumnNames}
+              columnNames={getWithoutId(clientsColumnNames)}
               saveNewRow={setNewRow}
             />
           </>

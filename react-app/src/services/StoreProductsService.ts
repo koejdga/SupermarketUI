@@ -102,7 +102,6 @@ class StoreProductsService extends Service {
         this.baseUrl + "/" + UPC,
         Service.config
       );
-      console.log(response);
       return response.data;
     } catch (error) {
       console.log(error);

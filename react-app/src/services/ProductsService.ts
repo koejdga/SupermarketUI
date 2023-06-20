@@ -3,7 +3,7 @@ import TableRow from "../classes/TableRow";
 import Service from "./Service";
 import CategoriesService from "./CategoriesService";
 import { Option } from "../components/AutocompleteTextField";
-import { formatDate } from "../utils/Utils";
+import { formatDate, formatDateForDb } from "../utils/Utils";
 
 export interface Product {
   id_product: number;
@@ -130,11 +130,13 @@ class ProductsService extends Service {
   async getAmountOfSoldProduct(): Promise<number> {
     try {
       if (!ProductsService.id) return -1;
+
       const url =
         this.baseUrl +
-        `/count/${ProductsService.id}/${formatDate(
+        `/count/${ProductsService.id}/${formatDateForDb(
           ProductsService.left_date
-        )}/${formatDate(ProductsService.right_date)}`;
+        )}/${formatDateForDb(ProductsService.right_date)}`;
+      console.log(url);
       const response = await axios.get(url, Service.config);
       console.log(response);
       return response.data;

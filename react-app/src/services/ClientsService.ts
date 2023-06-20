@@ -124,14 +124,13 @@ class ClientsService extends Service {
     }
   }
 
-  async getPercentOptions(): Promise<string[]> {
+  async getPercents(): Promise<string[]> {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
-      let result = response.data.map((client: Client) =>
-        client.percent.toString()
-      );
+      let result = response.data.map((client: Client) => client.percent);
       result = [...new Set(result)];
-      return result;
+      result = result.sort((n1: number, n2: number) => n1 - n2);
+      return result.map((percent: number) => percent.toString());
     } catch (error) {
       console.log(error);
       throw error;
