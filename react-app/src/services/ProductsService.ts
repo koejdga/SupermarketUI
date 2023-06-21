@@ -31,28 +31,6 @@ function productToTableRow(product: Product): TableRow {
 export function tableRowToProduct(tableRow: TableRow): Product {
   let product: Product;
 
-  // const categoriesService = new CategoriesService();
-  // let categories;
-  // try {
-  //   categories = await categoriesService.getCategoriesOptions();
-  // } catch (error) {
-  //   console.log(error);
-  // }
-
-  // const element = tableRow.values.length === 4 ? 1 : 0;
-  // let categoryNumber;
-  // try {
-  //   console.log(tableRow.values[element]);
-  //   const category = categories.filter(
-  //     (category: Option) => category.label === tableRow.values[element]
-  //   )[0];
-  //   console.log(category);
-  //   categoryNumber = category;
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  // console.log(categoryNumber);
-
   if (tableRow.values.length === 4) {
     product = {
       id_product: Number(tableRow.values[0]),
@@ -91,6 +69,16 @@ class ProductsService extends Service {
     try {
       const response = await axios.get(this.baseUrl, Service.config);
       return response.data.map((row: any) => productToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getProducts(): Promise<Product[]> {
+    try {
+      const response = await axios.get(this.baseUrl, Service.config);
+      return response.data;
     } catch (error) {
       console.log(error);
       throw error;
