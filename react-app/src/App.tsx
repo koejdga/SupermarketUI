@@ -227,22 +227,6 @@ function App() {
     "ПДВ",
   ];
   //#endregion
-  /*
-  const [showAlertUPC, setShowAlertUPC] = useState(false);
-  const [alertMessageUPC, setAlertMessageUPC] = useState("Помилка UPC");
-
-  if (addProductStoreError) {
-    setAlertMessageUPC("Помилка UPC");
-    setShowAlertUPC(true);
-    setTimeout(() => {
-      setShowAlertUPC(false);
-    }, 3000);
-  }*/
-
-  const handleCloseAlert = () => {
-    setShowError(false);
-    // addProductStoreError = false;
-  };
 
   //#region Variables
 
@@ -748,6 +732,23 @@ function App() {
   //#endregion
 
   //#region Functions
+
+  /*
+  const [showAlertUPC, setShowAlertUPC] = useState(false);
+  const [alertMessageUPC, setAlertMessageUPC] = useState("Помилка UPC");
+
+  if (addProductStoreError) {
+    setAlertMessageUPC("Помилка UPC");
+    setShowAlertUPC(true);
+    setTimeout(() => {
+      setShowAlertUPC(false);
+    }, 3000);
+  }*/
+
+  const handleCloseAlert = () => {
+    setShowError(false);
+    // addProductStoreError = false;
+  };
 
   const handleLogIn = async (idEmployee: string, user: User) => {
     saveUserData(user);
