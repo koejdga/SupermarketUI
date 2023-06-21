@@ -930,9 +930,13 @@ function App() {
     };
   };
 
+  const [sumTotal, setSumTotal] = useState(40);
+
   const saveCheck = async () => {
     const checksService = new ChecksService(isCashier, idEmployee);
     const check = createCheck();
+    setSumTotal(Number(check?.sum_total));
+    console.log(check?.sum_total);
     if (check) setCurrentCheck(check);
 
     let sales = checkRows.map((row) => tableRowToSale(row));
@@ -947,6 +951,7 @@ function App() {
     }
     console.log("Check is saved");
     console.log("TODO add alert check is saved");
+    return check?.sum_total;
   };
 
   const clearCheckValues = () => {
@@ -959,7 +964,8 @@ function App() {
     setChecksPageView(ShowOnChecksPage.showCheckInfo);
   };
 
-  const printCheck = () => {
+  const printCheck = (sumTotal: number) => {
+    console.log(sumTotal);
     const checkForPrinting = `<!DOCTYPE html>
     <html>
       <head>
@@ -1002,7 +1008,7 @@ function App() {
           )
           .join("")}
       <br />
-        <h3>Total: ${currentCheck?.sum_total}</h3>
+        <h3>Всього: ${sumTotal}</h3>
       
       </body>
     </html>`;
@@ -1858,11 +1864,13 @@ function App() {
                       className="print-check-button"
                       onClick={async () => {
                         try {
-                          await saveCheck();
+                          let sumTotal = await saveCheck();
+                          console.log(sumTotal);
+                          printCheck(sumTotal || 40);
                         } catch (error) {
                           console.log(error);
                         }
-                        printCheck();
+
                         clearCheckValues();
                         setShowAddCheckForm(false);
                       }}
