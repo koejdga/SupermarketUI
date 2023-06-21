@@ -333,6 +333,7 @@ function App() {
     if (newRow) {
       if (!editing) {
         console.log("creating");
+        console.log(newRow);
         currentService.createRow(newRow).then(() => {
           setUpdater(!updater);
         });

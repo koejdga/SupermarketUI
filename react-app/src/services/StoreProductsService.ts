@@ -189,6 +189,7 @@ class StoreProductsService extends Service {
   createRow = async (row: TableRow): Promise<void> => {
     try {
       let storeProduct = tableRowToStoreProductToPost(row);
+      console.log(storeProduct);
       await axios.post(this.postUpdateUrl, storeProduct, Service.config);
     } catch (error) {
       console.log(error);
