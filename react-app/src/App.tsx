@@ -290,6 +290,13 @@ function App() {
 
   const [valueForMinCost, setValueForMinCost] = useState("");
 
+  const [showSumOfSoldProducts, setShowSumOfSoldProducts] = useState(false);
+
+  const [minSum, setMinSum] = useState("0");
+
+  const [sumOfSoldProductsRows, setSumOfSoldProductsRows] =
+    useState<TableRow[]>();
+
   //#endregion
 
   //#region useEffect
@@ -882,10 +889,15 @@ function App() {
 
     let salesForDb = sales.map((sale) => saleToSaleForDb(sale));
 
-    if (currentCheck) await checksService.createCheck(currentCheck, salesForDb);
+    try {
+      if (check) await checksService.createCheck(check, salesForDb);
+    } catch (error) {
+      console.log(error);
+      console.log("Check is not saved");
+      return;
+    }
     console.log("Check is saved");
     console.log("TODO add alert check is saved");
-    setShowAddCheckForm(false);
   };
 
   const showCheckInfo = () => {
@@ -969,6 +981,24 @@ function App() {
     продано товарів на ${totalSum} гривень`;
   };
 
+  const getSumsForWorkers = async () => {
+    let sum;
+    try {
+      sum = Number(minSum);
+    } catch (error) {
+      showErrorFunction("Введіть число");
+      return;
+    }
+
+    try {
+      const response = await workersService.getSoldSumsOfWorkers(sum);
+      setSumOfSoldProductsRows(response);
+    } catch (error) {
+      console.log(error);
+      showErrorFunction("Помилка");
+    }
+  };
+
   //#endregion
 
   //#region Parts of return
@@ -1022,31 +1052,6 @@ function App() {
       </button>
     </div>
   );
-
-  const [showSumOfSoldProducts, setShowSumOfSoldProducts] = useState(false);
-
-  const [minSum, setMinSum] = useState("0");
-
-  const [sumOfSoldProductsRows, setSumOfSoldProductsRows] =
-    useState<TableRow[]>();
-
-  const getSumsForWorkers = async () => {
-    let sum;
-    try {
-      sum = Number(minSum);
-    } catch (error) {
-      showErrorFunction("Введіть число");
-      return;
-    }
-
-    try {
-      const response = await workersService.getSoldSumsOfWorkers(sum);
-      setSumOfSoldProductsRows(response);
-    } catch (error) {
-      console.log(error);
-      showErrorFunction("Помилка");
-    }
-  };
 
   const managerPage = (
     <div>
@@ -1294,11 +1299,11 @@ function App() {
                   магазині, ця група не відображається
                 </p>{" "}
                 Групи товарів:
-                <br />• перша (товари з ціною більшою, ніж 75% від найдорожчого
+                <br />• First (товари з ціною більшою, ніж 75% від найдорожчого
                 товару в цій категорії)
-                <br />• друга (товари з ціною більшою, ніж 25%, та меншою, ніж
+                <br />• Second (товари з ціною більшою, ніж 25%, та меншою, ніж
                 75% від найдорожчого товару в цій категорії)
-                <br />• третя (товари з ціною меншою, ніж 25% від найдорожчого
+                <br />• Third (товари з ціною меншою, ніж 25% від найдорожчого
                 товару в цій категорії)
               </label>
             </div>
@@ -1306,7 +1311,7 @@ function App() {
               className="column-container"
               style={{ alignItems: "center", height: "50px" }}
             >
-              <div>
+              <div style={{ display: "flex", gap: "0.3rem" }}>
                 <button
                   style={{ marginRight: "15px" }}
                   type="button"
@@ -1371,7 +1376,7 @@ function App() {
                   label="Відсоток знижки"
                   style={{ width: "180px" }}
                 />
-                <Tooltip title="Клієнт/ки, що купували хоч раз товари з кожної категорії у магазині">
+                <Tooltip title="Клієнт/ки з певного міста, що купували хоч раз товари з кожної категорії у магазині">
                   <FormControlLabel
                     control={<Checkbox />}
                     label="Активні"
@@ -1397,7 +1402,6 @@ function App() {
                     (ClientsService.city = event.target.value)
                   }
                   variant="outlined"
-                  // value={editedRow?.values[1] || ""}
                 />
               </div>
               <div style={{ marginRight: "25px" }}>
@@ -1785,6 +1789,7 @@ function App() {
                       className="save-check-button"
                       onClick={async () => {
                         await saveCheck();
+                        setShowAddCheckForm(false);
                       }}
                     >
                       Зберегти чек
