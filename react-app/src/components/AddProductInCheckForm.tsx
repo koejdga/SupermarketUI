@@ -41,10 +41,14 @@ const AddProductInCheckForm = ({ options, onAdd }: Props) => {
       try {
         await onAdd(upc, amount);
       } catch (error) {
-        showErrorFunction((error as Error).message);
+        showErrorFunction("Таке UPC уже наявне");
+        throw error;
       }
     }
   };
+
+  const [showAlertSameUPC, setShowAlertSameUPC] = useState(false);
+  const [alertMessageSameUPC, setAlertMessageSameUPC] = useState("Помилка");
 
   const showErrorFunction = (errorMessage?: string) => {
     if (errorMessage) {

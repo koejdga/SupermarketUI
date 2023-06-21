@@ -20,15 +20,20 @@ const AddStoreProductForm = ({
 }: Props) => {
   const [productNames, setProductNames] = useState<Option[]>();
 
-  useEffect(() => {
-    const fetchProductNames = async () => {
-      const productsService = new ProductsService();
-      const productNames = await productsService.getProductNamesOptions();
-      setProductNames(productNames);
-    };
+  try {
+    useEffect(() => {
+      const fetchProductNames = async () => {
+        const productsService = new ProductsService();
+        const productNames = await productsService.getProductNamesOptions();
+        setProductNames(productNames);
+      };
 
-    fetchProductNames();
-  }, [editedRow]);
+      fetchProductNames();
+    }, [editedRow]);
+  } catch (error) {
+    console.log(66);
+    throw error;
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

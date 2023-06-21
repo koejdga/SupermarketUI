@@ -46,6 +46,7 @@ import ReactDOMServer from "react-dom/server";
 import UserService, { User } from "./services/UserService";
 import { AxiosError } from "axios";
 import { formatDate } from "./utils/Utils";
+import AddStoreProductForm from "./components/AddStoreProductForm";
 
 function App() {
   //#region Services
@@ -220,6 +221,22 @@ function App() {
     "ПДВ",
   ];
   //#endregion
+  /*
+  const [showAlertUPC, setShowAlertUPC] = useState(false);
+  const [alertMessageUPC, setAlertMessageUPC] = useState("Помилка UPC");
+
+  if (addProductStoreError) {
+    setAlertMessageUPC("Помилка UPC");
+    setShowAlertUPC(true);
+    setTimeout(() => {
+      setShowAlertUPC(false);
+    }, 3000);
+  }*/
+
+  const handleCloseAlert = () => {
+    setShowError(false);
+    addProductStoreError = false;
+  };
 
   //#region Variables
 
@@ -789,11 +806,24 @@ function App() {
     if (errorMessage) {
       setErrorMessage(errorMessage);
     }
-    setShowError(true);
-    setTimeout(() => {
-      setShowError(false);
-    }, 3000);
+    if (errorMessage === "Помилка UPC") {
+      if (addProductStoreError) {
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+      }
+    } else {
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+    }
   };
+
+  if (addProductStoreError) {
+    showErrorFunction("Помилка UPC");
+  }
 
   const addCheckRowToUITable = (newRow: TableRow) => {
     if (checkRows.length === 0) {
@@ -1173,6 +1203,7 @@ function App() {
                     defaultValue={isPromotionalOptions[0]}
                     style={{ width: "200px" }}
                   />
+
                   <AutocompleteTextField
                     label="Сортування"
                     options={sortingStoreProductsOptions}
@@ -1181,6 +1212,7 @@ function App() {
                     style={{ width: "250px" }}
                   />
                 </div>
+
                 <div
                   style={{
                     display: "flex",
@@ -1202,6 +1234,7 @@ function App() {
                   />
                 </div>
               </div>
+
               <div>
                 {currentGet !== Get.UPC && (
                   <TableObject
@@ -2024,4 +2057,17 @@ function App() {
   );
 }
 
+let addProductStoreError = false;
+
+export function setErrorStoreProduct(alertMessage: string, isAlert: boolean) {
+  addProductStoreError = isAlert;
+}
+
 export default App;
+/*
+{showError && addProductStoreError && (
+  <AlertComponent
+    onClose={handleCloseAlert}
+    errorMessage={errorMessage}
+  />
+)}*/

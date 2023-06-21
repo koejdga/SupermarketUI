@@ -72,12 +72,15 @@ const EditOrCreateWindow = ({
 
   const handleSave = () => {
     console.log(saveNewRow);
-    if (saveNewRow) {
-      console.log(editedRow);
-      saveNewRow(editedRow);
-      setAlertMessageChange("Додано");
+    try {
+      if (saveNewRow) {
+        console.log(editedRow);
+        saveNewRow(editedRow);
+        setAlertMessageChange("Додано");
+      }
+    } catch (error) {
+      console.log(error);
     }
-
     setShowAlertChange(true);
     setTimeout(() => {
       setShowAlertChange(false);
@@ -97,7 +100,7 @@ const EditOrCreateWindow = ({
       aria-labelledby="offcanvasScrollingLabel"
       style={{ width: "400px" }}
     >
-      {showAlertChange && ( // Відображаємо спливаюче вікно, якщо showAlert === true
+      {showAlertChange && (
         <AlertComponent
           onClose={handleCloseAlert}
           errorMessage={alertMessageChange}
