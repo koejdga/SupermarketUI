@@ -40,7 +40,12 @@ import ProfileService from "./services/ProfileService";
 import CheckInfo from "./components/CheckInfo";
 import BasicCheckInfo from "./components/BasicCheckInfo";
 import Service from "./services/Service";
-import { Sale, saleToSaleForDb, saleToTableRow } from "./services/SalesService";
+import {
+  Sale,
+  saleToSaleForDb,
+  saleToTableRow,
+  tableRowToSale,
+} from "./services/SalesService";
 import { Worker } from "./services/WorkersService";
 import ReactDOMServer from "react-dom/server";
 import UserService, { User } from "./services/UserService";
@@ -823,6 +828,14 @@ function App() {
     }
   };
 
+  const deleteSaleFromSales = (rowIndex: string | number) => {
+    const updatedRows = checkRows.filter((row) => row.id !== rowIndex);
+    setCheckRows(updatedRows);
+
+    const updatedSales = sales.filter((sale) => sale.upc !== rowIndex);
+    setSales(updatedSales);
+  };
+
   const addCheckRow = async function (
     upc: string,
     amount: number
@@ -886,6 +899,7 @@ function App() {
     const check = createCheck();
     if (check) setCurrentCheck(check);
 
+    let sales = checkRows.map((row) => tableRowToSale(row));
     let salesForDb = sales.map((sale) => saleToSaleForDb(sale));
 
     try {
@@ -1824,6 +1838,8 @@ function App() {
                     <TableObject
                       columnNames={checkColumnNames}
                       rows={checkRows}
+                      deleteFunction={deleteSaleFromSales}
+                      onlyDeleteButton={true}
                     />
                   </div>
                 </div>
