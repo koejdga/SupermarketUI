@@ -30,6 +30,8 @@ interface Props {
   selectRow?: (row: TableRow) => void;
   saveNewRow?: (row: TableRow) => void;
   tableType?: TableType;
+  deleteFunction?: (rowIndex: string | number) => void;
+  onlyDeleteButton?: boolean;
 }
 
 export enum Get {
@@ -53,6 +55,7 @@ interface RowActionsProps {
   onSelect: (rowIndex: number | string) => void;
   onlyEditButton?: boolean;
   setEditing?: (editing: boolean) => void;
+  onlyDeleteButton?: boolean;
 }
 
 function RowActions({
@@ -61,6 +64,7 @@ function RowActions({
   onSelect,
   onlyEditButton = false,
   setEditing,
+  onlyDeleteButton,
 }: RowActionsProps) {
   const [showActions, setShowActions] = useState(false);
   const buttonARef = useRef<HTMLButtonElement>(null);
@@ -113,7 +117,9 @@ function RowActions({
           errorMessage={alertMessage}
         />
       )}
-      {!onlyEditButton && <button onClick={handleSelect}>Вибрати</button>}
+      {!onlyEditButton && !onlyDeleteButton && (
+        <button onClick={handleSelect}>Вибрати</button>
+      )}
       {showActions && (
         <div>
           <button
@@ -139,6 +145,7 @@ function RowActions({
           Редагувати
         </button>
       )}
+      {onlyDeleteButton && <button onClick={handleDelete}>Видалити</button>}
     </td>
   );
 }
@@ -156,6 +163,8 @@ function TableObject({
   selectRow,
   saveNewRow,
   tableType,
+  deleteFunction,
+  onlyDeleteButton,
 }: Props) {
   const [rows, setRows] = useState<TableRow[]>(initialRows || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | string>(-1);
@@ -187,7 +196,6 @@ function TableObject({
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
       } else if (getFunction === Get.ChecksDateRange) {
-        console.log("getting checks");
         if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
@@ -306,6 +314,11 @@ function TableObject({
       } catch (error) {
         showRowAlert("Не видалено");
       }
+    } else if (deleteFunction) {
+      deleteFunction(rowIndexDb);
+      const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
+      setRows(updatedRows);
+      showRowAlert("Видалено");
     } else {
       showRowAlert("Не видалено");
     }
@@ -381,6 +394,7 @@ function TableObject({
                     onSelect={handleSelectRow}
                     onlyEditButton={onlyEditButton}
                     setEditing={setEditing}
+                    onlyDeleteButton={onlyDeleteButton}
                   />
                 )}
 

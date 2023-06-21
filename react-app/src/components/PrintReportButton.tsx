@@ -7,7 +7,10 @@ import WorkersService, {
 import { Client, tableRowToClient } from "../services/ClientsService";
 import Service from "../services/Service";
 import { Category, tableRowToCategory } from "../services/CategoriesService";
-import { Product, tableRowToProduct } from "../services/ProductsService";
+import ProductsService, {
+  Product,
+  tableRowToProduct,
+} from "../services/ProductsService";
 import { convertStringToDate, formatDate } from "../utils/Utils";
 import ChecksService from "../services/ChecksService";
 
@@ -64,6 +67,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
     const rows = await service?.getRows().catch((error) => {
       console.log(error);
     });
+    console.log(rows);
     if (!rows) return "";
 
     switch (tableType) {
@@ -125,10 +129,8 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
         return categoriesReport;
       }
       case TableType.Products: {
-        let products: Product[] = [];
-        for (let i = 0; i < rows.length; i++) {
-          products.push(tableRowToProduct(rows[i]));
-        }
+        const productsService = new ProductsService();
+        const products = await productsService.getProducts();
 
         const productsReport = `<!DOCTYPE html>
         <html>
@@ -155,7 +157,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
             <table>
               <tr>
                 <th>ID</th>
-                <th>ID категорії</th>
+                <th>Категорія</th>
                 <th>Назва товару</th>
                 <th>Характеристики</th>
               </tr>
@@ -164,7 +166,7 @@ const PrintReportButton = ({ service, tableType, buttonStyle = {} }: Props) => {
                   (row) => `
                 <tr>
                   <td>${row.id_product}</td>
-                  <td>${row.category_number}</td>
+                  <td>${row.category_name}</td>
                   <td>${row.product_name}</td>
                   <td>${row.characteristics}</td>
                 </tr>

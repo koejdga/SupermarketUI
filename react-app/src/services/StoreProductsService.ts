@@ -49,14 +49,14 @@ export function tableRowToStoreProduct(tableRow: TableRow): StoreProduct {
   return product;
 }
 
-export async function tableRowToStoreProductToPost(
+export function tableRowToStoreProductToPost(
   tableRow: TableRow
-): Promise<StoreProductToPost> {
+): StoreProductToPost {
   const product: StoreProductToPost = {
     upc: tableRow.values[0],
     upc_prom: tableRow.values[1],
     id_product: Number(tableRow.values[2]),
-    selling_price: Number(tableRow.values[3]),
+    selling_price: tableRow.values[3] === "" ? -1 : Number(tableRow.values[3]),
     products_number: Number(tableRow.values[4]),
     promotional_product: tableRow.values[5] === "так" ? true : false,
   };
@@ -188,7 +188,7 @@ class StoreProductsService extends Service {
 
   createRow = async (row: TableRow): Promise<void> => {
     try {
-      let storeProduct = await tableRowToStoreProductToPost(row);
+      let storeProduct = tableRowToStoreProductToPost(row);
       await axios.post(this.postUpdateUrl, storeProduct, Service.config);
     } catch (error) {
       console.log(error);

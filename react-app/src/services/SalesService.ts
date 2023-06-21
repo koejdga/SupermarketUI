@@ -19,6 +19,16 @@ export function saleToSaleForDb(sale: Sale): SaleForDb {
   return { first: sale.upc, second: sale.products_number };
 }
 
+export function tableRowToSale(tableRow: TableRow): Sale {
+  return {
+    upc: tableRow.values[0],
+    product_name: tableRow.values[1],
+    products_number: Number(tableRow.values[2]),
+    selling_price: Number(tableRow.values[3]),
+    total: Number(tableRow.values[4]),
+  };
+}
+
 export function saleToTableRow(sale: Sale): TableRow {
   const values: string[] = [
     sale.upc,
