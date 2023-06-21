@@ -19,6 +19,7 @@ const AddStoreProductForm = ({
   columnNames,
 }: Props) => {
   const [productNames, setProductNames] = useState<Option[]>();
+  const [promotional, setPromotional] = useState(false);
 
   useEffect(() => {
     const fetchProductNames = async () => {
@@ -59,6 +60,7 @@ const AddStoreProductForm = ({
         variant="outlined"
         value={editedRow?.values[3] || ""}
         fullWidth
+        disabled={promotional}
       />
       <TextField
         className="text-field"
@@ -75,6 +77,7 @@ const AddStoreProductForm = ({
         key={"prom"}
         onChange={(event) => {
           console.log(event);
+          setPromotional(!promotional);
           handleChanges(5, "change checkbox");
         }}
       />

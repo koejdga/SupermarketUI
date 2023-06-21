@@ -1994,12 +1994,6 @@ function App() {
                         setDateRange={setChecksDateRangeCashier}
                       />
                     </div>
-                    <div style={{ width: "200px", marginLeft: "500px" }}>
-                      <TextField
-                        label={"Мінімальна ціна"}
-                        onChange={handleOnChangeForMinCost}
-                      />
-                    </div>
                   </div>
                   <TableObject
                     columnNames={checksColumnNames}
