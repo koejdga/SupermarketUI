@@ -397,7 +397,6 @@ function App() {
       checksDateRangeCashier[0] !== null &&
       checksDateRangeCashier[1] !== null
     ) {
-      console.log(checksDateRangeCashier[0]);
       ChecksService.left_date = checksDateRangeCashier[0];
       ChecksService.right_date = checksDateRangeCashier[1];
       setCurrentGet(Get.ChecksDateRange);
@@ -898,6 +897,12 @@ function App() {
     }
     console.log("Check is saved");
     console.log("TODO add alert check is saved");
+  };
+
+  const clearCheckValues = () => {
+    setSelectedClientCard("");
+    setSales([]);
+    setCheckRows([]);
   };
 
   const showCheckInfo = () => {
@@ -1789,6 +1794,7 @@ function App() {
                       className="save-check-button"
                       onClick={async () => {
                         await saveCheck();
+                        clearCheckValues();
                         setShowAddCheckForm(false);
                       }}
                     >
@@ -1804,6 +1810,8 @@ function App() {
                           console.log(error);
                         }
                         printCheck();
+                        clearCheckValues();
+                        setShowAddCheckForm(false);
                       }}
                     >
                       Роздрукувати чек
@@ -1983,6 +1991,7 @@ function App() {
                     updater={updater}
                     withButtons={false}
                     onDoubleClickRow={showCheckInfo}
+                    getFunction={currentGet}
                   />
                 </div>
               )}
@@ -2008,7 +2017,6 @@ function App() {
             </div>
           </>
         )}
-
         {whatTableIsVisible === Table.Profile && (
           <div style={{ width: "50%" }}>
             {idEmployee && <Profile id_employee={idEmployee} />}

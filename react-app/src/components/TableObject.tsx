@@ -187,7 +187,6 @@ function TableObject({
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);
       } else if (getFunction === Get.ChecksDateRange) {
-        console.log("getting checks");
         if (service) result = await service.getRows();
       } else if (getFunction === Get.OnlyCashiers) {
         let workersService = new WorkersService();
