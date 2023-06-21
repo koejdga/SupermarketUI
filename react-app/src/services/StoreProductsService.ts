@@ -1,7 +1,7 @@
 import axios from "axios";
 import TableRow from "../classes/TableRow";
 import Service from "./Service";
-import { setErrorStoreProduct } from "../App";
+//import { setErrorStoreProduct } from "../App";
 
 export interface StoreProduct {
   upc: string;
@@ -192,8 +192,8 @@ class StoreProductsService extends Service {
       await axios.post(this.postUpdateUrl, storeProduct, Service.config);
     } catch (error) {
       console.log(error);
-      setErrorStoreProduct("Помилка UPC", true);
-      //throw error;
+      // setErrorStoreProduct("Помилка UPC", true);
+      throw error;
     }
     console.log("added");
   };

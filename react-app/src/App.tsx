@@ -240,7 +240,7 @@ function App() {
 
   const handleCloseAlert = () => {
     setShowError(false);
-    addProductStoreError = false;
+    // addProductStoreError = false;
   };
 
   //#region Variables
@@ -817,24 +817,12 @@ function App() {
     if (errorMessage) {
       setErrorMessage(errorMessage);
     }
-    if (errorMessage === "Помилка UPC") {
-      if (addProductStoreError) {
-        setShowError(true);
-        setTimeout(() => {
-          setShowError(false);
-        }, 3000);
-      }
-    } else {
-      setShowError(true);
-      setTimeout(() => {
-        setShowError(false);
-      }, 3000);
-    }
-  };
 
-  if (addProductStoreError) {
-    showErrorFunction("Помилка UPC");
-  }
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+    }, 3000);
+  };
 
   const addCheckRowToUITable = (newRow: TableRow) => {
     if (checkRows.length === 0) {
@@ -2078,12 +2066,6 @@ function App() {
       {isLoggedIn && <div>{isCashier ? cashierPage : managerPage}</div>}
     </div>
   );
-}
-
-let addProductStoreError = false;
-
-export function setErrorStoreProduct(alertMessage: string, isAlert: boolean) {
-  addProductStoreError = isAlert;
 }
 
 export default App;
