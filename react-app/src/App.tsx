@@ -315,20 +315,34 @@ function App() {
 
   const [updater, setUpdater] = useState(true);
   useEffect(() => {
-    if (newRow) {
-      if (!editing) {
-        console.log("creating");
-        console.log(newRow);
-        currentService.createRow(newRow).then(() => {
-          setUpdater(!updater);
-        });
-      } else {
-        console.log("updating row, row id = " + newRow.id);
-        currentService.updateRow(newRow.id, newRow).then(() => {
-          setUpdater(!updater);
-        });
+    const handleCreateOrEdit = async () => {
+      if (newRow) {
+        if (!editing) {
+          console.log("creating");
+          console.log(newRow);
+          try {
+            await currentService.createRow(newRow).then(() => {
+              setUpdater(!updater);
+            });
+          } catch (error) {
+            console.log("Не вдалося створити об'єкт");
+            showErrorFunction("Не вдалося створити об'єкт");
+          }
+        } else {
+          console.log("updating row, row id = " + newRow.id);
+          try {
+            await currentService.updateRow(newRow.id, newRow).then(() => {
+              setUpdater(!updater);
+            });
+          } catch (error) {
+            console.log("Не вдалося відредагувати об'єкт");
+            showErrorFunction("Не вдалося відредагувати об'єкт");
+          }
+        }
       }
-    }
+    };
+
+    handleCreateOrEdit();
   }, [newRow]);
 
   useEffect(() => {
