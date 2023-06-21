@@ -115,6 +115,22 @@ class ProductsService extends Service {
     }
   }
 
+  async getRowsById(name: string): Promise<TableRow[]> {
+    try {
+      console.log(name);
+      console.log(this.baseUrl + "/" + name);
+      const response = await axios.get(
+        this.baseUrl + "/" + name,
+        Service.config
+      );
+      console.log(response);
+      return response.data.map((row: any) => productToTableRow(row));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getAmountOfSoldProduct(): Promise<number> {
     try {
       if (!ProductsService.id) return -1;

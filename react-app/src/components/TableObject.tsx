@@ -189,9 +189,8 @@ function TableObject({
         console.log("category");
       } else if (getFunction === Get.ProductName) {
         let productsService = new ProductsService();
-        result = await productsService.getRowsByName(
-          ProductsService.productName
-        );
+        result = await productsService.getRowsById(ProductsService.productName);
+        console.log(result);
       } else if (getFunction === Get.ClientSurname) {
         let clientsService = new ClientsService();
         result = await clientsService.getRowsBySurname(ClientsService.surname);

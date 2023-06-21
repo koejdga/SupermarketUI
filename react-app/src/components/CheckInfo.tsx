@@ -58,9 +58,9 @@ const CheckInfo = ({ checkNumber, checkColumnNames }: Props) => {
             </div>
 
             <div>
-              <label>Загальна сума: {check.sum_total}</label>
+              <label>Загальна сума: {check.sum_total} грн.</label>
               <br />
-              <label>ПДВ: {check.vat}</label>
+              <label>ПДВ: {check.vat} грн.</label>
             </div>
           </div>
           <TableObject

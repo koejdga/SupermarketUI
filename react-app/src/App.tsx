@@ -117,6 +117,7 @@ function App() {
       setCurrentService(productsService);
     },
     () => {
+      StoreProductsService.UPC = "";
       setTableVisible(Table.StoreProducts);
       setCurrentService(storeProductsService);
     },
@@ -560,6 +561,7 @@ function App() {
   const handleOnChangeProductName = (value: string) => {
     ProductsService.productName = value;
     if (value !== "") {
+      console.log(value);
       setCurrentGet(Get.ProductName);
     } else setCurrentGet(Get.Default);
   };
