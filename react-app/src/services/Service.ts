@@ -40,7 +40,8 @@ abstract class Service {
       return true;
     } catch (error) {
       console.log(error);
-      return false;
+      throw error;
+      // return false;
     }
   }
 }

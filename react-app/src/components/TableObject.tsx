@@ -301,16 +301,17 @@ function TableObject({
     showRowAlert("Скасовано");
   };
 
-  const handleDeleteRow = (rowIndexDb: number | string) => {
+  const handleDeleteRow = async (rowIndexDb: number | string) => {
     if (service) {
       try {
-        service.deleteRow(rowIndexDb);
+        await service.deleteRow(rowIndexDb);
         const updatedRows = rows.filter((row) => row.id !== rowIndexDb);
         setRows(updatedRows);
         console.log(rowIndexDb + " - row index database");
 
         showRowAlert("Видалено");
       } catch (error) {
+        console.log(error);
         showRowAlert("Не видалено");
       }
     } else if (deleteFunction) {
